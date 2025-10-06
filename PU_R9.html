@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Badminton Pair-UP</title>
+  <style>
+   /* === GLOBAL === */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #3b0073, #7d00b8);
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
+}
+header {
+  padding: 10px;
+}
+h1 {
+  font-size: 42px;
+  margin: 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #3a1818;
+}
+h4 {
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+/* === PAGE 1: Player Entry / Setup === */
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+.card {
+  background: white;
+  color: purple;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.card input, .card select, .card button, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+.card button {
+  background: purple;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+.card button:hover {
+  background: #5e009c;
+  transform: scale(1.05);
+}
+#player-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2px;
+}
+#player-list-table th, #player-list-table td {
+  border: 1px solid #ccc;
+  padding: 2px 4px;
+  text-align: left;
+  font-size: 12px;
+}
+#player-list-table th {
+  background: #f2f2f2;
+}
+.delete-btn {
+  background: none;
+  border: none;
+  color: #d11a2a;
+  font-size: 16px;
+  cursor: pointer;
+}
+.delete-btn:hover {
+  color: #a00;
+}
+.fixed-pairs-list {
+  margin-top: 10px;
+}
+.fixed-pair-item {
+  background: #eee;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.fixed-pair-remove {
+  color: #d11a2a;
+  cursor: pointer;
+  margin-left: 12px;
+}
+.fixed-pair-remove:hover {
+  color: #a00;
+}
+.main-action {
+  display: block;
+  width: 100%;
+  background: orange;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s, transform 0.2s;
+}
+.main-action:hover {
+  background: #ffb84d;
+  transform: scale(1.05);
+}
+
+/* === Modal === */
+#importModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+}
+#importModal .modal-content {
+  background: white;
+  color: black;
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+#importModal button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* === PAGE 2: Match Results / Court Layout === */
+#game-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 5px 5px;
+  background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
+  min-height: 40vh;
+}
+
+.match-card {
+  background: white;
+  color: #3b0073;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.match-card h3 {
+  color: #3b0073;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.match-card .teams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+}
+
+.Lplayer-btn {
+  background: #009c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.Lplayer-btn:hover {
+  background: #34995b;
+  transform: scale(1.03);
+}
+.Rplayer-btn {
+  background: #0494ad;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.Rplayer-btn:hover {
+  background: #3f8e9c;
+  transform: scale(1.03);
+}
+
+.vs-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #3b0073;
+}
+
+.match-time {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #3b0073;
+  font-weight: 600;
+}
+
+.swipe-hint {
+  font-size: 14px;
+  color: #ccc;
+  margin-top: 30px;
+  text-align: center;
+}
+
+/* === NEW: Round Navigation (Improved) === */
+.round-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 15px;
+  padding: 5px;
+  background: linear-gradient(135deg, #2a2a72, #009ffd);
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.round-navigation .round-label {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.round-navigation button {
+  background: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-width: 50px;
+}
+
+.round-navigation button:hover:enabled {
+  background: #009ffd;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.round-navigation button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .match-card {
+    width: 95%;
+    padding: 18px;
+  }
+  .teams {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .team {
+    width: 48%;
+  }
+  .round-navigation {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .round-navigation .round-label {
+    font-size: 0.9rem;
+  }
+}
+
+  </style>
+</head>
+<body onload="initPage()">
+
+  <!-- Page 1 -->
+  <div id="page1">
+    <div class="container">
+      <h1>Badminton Setup</h1>
+
+      <!-- Import Players -->
+      <div class="card">
+        <h3>Import Players</h3>
+        <button onclick="showImportModal()">Paste All Players</button>
+      </div>
+
+      <!-- Modal -->
+      <div id="importModal">
+        <div class="modal-content">
+          <h3>Paste Players List</h3>
+          <textarea id="players-textarea" rows="8" placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
+          <button onclick="addPlayersFromText()">OK</button>
+          <button onclick="hideImportModal()" style="background:#d11a2a; color:white;">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Add Player Form -->
+      <div class="card">
+        <h3>Add Players</h3>
+        <input type="text" id="player-name" placeholder="Enter Player Name">
+        <select id="player-gender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        <button onclick="addPlayer()">Add Player</button>
+      </div>
+
+      <!-- Players List -->
+      <div class="card">
+        <h3>Players List</h3>
+        <table id="player-list-table"></table>
+      </div>
+
+      <!-- Fixed Pairs -->
+      <div class="card">
+        <h3>Set Fixed Pairs (Optional)</h3>
+        <select id="fixed-pair-1"></select>
+        <select id="fixed-pair-2"></select>
+        <button onclick="addFixedPair()">Add Fixed Pair</button>
+        <div id="fixed-pair-list" class="fixed-pairs-list"></div>
+      </div>
+
+      <!-- Game Setup -->
+      <div class="card">
+        <!--<h3>Setup Matches</h3> -->
+        <input type="number" id="num-courts" placeholder="Enter Number of Courts" min="1">
+        <button onclick="generateGames(); goToRounds();">Generate Games</button>
+      </div>
+
+      <!-- Go to Rounds -->
+      <button class="main-action" onclick="goToRounds()">Go to Rounds ➡️</button>
+    </div>
+  </div>
+
+  <!-- Page 2 -->
+  <div id="page2" style="display:none;">
+    <header>
+      <!--<h1>BADMINTON</h1> -->
+      <h4 id="roundTitle">Championship</h4>
+    </header>
+
+    <div id="game-results"></div>
+
+    <div class="round-navigation">      
+      <button id="prevBtn" onclick="prevRound()" disabled>←Prev</button>
+      <button id="nextBtn" onclick="nextRound()" disabled>Next→</button>
+    </div>
+
+    <!-- Back button -->
+     <button class="main-action" onclick="goBack()">Back</button>
+    <!--<button onclick="goBack()" style="margin:20px auto; display:block;">Back</button>-->
+  </div>
+
+  <script>
+    // ===== Global Player List & State =====
+    let players = [];
+    let allRounds = [];
+    let currentRoundIndex = 0;
+    let fixedPairs = [];
+
+    function goToRounds() {
+      document.getElementById("page1").style.display = 'none';
+      document.getElementById("page2").style.display = 'block';
+    }
+    function goBack() {
+      document.getElementById("page1").style.display = 'block';
+      document.getElementById("page2").style.display = 'none';
+    }
+    function initPage() {
+      document.getElementById("page1").style.display = 'block';
+      document.getElementById("page2").style.display = 'none';
+    }
+
+    // ===== Import Modal =====
+    function showImportModal() { document.getElementById('importModal').style.display = 'block'; }
+    function hideImportModal() {
+      document.getElementById('importModal').style.display = 'none';
+      document.getElementById('players-textarea').value = '';
+    }
+    function addPlayersFromText() {
+      const text = document.getElementById('players-textarea').value.trim();
+      if (!text) return;
+      const lines = text.split(/\r?\n/);
+      let addedCount = 0;
+      lines.forEach(line => {
+        const parts = line.split(',');
+        const name = (parts[0] || '').trim();
+        let gender = "Male"; // Default gender
+        if (parts.length >= 2 && parts[1].trim()) gender = parts[1].trim();
+        if (name) {
+          players.push({ name, gender });
+          addedCount++;
+        }
+      });
+      updatePlayerList();
+      updateFixedPairSelectors();
+      alert(addedCount + " players added!");
+      hideImportModal();
+    }
+
+    // ===== Add Player =====
+    function addPlayer() {
+      const name = document.getElementById('player-name').value.trim();
+      const gender = document.getElementById('player-gender').value;
+      if (name && gender) {
+        players.push({ name, gender });
+        updatePlayerList();
+        clearPlayerForm();
+        updateFixedPairSelectors();
+      }
+    }
+
+    // ===== Update Player List =====
+    function updatePlayerList() {
+      const table = document.getElementById('player-list-table');
+      table.innerHTML = '<tr><th>Name</th><th>Gender</th><th>Action</th></tr>';
+      players.forEach((p, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <input type="text" value="${p.name}" onchange="editPlayer(${i}, 'name', this.value)">
+          </td>
+          <td>
+            <select onchange="editPlayer(${i}, 'gender', this.value)">
+              <option value="Male" ${p.gender === 'Male' ? 'selected' : ''}>Male</option>
+              <option value="Female" ${p.gender === 'Female' ? 'selected' : ''}>Female</option>
+            </select>
+          </td>
+          <td>
+            <button class="delete-btn" onclick="deletePlayer(${i})">Delete</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+      updateFixedPairSelectors();
+    }
+
+    // ===== Edit Player =====
+    function editPlayer(index, field, value) {
+      players[index][field] = value.trim();
+      updateFixedPairSelectors();
+    }
+
+    // ===== Delete Player =====
+    function deletePlayer(index) {
+      players.splice(index, 1);
+      updatePlayerList();
+      updateFixedPairSelectors();
+    }
+
+    // ===== Update Fixed Pair Dropdowns =====
+    function updateFixedPairSelectors() {
+      const sel1 = document.getElementById('fixed-pair-1');
+      const sel2 = document.getElementById('fixed-pair-2');
+      sel1.innerHTML = ''; sel2.innerHTML = '';
+      players.forEach(p => {
+        sel1.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+        sel2.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+      });
+    }
+
+    // ===== Add/Remove Fixed Pair =====
+    function addFixedPair() {
+      const pair1 = document.getElementById('fixed-pair-1').value;
+      const pair2 = document.getElementById('fixed-pair-2').value;
+      if (pair1 && pair2 && pair1 !== pair2) {
+        fixedPairs.push([pair1, pair2]);
+        const div = document.createElement('div');
+        div.classList.add('fixed-pair-item');
+        div.innerHTML = `${pair1} & ${pair2} <span class="fixed-pair-remove" onclick="removeFixedPair(this, '${pair1}', '${pair2}')">Remove</span>`;
+        document.getElementById('fixed-pair-list').appendChild(div);
+      }
+    }
+    function removeFixedPair(el, p1, p2) {
+      fixedPairs = fixedPairs.filter(pair => !(pair[0] === p1 && pair[1] === p2));
+      el.parentElement.remove();
+    }
+
+    // ===== Clear Player Form =====
+    function clearPlayerForm() {
+      document.getElementById('player-name').value = '';
+      document.getElementById('player-gender').value = 'Male';
+    }
+
+    // ===== Generate Games =====
+    function generateGames() {
+      const numRounds = 100; // or make this configurable
+      if (players.length < 4) { alert("Need at least 4 players."); return; }
+      let numCourts = parseInt(document.getElementById('num-courts').value);
+      if (!numCourts || numCourts < 1) { alert("Enter number of courts."); return; }
+      if (players.length / 4 < numCourts) {
+        numCourts = Math.floor(players.length / 4);
+        if (numCourts < 1) numCourts = 1;
+      }
+      const playerNames = players.map(p => p.name);
+      allRounds = scheduleDoublesRoundsWithRestart(playerNames, numCourts, numRounds);
+      //  allRounds = scheduleUniquePairRoundsWithFixedAndCirculatedResting(playerNames, numCourts, fixedPairs);
+      currentRoundIndex = 0;
+      showRound(currentRoundIndex);
+      document.getElementById('prevBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = allRounds.length <= 1;
+    }
+
+    // ===== Scheduling Function =====
+    function scheduleDoublesRoundsWithRestart(players, numCourts, totalRounds = 100, fixedPairs = []) {
+      const numPlayersPerRound = numCourts * 4;
+      const totalPlayers = players.length;
+      const numResting = totalPlayers > numPlayersPerRound ? totalPlayers - numPlayersPerRound : 0;
+
+      // Generate all possible pairs
+      const allPossiblePairs = new Set();
+      for (let i = 0; i < totalPlayers; i++) {
+        for (let j = i + 1; j < totalPlayers; j++) {
+          allPossiblePairs.add([players[i], players[j]].sort().join(' & '));
+        }
+      }
+
+      let rotatedPlayers = [...players];
+      let playedPairs = new Set();
+      const rounds = [];
+      let cycle = 1;
+
+      for (let round = 0; round < totalRounds; round++) {
+        // 1. Select resting and playing players
+        let resting = [];
+        let playing = [];
+        if (numResting > 0) {
+          resting = rotatedPlayers.slice(-numResting);
+          playing = rotatedPlayers.slice(0, numPlayersPerRound);
+        } else {
+          resting = [];
+          playing = [...rotatedPlayers];
+        }
+
+        // 2. Assign fixed pairs first
+        let usedPlayers = new Set();
+        let pairs = [];
+        for (let pair of fixedPairs) {
+          if (playing.includes(pair[0]) && playing.includes(pair[1]) &&
+              !usedPlayers.has(pair[0]) && !usedPlayers.has(pair[1])) {
+            let pairStr = [pair[0], pair[1]].sort().join(' & ');
+            if (!playedPairs.has(pairStr)) {
+              pairs.push([pair[0], pair[1]]);
+              usedPlayers.add(pair[0]);
+              usedPlayers.add(pair[1]);
+              playedPairs.add(pairStr);
+            }
+          }
+        }
+
+        // 3. Shuffle remaining players
+        let freePlayers = playing.filter(p => !usedPlayers.has(p));
+        freePlayers = freePlayers.sort(() => Math.random() - 0.5);
+
+        // 4. Make pairs, prioritizing unused pairs
+        for (let i = 0; i + 1 < freePlayers.length; i += 2) {
+          let p1 = freePlayers[i];
+          let p2 = freePlayers[i + 1];
+          let pairStr = [p1, p2].sort().join(' & ');
+          let tries = 0;
+          // If already used, try to swap with someone later in the list
+          while (playedPairs.has(pairStr) && tries < freePlayers.length) {
+            let swapped = false;
+            for (let j = i + 2; j < freePlayers.length; j++) {
+              let alt = freePlayers[j];
+              let altPairStr = [p1, alt].sort().join(' & ');
+              if (!playedPairs.has(altPairStr)) {
+                // Swap
+                [freePlayers[i + 1], freePlayers[j]] = [freePlayers[j], freePlayers[i + 1]];
+                p2 = alt;
+                pairStr = altPairStr;
+                swapped = true;
+                break;
+              }
+            }
+            if (!swapped) break;
+            tries++;
+          }
+          pairs.push([p1, p2]);
+          playedPairs.add(pairStr);
+        }
+
+        // 5. If all pairs used up, reset for next cycle
+        if (playedPairs.size >= allPossiblePairs.size) {
+          playedPairs = new Set();
+          cycle++;
+        }
+
+        // 6. Assign pairs to courts
+        let games = [];
+        for (let i = 0; i < numCourts; i++) {
+          const pair1 = pairs[i * 2];
+          const pair2 = pairs[i * 2 + 1];
+          games.push({ court: i + 1, pair1, pair2 });
+        }
+
+        // 7. Save round info
+        rounds.push({
+          round: round + 1,
+          cycle: cycle,
+          resting: resting,
+          playing: playing,
+          games: games
+        });
+
+        // 8. Rotate: move resting to front for next round
+        rotatedPlayers = numResting > 0 ? resting.concat(playing) : rotatedPlayers;
+      }
+
+      return rounds;
+    }
+
+    function scheduleUniquePairRoundsWithFixedAndCirculatedResting(players, numCourts, fixedPairs) {
+      const numPlayersPerRound = numCourts * 4;
+      const numResting = players.length - numPlayersPerRound;
+      const numRounds = numResting > 0 ? Math.ceil(players.length / numResting) : 1;
+      let rotatedPlayers = [...players];
+      const rounds = [];
+      for (let round = 0; round < numRounds; round++) {
+        let restingPlayers = [];
+        let playingPlayers = [];
+        if (numResting > 0) {
+          restingPlayers = rotatedPlayers.slice(-numResting);
+          playingPlayers = rotatedPlayers.slice(0, numPlayersPerRound);
+        } else {
+          restingPlayers = [];
+          playingPlayers = [...rotatedPlayers];
+        }
+        let usedPlayers = new Set();
+        let pairs = [];
+        // Fixed pairs
+        for (let pair of fixedPairs) {
+          if (playingPlayers.includes(pair[0]) && playingPlayers.includes(pair[1]) &&
+              !usedPlayers.has(pair[0]) && !usedPlayers.has(pair[1])) {
+            pairs.push(pair);
+            usedPlayers.add(pair[0]);
+            usedPlayers.add(pair[1]);
+          }
+        }
+        // Random pairs
+        let freePlayers = playingPlayers.filter(p => !usedPlayers.has(p));
+        freePlayers = freePlayers.sort(() => Math.random() - 0.5);
+        for (let i = 0; i + 1 < freePlayers.length; i += 2) {
+          pairs.push([freePlayers[i], freePlayers[i + 1]]);
+        }
+        // Courts
+        let roundMatches = [];
+        for (let i = 0; i < numCourts; i++) {
+          const pair1 = pairs[i * 2];
+          const pair2 = pairs[i * 2 + 1];
+          roundMatches.push({ court: i + 1, pair1, pair2 });
+        }
+        rounds.push({
+          round: round + 1,
+          resting: restingPlayers,
+          playing: playingPlayers,
+          games: roundMatches
+        });
+        // Rotate for next round
+        rotatedPlayers = numResting > 0 ? restingPlayers.concat(playingPlayers) : rotatedPlayers;
+      }
+      return rounds;
+    }
+
+// ===== Show Specific Round with Match-Cards =====
+function showRound(index) {
+    const resultsDiv = document.getElementById('game-results');
+    resultsDiv.innerHTML = '';
+
+    const roundData = allRounds[index];
+
+    // Update round title
+    document.getElementById("roundTitle").innerText = 
+      `Round ${roundData.round}`;
+
+    // Round header (resting players)
+    const roundHeader = document.createElement('div');
+    roundHeader.className = 'round-header';
+    roundHeader.innerText = `Resting: ${roundData.resting.join(', ') || 'None'}`;
+    resultsDiv.appendChild(roundHeader);
+
+    // Render each court match as a card
+    roundData.games.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+        
+        //const title = document.createElement('h3');
+        //title.innerText = `Court ${game.court}`;
+        //card.appendChild(title);
+        
+        const teamsDiv = document.createElement('div');
+        teamsDiv.className = 'teams';
+
+        // Team 1
+        const team1Div = document.createElement('div');
+        team1Div.className = 'team';
+        (game.pair1 || []).forEach(player => {
+            const btn = document.createElement('button');
+            btn.className = 'Lplayer-btn';
+            btn.innerText = player;
+            btn.onclick = () => selectPlayer(player);
+            team1Div.appendChild(btn);
+        });
+
+        // VS
+        const vsSpan = document.createElement('span');
+        vsSpan.className = 'vs';
+        vsSpan.innerText = "VS";
+
+        // Team 2
+        const team2Div = document.createElement('div');
+        team2Div.className = 'team';
+        (game.pair2 || []).forEach(player => {
+            const btn = document.createElement('button');
+            btn.className = 'Rplayer-btn';
+            btn.innerText = player;
+            btn.onclick = () => selectPlayer(player);
+            team2Div.appendChild(btn);
+        });
+
+        teamsDiv.appendChild(team1Div);
+        teamsDiv.appendChild(vsSpan);
+        teamsDiv.appendChild(team2Div);
+        card.appendChild(teamsDiv);
+
+        resultsDiv.appendChild(card);
+    });
+
+    // Prev/Next buttons enable/disable
+    document.getElementById('prevBtn').disabled = index === 0;
+    document.getElementById('nextBtn').disabled = index === allRounds.length - 1;
+}
+
+// ===== Next / Previous Round =====
+
+        function nextRound() {
+
+            if (currentRoundIndex < allRounds.length - 1) {
+
+                currentRoundIndex++;
+
+                showRound(currentRoundIndex);
+
+            }
+
+        }
+
+        function prevRound() {
+
+            if (currentRoundIndex > 0) {
+
+                currentRoundIndex--;
+
+                showRound(currentRoundIndex);
+
+            }
+
+        }
+
+
+  </script>
+</body>
+</html>
