@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Badminton Pair-UP</title>
   <style>
-/* === GLOBAL === */
+   /* === GLOBAL === */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -13,7 +13,6 @@ body {
   color: white;
   text-align: center;
   overflow-x: hidden;
-  -webkit-text-size-adjust: 100%; /* Prevent iOS zoom adjustments */
 }
 header {
   padding: 10px;
@@ -32,6 +31,8 @@ h3 {
 }
 h4 {
   font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 10px;
   margin: 0;
   padding: 0;
 }
@@ -52,9 +53,9 @@ h4 {
 }
 .card input, .card select, .card button, textarea {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   margin: 8px 0;
-  font-size: 17px; /* ✅ Increased to prevent zoom */
+  font-size: 16px;
   border-radius: 6px;
   border: 1px solid #ccc;
   box-sizing: border-box;
@@ -78,9 +79,9 @@ h4 {
 }
 #player-list-table th, #player-list-table td {
   border: 1px solid #ccc;
-  padding: 4px 6px;
+  padding: 2px 4px;
   text-align: left;
-  font-size: 16px; /* ✅ Increased from 12px */
+  font-size: 12px;
 }
 #player-list-table th {
   background: #f2f2f2;
@@ -89,7 +90,7 @@ h4 {
   background: none;
   border: none;
   color: #d11a2a;
-  font-size: 18px; /* ✅ Larger for iOS tap */
+  font-size: 16px;
   cursor: pointer;
 }
 .delete-btn:hover {
@@ -101,19 +102,17 @@ h4 {
 .fixed-pair-item {
   background: #eee;
   color: black;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 6px;
   margin: 5px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 17px;
 }
 .fixed-pair-remove {
   color: #d11a2a;
   cursor: pointer;
   margin-left: 12px;
-  font-size: 18px;
 }
 .fixed-pair-remove:hover {
   color: #a00;
@@ -125,7 +124,7 @@ h4 {
   color: black;
   font-size: 20px;
   font-weight: bold;
-  padding: 16px;
+  padding: 14px;
   border-radius: 8px;
   margin-top: 20px;
   cursor: pointer;
@@ -153,13 +152,11 @@ h4 {
   margin: 100px auto;
   padding: 20px;
   border-radius: 10px;
-  font-size: 17px;
 }
 #importModal button {
   margin-top: 10px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 6px;
-  font-size: 17px;
 }
 
 /* === PAGE 2: Match Results / Court Layout === */
@@ -168,7 +165,7 @@ h4 {
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  padding: 5px;
+  padding: 5px 5px 5px;
   background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
   min-height: 40vh;
 }
@@ -205,29 +202,32 @@ h4 {
   width: 45%;
 }
 
-.Lplayer-btn, .Rplayer-btn {
-  border: none;
-  border-radius: 6px;
-  font-size: 17px; /* ✅ Increased */
-  padding: 12px;
-  margin: 4px 0;
-  text-align: center;
-  transition: transform 0.2s, background 0.2s;
-}
-
 .Lplayer-btn {
   background: #009c3c;
   color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .Lplayer-btn:hover {
   background: #34995b;
   transform: scale(1.03);
 }
-
 .Rplayer-btn {
   background: #0494ad;
   color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .Rplayer-btn:hover {
@@ -243,13 +243,13 @@ h4 {
 
 .match-time {
   margin-top: 10px;
-  font-size: 17px;
+  font-size: 16px;
   color: #3b0073;
   font-weight: 600;
 }
 
 .swipe-hint {
-  font-size: 16px;
+  font-size: 14px;
   color: #ccc;
   margin-top: 30px;
   text-align: center;
@@ -260,9 +260,9 @@ h4 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 25px;
   margin-top: 15px;
-  padding: 8px;
+  padding: 5px;
   background: linear-gradient(135deg, #2a2a72, #009ffd);
   border-radius: 12px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
@@ -271,15 +271,15 @@ h4 {
 .round-navigation .round-label {
   color: #fff;
   font-weight: 600;
-  font-size: 17px; /* ✅ Increased */
+  font-size: 1rem;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .round-navigation button {
   background: #fff;
   border: none;
-  padding: 10px 18px;
-  font-size: 17px; /* ✅ Increased */
+  padding: 8px 16px;
+  font-size: 0.95rem;
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
@@ -316,7 +316,7 @@ h4 {
     gap: 10px;
   }
   .round-navigation .round-label {
-    font-size: 16px;
+    font-size: 0.9rem;
   }
 }
 
@@ -375,11 +375,13 @@ h4 {
       <div class="card">
         <!--<h3>Setup Matches</h3> -->
         <input type="number" id="num-courts" placeholder="Enter Number of Courts" min="1">
-        <button onclick="generateGames(); goToRounds();">Generate Games</button>
+        <button onclick="generateGames(); enableRoundsButton(); goToRounds(); ">Generate Games</button>
       </div>
 
-      <!-- Go to Rounds -->
-      <button class="main-action" onclick="goToRounds()">Go to Rounds ➡️</button>
+      <!-- Go to Rounds -->    
+       <button id="goToRoundsBtn" class="main-action" onclick="goToRounds()" style="display:none;">Go to Rounds ➡️</button>
+
+      <!--<button class="main-action" onclick="goToRounds()" style="display:none;">Go to Rounds ➡️</button>            -->
     </div>
   </div>
 
@@ -393,8 +395,8 @@ h4 {
     <div id="game-results"></div>
 
     <div class="round-navigation">      
-      <button id="prevBtn" onclick="prevRound()" disabled>←Prev</button>
-      <button id="nextBtn" onclick="nextRound()" disabled>Next→</button>
+      <button id="prevBtn" onclick="prevRound()" disabled>Prev Round</button>
+      <button id="nextBtn" onclick="nextRound()" disabled>NextRound</button>
     </div>
 
     <!-- Back button -->
@@ -408,7 +410,14 @@ h4 {
     let allRounds = [];
     let currentRoundIndex = 0;
     let fixedPairs = [];
+    let ShowRoundFlag = false;
+    
 
+    function enableRoundsButton() {
+      //ShowRoundFlag = true;
+    const btn = document.getElementById("goToRoundsBtn");
+    btn.style.display = "block";  // show the button
+    }
     function goToRounds() {
       document.getElementById("page1").style.display = 'none';
       document.getElementById("page2").style.display = 'block';
@@ -544,7 +553,7 @@ h4 {
         if (numCourts < 1) numCourts = 1;
       }
       const playerNames = players.map(p => p.name);
-      allRounds = scheduleDoublesRoundsWithRestart(playerNames, numCourts, numRounds);
+      allRounds = scheduleDoublesRoundsWithRestart(playerNames, numCourts, numRounds,fixedPairs);
       //  allRounds = scheduleUniquePairRoundsWithFixedAndCirculatedResting(playerNames, numCourts, fixedPairs);
       currentRoundIndex = 0;
       showRound(currentRoundIndex);
@@ -554,6 +563,136 @@ h4 {
 
     // ===== Scheduling Function =====
     function scheduleDoublesRoundsWithRestart(players, numCourts, totalRounds = 100, fixedPairs = []) {
+      const numPlayersPerRound = numCourts * 4;
+      const totalPlayers = players.length;
+      const numResting = totalPlayers > numPlayersPerRound ? totalPlayers - numPlayersPerRound : 0;
+
+      // Generate all possible pairs
+      const allPossiblePairs = new Set();
+      for (let i = 0; i < totalPlayers; i++) {
+        for (let j = i + 1; j < totalPlayers; j++) {
+          allPossiblePairs.add([players[i], players[j]].sort().join(' & '));
+        }
+      }
+      
+      // Interleave fixed pairs
+      let dynamicPlayers = [...players];
+  const fixedPlayersSet = new Set(fixedPairs.flat());
+  dynamicPlayers = dynamicPlayers.filter(p => !fixedPlayersSet.has(p));
+  let mergedPlayers = [];
+  let dynamicIndex = 0;
+  let fixedIndex = 0;
+  for (let i = 0; i < totalPlayers; i++) {
+  // Insert fixed pair every 'numResting' dynamic players
+    if (i % numResting === 0 && fixedIndex < fixedPairs.length) {
+      mergedPlayers.push(...fixedPairs[fixedIndex++]);      
+      i++
+    } else if (dynamicIndex < dynamicPlayers.length) {
+      mergedPlayers.push(dynamicPlayers[dynamicIndex++]);      
+   
+    }
+  }
+
+      let rotatedPlayers = [...mergedPlayers];
+      let playedPairs = new Set();
+      let playedagainst = new Set();
+      const rounds = [];
+      let cycle = 1;
+
+      for (let round = 0; round < totalRounds; round++) {
+        // 1. Select resting and playing players
+        let resting = [];
+        let playing = [];
+        if (numResting > 0) {
+          resting = rotatedPlayers.slice(-numResting);
+          playing = rotatedPlayers.slice(0, numPlayersPerRound);
+        } else {
+          resting = [];
+          playing = [...rotatedPlayers];
+        }
+
+        // 2. Assign fixed pairs first
+        let usedPlayers = new Set();
+        let pairs = [];
+        for (let pair of fixedPairs) {
+          if (playing.includes(pair[0]) && playing.includes(pair[1]) &&
+              !usedPlayers.has(pair[0]) && !usedPlayers.has(pair[1])) {
+            let pairStr = [pair[0], pair[1]].sort().join(' & ');
+            //if (!playedPairs.has(pairStr)) {
+              pairs.push([pair[0], pair[1]]);
+              usedPlayers.add(pair[0]);
+              usedPlayers.add(pair[1]);
+              playedPairs.add(pairStr);
+            //}
+          }
+        }
+
+        // 3. Shuffle remaining players
+        let freePlayers = playing.filter(p => !usedPlayers.has(p));
+        freePlayers = freePlayers.sort(() => Math.random() - 0.5);
+
+        // 4. Make pairs, prioritizing unused pairs
+        for (let i = 0; i + 1 < freePlayers.length; i += 2) {
+          let p1 = freePlayers[i];
+          let p2 = freePlayers[i + 1];
+          let pairStr = [p1, p2].sort().join(' & ');
+          let tries = 0;
+          // If already used, try to swap with someone later in the list
+          while (playedPairs.has(pairStr) && tries < freePlayers.length) {
+            let swapped = false;
+            for (let j = i + 2; j < freePlayers.length; j++) {
+              let alt = freePlayers[j];
+              let altPairStr = [p1, alt].sort().join(' & ');
+              if (!playedPairs.has(altPairStr)) {
+                // Swap
+                [freePlayers[i + 1], freePlayers[j]] = [freePlayers[j], freePlayers[i + 1]];
+                p2 = alt;
+                pairStr = altPairStr;
+                swapped = true;
+                break;
+              }
+            }
+            if (!swapped) break;
+            tries++;
+          }
+          pairs.push([p1, p2]);
+          playedPairs.add(pairStr);
+        }
+
+        // 5. If all pairs used up, reset for next cycle
+        if (playedPairs.size >= allPossiblePairs.size) {
+          playedPairs = new Set();
+          cycle++;
+        }
+
+        // 6. Assign pairs to courts
+       // Shuffle pairs randomly first
+const shuffledPairs = [...pairs].sort(() => Math.random() - 0.5);
+
+let games = [];
+for (let i = 0; i < numCourts; i++) {
+  const pair1 = shuffledPairs[i * 2];
+  const pair2 = shuffledPairs[i * 2 + 1];
+  if (!pair1 || !pair2) continue; // skip incomplete court
+  games.push({ court: i + 1, pair1, pair2 });
+}
+
+        // 7. Save round info
+        rounds.push({
+          round: round + 1,
+          cycle: cycle,
+          resting: resting,
+          playing: playing,
+          games: games
+        });
+
+        // 8. Rotate: move resting to front for next round
+        rotatedPlayers = numResting > 0 ? resting.concat(playing) : rotatedPlayers;
+      }
+
+      return rounds;
+    }
+    function scheduleDoublesRoundsWithRestartold(players, numCourts, totalRounds = 100, fixedPairs = []) {
       const numPlayersPerRound = numCourts * 4;
       const totalPlayers = players.length;
       const numResting = totalPlayers > numPlayersPerRound ? totalPlayers - numPlayersPerRound : 0;
