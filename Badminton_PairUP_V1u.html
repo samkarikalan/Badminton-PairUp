@@ -653,10 +653,6 @@ h4 {
         const rounds = [];
 
         let cycle = 1;
-const opponentsMap = {};
-
-freePlayers.forEach(p => opponentsMap[p] = new Set());
- 
 
         for (let round = 0; round < totalRounds; round++) {
 
@@ -714,7 +710,11 @@ freePlayers.forEach(p => opponentsMap[p] = new Set());
 
             freePlayers = freePlayers.sort(() => Math.random() - 0.5);
 
+ const opponentsMap = {};
+
+freePlayers.forEach(p => opponentsMap[p] = new Set());
  
+
 
             // 4. Make pairs, prioritizing unused pairs
 for (let i = 0; i + 1 < freePlayers.length; i += 2) {
@@ -1156,3 +1156,4 @@ function showRound(index) {
   </script>
 </body>
 </html>
+
