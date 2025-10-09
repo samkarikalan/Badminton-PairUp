@@ -567,7 +567,7 @@ function generateBadmintonSchedule(players, courts, totalRounds = 100, options =
     fixedPairs = [],
     playedPairs = [],
     playedGames = [],
-    playedCounts = {}
+    playedCounts = {},
   } = options;
 
   const rounds = [];
@@ -578,6 +578,10 @@ function generateBadmintonSchedule(players, courts, totalRounds = 100, options =
   const teamKey = team => team.slice().sort().join("-");
   const gameKey = (t1, t2) => [teamKey(t1), teamKey(t2)].sort().join(" vs ");
   const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+
+  // Track how many times each player has faced each opponent
+  const playerOpponents = {};
+  players.forEach(p => playerOpponents[p] = {});
 
   const teamSplits = ([a, b, c, d]) => [
     [[a, b], [c, d]],
@@ -598,15 +602,31 @@ function generateBadmintonSchedule(players, courts, totalRounds = 100, options =
     return merged;
   }
 
+  function getOpponentFreshness(match) {
+    const { teamA, teamB } = match;
+    let score = 0;
+    // For each player, sum inverse of number of times they faced each opponent
+    teamA.forEach(p => teamB.forEach(op => {
+      const count = playerOpponents[p][op] || 0;
+      score += 1 / (1 + count);
+    }));
+    teamB.forEach(p => teamA.forEach(op => {
+      const count = playerOpponents[p][op] || 0;
+      score += 1 / (1 + count);
+    }));
+    return score / 8; // 8 comparisons per match
+  }
+
   function getScore(round) {
-    let pairScore = 0, gameScore = 0, playerScore = 0;
+    let pairScore = 0, gameScore = 0, playerScore = 0, opponentScore = 0;
     let totalPairs = 0, totalGames = 0, totalPlayers = 0;
 
-    for (const match of round.matches) { // <- matches property
+    for (const match of round.matches) {
       const { teamA, teamB } = match;
       const pairs = [teamA, teamB];
       const game = gameKey(teamA, teamB);
 
+      // Pair freshness
       pairs.forEach(pair => {
         totalPairs++;
         const key = teamKey(pair);
@@ -614,26 +634,32 @@ function generateBadmintonSchedule(players, courts, totalRounds = 100, options =
         else if (!playedPairs.includes(key)) pairScore += 1;
       });
 
+      // Game freshness
       totalGames++;
       if (!playedGames.includes(game)) gameScore += 1;
 
+      // Player usage freshness
       [...teamA, ...teamB].forEach(p => {
         totalPlayers++;
         const count = playedCounts[p] || 0;
         playerScore += 1 / (1 + count);
       });
+
+      // Opponent freshness
+      opponentScore += getOpponentFreshness(match);
     }
 
     const pairFreshness = pairScore / totalPairs;
     const gameFreshness = gameScore / totalGames;
     const playerFreshness = playerScore / totalPlayers;
+    const opponentFreshness = opponentScore / totalGames; // normalize per game
 
-    return (pairFreshness * 0.4 + gameFreshness * 0.3 + playerFreshness * 0.3) * 100;
+    return 0.25 * pairFreshness + 0.25 * gameFreshness + 0.25 * playerFreshness + 0.25 * opponentFreshness;
   }
 
   function getRestPlayers(roundIndex) {
     if (restCount === 0) return [];
-    const reversed = [...players].reverse(); // start from back
+    const reversed = [...players].reverse();
     const start = (roundIndex * restCount) % totalPlayers;
     let rest = reversed.slice(start, start + restCount);
     if (rest.length < restCount) {
@@ -676,23 +702,33 @@ function generateBadmintonSchedule(players, courts, totalRounds = 100, options =
       const keyA = teamKey(teamA);
       const keyB = teamKey(teamB);
       const game = gameKey(teamA, teamB);
+
       if (!playedPairs.includes(keyA)) playedPairs.push(keyA);
       if (!playedPairs.includes(keyB)) playedPairs.push(keyB);
       if (!playedGames.includes(game)) playedGames.push(game);
       [...teamA, ...teamB].forEach(p => playedCounts[p] = (playedCounts[p] || 0) + 1);
+
+      // Update opponent counts
+      teamA.forEach(p => teamB.forEach(op => {
+        playerOpponents[p][op] = (playerOpponents[p][op] || 0) + 1;
+      }));
+      teamB.forEach(p => teamA.forEach(op => {
+        playerOpponents[p][op] = (playerOpponents[p][op] || 0) + 1;
+      }));
     }
 
-    // Push round in old structure
     rounds.push({
       round: r + 1,
-      matches: best.matches,  // old property
-      rest: best.rest,        // old property
-      playing: best.playing   // optional
+      matches: best.matches,
+      rest: best.rest,
+      playing: best.playing
     });
   }
 
   return rounds;
 }
+
+
 // ===== Show Specific Round with Match-Cards =====
 function showRound(index) {
   const resultsDiv = document.getElementById('game-results');
@@ -795,3 +831,4 @@ function showRound(index) {
   </script>
 </body>
 </html>
+
