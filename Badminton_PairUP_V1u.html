@@ -594,7 +594,7 @@ h4 {
         if (numCourts < 1) numCourts = 1;
       }
       const playerNames = players.map(p => p.name);
-      allRounds = scheduleDoublesRoundsWithRestart(playerNames, numCourts, numRounds,fixedPairs);
+      allRounds = schedules(playerNames, numCourts, numRounds,fixedPairs);
       //  allRounds = scheduleUniquePairRoundsWithFixedAndCirculatedResting(playerNames, numCourts, fixedPairs);
       currentRoundIndex = 0;
       showRound(currentRoundIndex);
@@ -603,6 +603,345 @@ h4 {
     }
 
     // ===== Scheduling Function =====
+    function schedules(players, numCourts, totalRounds = 100, fixedPairs = []) {
+
+  // Helper to flatten arrays
+
+  const flat = arr => [].concat(...arr);
+
+ 
+
+  // Track all matches played (pair vs pair)
+
+  let MatchesPlayed = new Set();
+
+ 
+
+  // Track all pairs played (player vs player in same pair)
+
+  let PlayedPairs = new Set();
+
+ 
+
+  // For each player, track whom they have played against
+
+  let playerOpponents = {};
+
+ 
+
+  const rounds = [];
+
+  const numPlayersPerRound = numCourts * 4;
+
+  const totalPlayers = players.length;
+
+ 
+
+  // All possible pairs for use in resets
+
+  const allPossiblePairObjs = [];
+
+  for (let i = 0; i < players.length; i++) {
+
+    for (let j = i + 1; j < players.length; j++) {
+
+      allPossiblePairObjs.push([players[i], players[j]]);
+
+    }
+
+  }
+
+ 
+
+  // Player rotation for fairness
+
+  let rotatedPlayers = [...players];
+
+ 
+
+  for (let round = 1; round <= totalRounds; round++) {
+
+    // 1. Select playing/resting players
+
+    let numResting = totalPlayers > numPlayersPerRound ? totalPlayers - numPlayersPerRound : 0;
+
+    let resting = [];
+
+    let playing = [];
+
+    if (numResting > 0) {
+
+      resting = rotatedPlayers.slice(-numResting);
+
+      playing = rotatedPlayers.slice(0, numPlayersPerRound);
+
+    } else {
+
+      resting = [];
+
+      playing = [...rotatedPlayers];
+
+    }
+
+ 
+
+    // 2. Assign fixed pairs first (if both players are playing)
+
+    let playing_fixed = fixedPairs.filter(
+
+      ([p1, p2]) => playing.includes(p1) && playing.includes(p2)
+
+    );
+
+ 
+
+    // 3. Find dynamic players (not in any playing fixed pair)
+
+    const fixedPlayersSet = new Set(flat(playing_fixed));
+
+    const playing_dynamic = playing.filter(p => !fixedPlayersSet.has(p));
+
+ 
+
+    // 4. Generate unused dynamic pairs (exclude played)
+
+    let unusedPairObjects = [];
+
+    for (let i = 0; i < playing_dynamic.length; i++) {
+
+      for (let j = i + 1; j < playing_dynamic.length; j++) {
+
+        const pairStr = [playing_dynamic[i], playing_dynamic[j]].sort().join('&');
+
+        if (!PlayedPairs.has(pairStr)) {
+
+          unusedPairObjects.push([playing_dynamic[i], playing_dynamic[j]]);
+
+        }
+
+      }
+
+    }
+
+    // If all pairs played, reset
+
+    if (unusedPairObjects.length === 0) {
+
+      unusedPairObjects = [];
+
+      for (let i = 0; i < playing_dynamic.length; i++) {
+
+        for (let j = i + 1; j < playing_dynamic.length; j++) {
+
+          unusedPairObjects.push([playing_dynamic[i], playing_dynamic[j]]);
+
+        }
+
+      }
+
+      PlayedPairs = new Set();
+
+    }
+
+ 
+
+    // 5. Combine all pairs for the round
+
+    const allPairs = playing_fixed.concat(unusedPairObjects);
+
+ 
+
+    // 6. Build player-opponent map
+
+    playerOpponents = {}; // Rebuild each round for current context
+
+    for (let matchStr of MatchesPlayed) {
+
+      const [pair1Str, pair2Str] = matchStr.split(' vs ');
+
+      const pair1 = pair1Str.split('&');
+
+      const pair2 = pair2Str.split('&');
+
+      pair1.forEach(p1 => {
+
+        if (!playerOpponents[p1]) playerOpponents[p1] = new Set();
+
+        pair2.forEach(p2 => playerOpponents[p1].add(p2));
+
+      });
+
+      pair2.forEach(p2 => {
+
+        if (!playerOpponents[p2]) playerOpponents[p2] = new Set();
+
+        pair1.forEach(p1 => playerOpponents[p2].add(p1));
+
+     });
+
+    }
+
+ 
+
+    // 7. Generate all possible matches between pairs, prefer "new team-vs-team"
+
+    const matches = [];
+
+    for (let i = 0; i < allPairs.length; i++) {
+
+      for (let j = i + 1; j < allPairs.length; j++) {
+
+        const pair1 = allPairs[i];
+
+        const pair2 = allPairs[j];
+
+        const pair1Str = pair1.slice().sort().join('&');
+
+        const pair2Str = pair2.slice().sort().join('&');
+
+        const matchStr = [pair1Str, pair2Str].sort().join(' vs ');
+
+        if (MatchesPlayed.has(matchStr)) continue;
+
+ 
+
+        // Preference: all players in pair1 have never played against pair2
+
+        let isNewMatch = true;
+
+        for (let p1 of pair1) {
+
+          for (let p2 of pair2) {
+
+            if (playerOpponents[p1] && playerOpponents[p1].has(p2)) {
+
+              isNewMatch = false;
+
+              break;
+
+            }
+
+          }
+
+          if (!isNewMatch) break;
+
+        }
+
+        matches.push({
+
+          pair1, pair2, matchStr, isNewMatch
+
+        });
+
+      }
+
+    }
+
+ 
+
+    // Shuffle for randomness
+
+    matches.sort(() => Math.random() - 0.5);
+
+ 
+
+    // 8. Select matches for the round (numCourts matches, each uses 2 pairs)
+
+    const finalGames = [];
+
+    const usedPairs = new Set();
+
+    for (let match of matches) {
+
+      const pairKey1 = match.pair1.slice().sort().join('&');
+
+      const pairKey2 = match.pair2.slice().sort().join('&');
+
+      if (usedPairs.has(pairKey1) || usedPairs.has(pairKey2)) continue;
+
+      // Prefer new matches, but allow old if needed
+
+      if (match.isNewMatch || finalGames.length + 1 > numCourts) {
+
+        finalGames.push({ pair1: match.pair1, pair2: match.pair2 });
+
+        usedPairs.add(pairKey1);
+
+        usedPairs.add(pairKey2);
+
+        // Add to played pairs and matches
+
+        PlayedPairs.add(pairKey1);
+
+        PlayedPairs.add(pairKey2);
+
+        MatchesPlayed.add(match.matchStr);
+
+        if (finalGames.length >= numCourts) break;
+
+      }
+
+    }
+
+    // If not enough matches, fill with any remaining
+
+    if (finalGames.length < numCourts) {
+
+      for (let match of matches) {
+
+        const pairKey1 = match.pair1.slice().sort().join('&');
+
+        const pairKey2 = match.pair2.slice().sort().join('&');
+
+        if (usedPairs.has(pairKey1) || usedPairs.has(pairKey2)) continue;
+
+        finalGames.push({ pair1: match.pair1, pair2: match.pair2 });
+
+        usedPairs.add(pairKey1);
+
+        usedPairs.add(pairKey2);
+
+        PlayedPairs.add(pairKey1);
+
+        PlayedPairs.add(pairKey2);
+
+        MatchesPlayed.add(match.matchStr);
+
+        if (finalGames.length >= numCourts) break;
+
+      }
+
+    }
+
+ 
+
+    // 9. Save round info
+
+    rounds.push({
+
+      round: round,
+
+      resting: resting,
+
+      playing: playing,
+
+      games: finalGames
+
+    });
+
+ 
+
+    // 10. Rotate players for next round (move resting to front for fairness)
+
+    rotatedPlayers = numResting > 0 ? resting.concat(playing) : rotatedPlayers;
+
+  }
+
+ 
+
+  return rounds;
+
+}
    // ===== Scheduling Function =====
 
     function scheduleDoublesRoundsWithRestart(players, numCourts, totalRounds = 100, fixedPairs = []) {
@@ -1197,6 +1536,7 @@ function showRound(index) {
   </script>
 </body>
 </html>
+
 
 
 
