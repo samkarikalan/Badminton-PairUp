@@ -847,73 +847,92 @@ h4 {
 
     // 8. Select matches for the round (numCourts matches, each uses 2 pairs)
 
-    const finalGames = [];
+    
 
-    const usedPairs = new Set();
+const finalGames = [];
 
-    for (let match of matches) {
+const usedPairs = new Set();
 
-      const pairKey1 = match.pair1.slice().sort().join('&');
-
-      const pairKey2 = match.pair2.slice().sort().join('&');
-
-      if (usedPairs.has(pairKey1) || usedPairs.has(pairKey2)) continue;
-
-      // Prefer new matches, but allow old if needed
-
-      if (match.isNewMatch || finalGames.length + 1 > numCourts) {
-
-        finalGames.push({ pair1: match.pair1, pair2: match.pair2 });
-
-        usedPairs.add(pairKey1);
-
-        usedPairs.add(pairKey2);
-
-        // Add to played pairs and matches
-
-        PlayedPairs.add(pairKey1);
-
-        PlayedPairs.add(pairKey2);
-
-        MatchesPlayed.add(match.matchStr);
-
-        if (finalGames.length >= numCourts) break;
-
-      }
-
-    }
-
-    // If not enough matches, fill with any remaining
-
-    if (finalGames.length < numCourts) {
-
-      for (let match of matches) {
-
-        const pairKey1 = match.pair1.slice().sort().join('&');
-
-        const pairKey2 = match.pair2.slice().sort().join('&');
-
-        if (usedPairs.has(pairKey1) || usedPairs.has(pairKey2)) continue;
-
-        finalGames.push({ pair1: match.pair1, pair2: match.pair2 });
-
-        usedPairs.add(pairKey1);
-
-        usedPairs.add(pairKey2);
-
-        PlayedPairs.add(pairKey1);
-
-        PlayedPairs.add(pairKey2);
-
-        MatchesPlayed.add(match.matchStr);
-
-        if (finalGames.length >= numCourts) break;
-
-      }
-
-    }
+const usedPlayers = new Set();
 
  
+
+for (let match of matches) {
+
+  const pairKey1 = match.pair1.slice().sort().join('&');
+
+  const pairKey2 = match.pair2.slice().sort().join('&');
+
+  // Check if pairs already used in this round
+
+  if (usedPairs.has(pairKey1) || usedPairs.has(pairKey2)) continue;
+
+  // Check if any player already assigned this round
+
+  const allPlayers = [...match.pair1, ...match.pair2];
+
+  if (allPlayers.some(p => usedPlayers.has(p))) continue;
+
+  // Assign match
+
+  finalGames.push({ pair1: match.pair1, pair2: match.pair2 });
+
+  usedPairs.add(pairKey1);
+
+  usedPairs.add(pairKey2);
+
+  allPlayers.forEach(p => usedPlayers.add(p));
+
+  PlayedPairs.add(pairKey1);
+
+  PlayedPairs.add(pairKey2);
+
+  MatchesPlayed.add(match.matchStr);
+
+  if (finalGames.length >= numCourts) break;
+
+}
+
+ 
+
+// Fill with any remaining if not enough courts, but still respect player uniqueness
+
+if (finalGames.length < numCourts) {
+
+  for (let match of matches) {
+
+    const pairKey1 = match.pair1.slice().sort().join('&');
+
+    const pairKey2 = match.pair2.slice().sort().join('&');
+
+    if (usedPairs.has(pairKey1) || usedPairs.has(pairKey2)) continue;
+
+    const allPlayers = [...match.pair1, ...match.pair2];
+
+    if (allPlayers.some(p => usedPlayers.has(p))) continue;
+
+    finalGames.push({ pair1: match.pair1, pair2: match.pair2 });
+
+    usedPairs.add(pairKey1);
+
+    usedPairs.add(pairKey2);
+
+    allPlayers.forEach(p => usedPlayers.add(p));
+
+    PlayedPairs.add(pairKey1);
+
+    PlayedPairs.add(pairKey2);
+
+    MatchesPlayed.add(match.matchStr);
+
+    if (finalGames.length >= numCourts) break;
+
+  }
+
+}
+
+ 
+
 
     // 9. Save round info
 
@@ -1536,6 +1555,7 @@ function showRound(index) {
   </script>
 </body>
 </html>
+
 
 
 
