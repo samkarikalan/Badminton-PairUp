@@ -8,730 +8,372 @@
    /* === GLOBAL === */
 
 body {
-
   margin: 0;
-
   font-family: 'Segoe UI', Arial, sans-serif;
-
   background: linear-gradient(120deg, #3b0073 0%, #7d00b8 100%);
-
   color: #f3e8ff;
-
   text-align: center;
-
   min-height: 100vh;
-
   overflow-x: hidden;
-
 }
 
 header {
-
-  padding: 18px 0 12px 0;
-
+  padding: 14px 0 10px 0;
   background: linear-gradient(90deg, #3b0073, #7d00b8 70%);
-
   box-shadow: 0 2px 10px rgba(50,0,80,0.12);
-
 }
 
 h1 {
-
-  font-size: 2.6rem;
-
+  font-size: 1.8rem;
   margin: 0;
-
   font-weight: 900;  
-
-  letter-spacing: 2.5px;
-
+  letter-spacing: 1.5px;
   color: #fff;
-
   text-shadow: 0 2px 6px rgba(60,0,100,0.15);
-
 }
 
 h3, h4 {
-
-  font-size: 1.15rem;
-
-  margin: 18px 0 10px 0;
-
+  font-size: 1rem;
+  margin: 14px 0 8px 0;
   color: #ffe2ff;
-
   font-weight: 600;
-
 }
 
 h4 {
-
   margin-top: 0;
-
-  padding-bottom: 4px;
-
+  padding-bottom: 2px;
   color: #c5b7d6;
-
 }
-
- 
 
 /* === PAGE 1: Player Entry / Setup === */
-
 .container {
-
   max-width: 900px;
-
-  margin: 30px auto 0 auto;
-
-  padding: 28px 14px 22px 14px;
-
+  margin: 12px auto 0 auto;
+  padding: 12px 4vw;
   background: rgba(255,255,255,0.08);
-
-  border-radius: 16px;
-
-  box-shadow: 0 6px 22px rgba(60,0,100,0.10);
-
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(60,0,100,0.10);
+  max-height: 95vh;
+  overflow-y: auto;
 }
 
- 
-
 .card {
-
   background: #fff;
-
   color: #44006e;
-
-  padding: 28px 22px;
-
-  margin-bottom: 30px;
-
-  border-radius: 14px;
-
-  box-shadow: 0 4px 14px rgba(50,0,80,0.18);
-
+  padding: 14px 10px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(50,0,80,0.18);
   transition: box-shadow 0.2s;
-
 }
 
 .card:hover {
-
-  box-shadow: 0 8px 24px rgba(60,0,100,0.28);
-
+  box-shadow: 0 6px 18px rgba(60,0,100,0.28);
 }
 
 .card input, .card select, .card button, textarea {
-
   width: 100%;
-
-  padding: 12px;
-
-  margin: 10px 0;
-
-  font-size: 1rem;
-
-  border-radius: 7px;
-
+  padding: 10px;
+  margin: 6px 0;
+  font-size: 0.9rem;
+  border-radius: 6px;
   border: 1px solid #c3a8e4;
-
   box-sizing: border-box;
-
   background: #f7f1ff;
-
   color: #3b0073;
-
   transition: border 0.2s, box-shadow 0.2s;
-
 }
 
 .card input:focus, .card select:focus, textarea:focus {
-
   border: 1.5px solid #7d00b8;
-
-  box-shadow: 0 0 6px #7d00b8;
-
+  box-shadow: 0 0 4px #7d00b8;
   outline: none;
-
 }
 
 .card button {
-
   background: linear-gradient(90deg, #7d00b8 30%, #3b0073 100%);
-
   color: #fff;
-
   border: none;
-
   font-weight: bold;
-
   cursor: pointer;
-
   transition: background 0.3s, transform 0.2s;
-
-  box-shadow: 0 2px 8px rgba(60,0,100,0.10);
-
+  box-shadow: 0 2px 6px rgba(60,0,100,0.10);
 }
 
 .card button:hover, .main-action:hover {
-
   background: linear-gradient(90deg, #5e009c 30%, #3b0073 100%);
-
-  transform: scale(1.045);
-
+  transform: scale(1.04);
 }
 
 #player-list-table {
-
   width: 100%;
-
   border-collapse: collapse;
-
-  margin-top: 6px;
-
+  margin-top: 4px;
   background: #f7f1ff;
-
-  border-radius: 8px;
-
+  border-radius: 6px;
   overflow: hidden;
-
 }
 
 #player-list-table th, #player-list-table td {
-
   border: 1px solid #d6c5e7;
-
-  padding: 7px 12px;
-
+  padding: 4px 6px;
   text-align: left;
-
-  font-size: 15px;
-
+  font-size: 12px;
 }
 
 #player-list-table th {
-
   background: #ece2f5;
-
   color: #3b0073;
-
   font-weight: 600;
-
 }
 
 .delete-btn {
-
   background: none;
-
   border: none;
-
   color: #d11a2a;
-
-  font-size: 18px;
-
+  font-size: 16px;
   cursor: pointer;
-
-  transition: color 0.2s;
-
 }
 
 .delete-btn:hover {
-
   color: #a00;
-
 }
 
 .fixed-pairs-list {
-
-  margin-top: 12px;
-
+  margin-top: 8px;
 }
 
 .fixed-pair-item {
-
   background: #ece2f5;
-
   color: #3b0073;
-
-  padding: 8px 16px;
-
-  border-radius: 7px;
-
-  margin: 6px 0;
-
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 4px 0;
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
   font-weight: 500;
-
+  font-size: 0.85rem;
 }
 
 .fixed-pair-remove {
-
   color: #d11a2a;
-
   cursor: pointer;
-
-  margin-left: 14px;
-
-  font-size: 1.2em;
-
-  transition: color 0.2s;
-
+  margin-left: 10px;
+  font-size: 1em;
 }
 
 .fixed-pair-remove:hover {
-
   color: #a00;
-
 }
 
 .main-action {
-
   display: block;
-
   width: 100%;
-
   background: linear-gradient(90deg, #ff9800 10%, #ffe2a0 100%);
-
   color: #3b0073;
-
-  font-size: 1.25rem;
-
+  font-size: 1rem;
   font-weight: bold;
-
-  padding: 16px;
-
-  border-radius: 9px;
-
-  margin-top: 28px;
-
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 14px;
   cursor: pointer;
-
   border: none;
-
   transition: background 0.3s, transform 0.2s;
-
-  box-shadow: 0 2px 8px rgba(60,0,100,0.10);
-
+  box-shadow: 0 2px 6px rgba(60,0,100,0.10);
 }
 
 .main-action:hover {
-
   background: linear-gradient(90deg, #ffb84d 10%, #ffe2a0 100%);
-
-  transform: scale(1.045);
-
+  transform: scale(1.04);
 }
 
- 
-
 /* === Modal === */
-
 #importModal {
-
   display: none;
-
   position: fixed;
-
   top: 0; left: 0;
-
   width: 100vw; height: 100vh;
-
   background: rgba(0,0,0,0.7);
-
   z-index: 1000;
-
 }
 
 #importModal .modal-content {
-
   background: #fff;
-
   color: #3b0073;
-
-  max-width: 420px;
-
-  margin: 120px auto;
-
-  padding: 26px;
-
-  border-radius: 12px;
-
-  box-shadow: 0 6px 22px rgba(50,0,80,0.17);
-
+  max-width: 380px;
+  margin: 80px auto;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(50,0,80,0.17);
 }
 
 #importModal button {
-
-  margin-top: 14px;
-
-  padding: 10px 16px;
-
-  border-radius: 7px;
-
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
   background: linear-gradient(90deg, #7d00b8 30%, #3b0073 100%);
-
   color: #fff;
-
   border: none;
-
   font-weight: 600;
-
-  font-size: 1rem;
-
+  font-size: 0.9rem;
 }
 
- 
-
-/* === PAGE 2: Match Results / Court Layout === */
-
+/* === PAGE 2: Match Results / Court Layout (Solid Background) === */
 #game-results {
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
-  gap: 14px;
-
-  padding: 18px 8px 16px;
-
-  background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
-
-  min-height: 45vh;
-
-  border-radius: 16px;
-
-  box-shadow: 0 6px 22px rgba(60,0,100,0.10);
-
+  gap: 8px;
+  padding: 8px 2vw;
+  background: #7d00b8; /* solid purple */
+  min-height: 90vh;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(60,0,100,0.10);
+  overflow-y: auto;
 }
 
 .match-card {
-
   background: #fff;
-
   color: #3b0073;
-
-  border-radius: 14px;
-
-  box-shadow: 0 4px 14px rgba(50, 0, 80, 0.22);
-
-  padding: 20px 18px;
-
-  width: 95%;
-
-  max-width: 650px;
-
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(50, 0, 80, 0.22);
+  padding: 10px 6px;
+  width: 98%;
+  max-width: 100%;
   text-align: center;
-
   font-weight: bold;
-
-  margin-bottom: 6px;
-
+  margin-bottom: 4px;
   border: 2px solid #ece2f5;
-
+  font-size: 0.9rem;
 }
 
 .match-card h3 {
-
   color: #3b0073;
-
-  font-size: 1.25rem;
-
-  margin-bottom: 12px;
-
+  font-size: 1rem;
+  margin-bottom: 8px;
   font-weight: 700;
-
 }
 
 .match-card .teams {
-
   display: flex;
-
- justify-content: space-between;
-
+  justify-content: space-between;
   align-items: center;
-
-  gap: 16px;
-
-  margin-bottom: 14px;
-
+  gap: 4px;
+  margin-bottom: 6px;
 }
 
 .team {
-
   display: flex;
-
   flex-direction: column;
-
-  width: 46%;
-
-  gap: 8px;
-
+  width: 48%;
+  gap: 4px;
 }
 
 .Lplayer-btn, .Rplayer-btn {
-
-  font-size: 1.05em;
-
-  padding: 12px;
-
-  margin: 5px 0;
-
-  border-radius: 7px;
-
+  font-size: 0.85rem;
+  padding: 6px;
+  margin: 2px 0;
+  border-radius: 6px;
   text-align: center;
-
   border: none;
-
   font-weight: 600;
-
-  box-shadow: 0 1px 4px rgba(60,0,100,0.10);
-
+  box-shadow: 0 1px 3px rgba(60,0,100,0.10);
   transition: transform 0.2s, background 0.2s;
-
 }
 
 .Lplayer-btn {
-
   background: linear-gradient(90deg, #009c3c 70%, #4dd093 100%);
-
   color: #fff;
-
 }
 
 .Lplayer-btn:hover {
-
-  background: linear-gradient(90deg, #34995b 70%, #4dd093 100%);
-
-  transform: scale(1.045);
-
+  transform: scale(1.03);
 }
 
 .Rplayer-btn {
-
   background: linear-gradient(90deg, #0494ad 70%, #6ee3f6 100%);
-
   color: #fff;
-
 }
 
 .Rplayer-btn:hover {
-
-  background: linear-gradient(90deg, #3f8e9c 70%, #6ee3f6 100%);
-
-  transform: scale(1.045);
-
+  transform: scale(1.03);
 }
 
 .vs-text {
-
-  font-size: 1.3rem;
-
+  font-size: 0.9rem;
   font-weight: bold;
-
-  color: #7d00b8;
-
-  margin: 0 10px;
-
+  color: #fff;
+  margin: 0 4px;
 }
 
 .match-time {
-
-  margin-top: 10px;
-
-  font-size: 1.06rem;
-
-  color: #3b0073;
-
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #fff;
   font-weight: 600;
-
 }
 
 .swipe-hint {
-
-  font-size: 14px;
-
-  color: #b6b6b6;
-
-  margin-top: 34px;
-
+  font-size: 12px;
+  color: #e0cfff;
+  margin-top: 8px;
   text-align: center;
-
 }
 
- 
-
-/* === NEW: Round Navigation (Improved) === */
-
+/* === Round Navigation === */
 .round-navigation {
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
-  gap: 28px;
-
-  margin-top: 18px;
-
-  padding: 10px 0;
-
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 0;
   background: linear-gradient(135deg, #2a2a72, #009ffd 80%);
-
-  border-radius: 14px;
-
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
-
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.13);
 }
 
 .round-navigation .round-label {
-
   color: #fff;
-
   font-weight: 700;
-
-  font-size: 1.09rem;
-
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.17);
-
+  font-size: 0.85rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.17);
 }
 
 .round-navigation button {
-
   background: #fff;
-
   border: none;
-
-  padding: 10px 20px;
-
-  font-size: 1rem;
-
+  padding: 4px 8px;
+  font-size: 0.8rem;
   font-weight: 700;
-
-  border-radius: 9px;
-
+  border-radius: 6px;
   cursor: pointer;
-
   transition: all 0.23s ease;
-
-  min-width: 52px;
-
-  box-shadow: 0 1px 4px rgba(60,0,100,0.10);
-
+  min-width: 40px;
+  box-shadow: 0 1px 3px rgba(60,0,100,0.10);
 }
 
 .round-navigation button:hover:enabled {
-
   background: #009ffd;
-
   color: #fff;
-
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.17);
-
-  transform: translateY(-1px) scale(1.05);
-
+  transform: translateY(-1px) scale(1.03);
 }
 
 .round-navigation button:disabled {
-
   opacity: 0.5;
-
   cursor: not-allowed;
-
 }
 
- 
-
-/* === Divider for section clarity === */
-
+/* === Divider === */
 .section-divider {
-
   width: 100%;
-
-  height: 2px;
-
+  height: 1.5px;
   background: linear-gradient(90deg, #7d00b8, #ff9800);
-
   border-radius: 2px;
-
-  margin: 24px 0;
-
+  margin: 16px 0;
   opacity: 0.15;
-
 }
-
- 
-
-/* === Responsive === */
-
-@media (max-width: 700px) {
-
-  .container {
-
-    padding: 10px 2vw;
-
-    margin-top: 12px;
-
-  }
-
-  .card {
-
-    padding: 16px 8px;
-
-  }
-
-  #game-results {
-
-    padding: 10px 2vw 10px;
-
-    min-height: 38vh;
-
-  }
-
-  .match-card {
-
-    width: 99%;
-
-    padding: 14px 4px;
-
-  }
-
-  .teams {
-
-    gap: 8px;
-
-  }
-
-  .team {
-
-    width: 49%;
-
-  }
-
-  .round-navigation {
-
-    gap: 10px;
-
-    padding: 6px 0;
-
-  }
-
-  .round-navigation .round-label {
-
-    font-size: 0.96rem;
-
-  }
-
-}
-
- 
-
-
 
   </style>
 </head>
