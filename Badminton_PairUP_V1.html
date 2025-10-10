@@ -562,6 +562,259 @@ h4 {
     }
 
     // ===== Scheduling Function =====
+
+    
+    // ===== Scheduling Function =====
+
+    function Aischeduler(players, numCourts, totalRounds = 100, fixedPairs = []) {
+
+        const numPlayersPerRound = numCourts * 4;
+
+        const totalPlayers = players.length;
+
+        const numResting = totalPlayers > numPlayersPerRound ? totalPlayers - numPlayersPerRound : 0;
+
+ 
+
+        // Generate all possible pairs
+
+        const allPossiblePairs = new Set();
+
+        for (let i = 0; i < totalPlayers; i++) {
+
+            for (let j = i + 1; j < totalPlayers; j++) {
+
+                allPossiblePairs.add([players[i], players[j]].sort().join(' & '));
+
+            }
+
+        }
+
+ 
+
+        // Interleave fixed pairs
+
+        let dynamicPlayers = [...players];
+
+        const fixedPlayersSet = new Set(fixedPairs.flat());
+
+        dynamicPlayers = dynamicPlayers.filter(p => !fixedPlayersSet.has(p));
+
+        let mergedPlayers = [];
+
+        mergedPlayers = [...fixedPairs.flat(), ...dynamicPlayers];
+
+ 
+
+ 
+
+        let rotatedPlayers = [...mergedPlayers];
+
+        let playedPairs = new Set();
+
+        let playedagainst = new Set();
+
+        let lastRound = new set();
+
+        const rounds = [];
+
+        let cycle = 1;
+
+ 
+
+        for (let round = 0; round < totalRounds; round++) {
+
+            // 1. Select resting and playing players
+
+            let resting = [];
+
+            let playing = [];
+
+            if (numResting > 0) {
+
+                resting = rotatedPlayers.slice(-numResting);
+
+                playing = rotatedPlayers.slice(0, numPlayersPerRound);
+
+            } else {
+
+                resting = [];
+
+                playing = [...rotatedPlayers];
+
+            }
+
+ 
+
+            // 2. Assign fixed pairs first
+
+            let usedPlayers = new Set();
+
+            let pairs = [];
+
+            for (let pair of fixedPairs) {
+
+                if (playing.includes(pair[0]) && playing.includes(pair[1]) &&
+
+                    !usedPlayers.has(pair[0]) && !usedPlayers.has(pair[1])) {
+
+                    let pairStr = [pair[0], pair[1]].sort().join(' & ');
+
+                    pairs.push([pair[0], pair[1]]);
+
+                    usedPlayers.add(pair[0]);
+
+                    usedPlayers.add(pair[1]);
+
+                    // playedPairs.add(pairStr);
+
+                }
+
+            }
+
+            // 3. Shuffle remaining players
+
+            let freePlayers = playing.filter(p => !usedPlayers.has(p));
+
+            freePlayers = freePlayers.sort(() => Math.random() - 0.5);
+
+ 
+
+            // 4. Make pairs, prioritizing unused pairs
+
+            //const opponentsMap = {};
+
+            //freePlayers.forEach(p => opponentsMap[p] = new Set());
+
+            let usedPlayers2 = new Set();
+
+            let pairs2 = [];
+
+
+      const allPossiblePairs2 = new Set();
+
+        for (let i = 0; i < freePlayers; i++) {
+
+            for (let j = i + 1; j < freePlayers; j++) {
+              let p1 = freePlayers[i];
+              let p2 = freePlayers[j];
+
+
+                allPossiblePairs2.add([freePlayers[i], freePlayers[j]].sort().join(' & '));
+
+            }
+
+        }    
+
+            for (let i = 0; i + 1 < freePlayers.length; i++) {
+
+                let p1 = freePlayers[i];
+
+                if (!usedPlayers2.has(p1)) {
+
+                    for (let j = 0; j + 1 < freePlayers.length; j++) {
+
+                        let p2 = freePlayers[j];
+
+                        if (!usedPlayers2.has(p2)) {
+
+                            let pairStr = [p1, p2].sort().join(' & ');
+
+                            if (!playedPairs.has(pairStr)) {
+
+                                pairs2.push(p1, p2);
+
+                                usedPlayers2.add(p1);
+
+                                usedPlayers2.add(p2);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            let remainPlayers = freePlayers.filter(p => !usedPlayers2.has(p));
+
+            for (let j = 0; j + 1 < remainPlayers.length; j += 2) {
+
+                let p1 = freePlayers[j];
+
+                let p2 = freePlayers[j + 1];
+
+                if (!usedPlayers2.has(p1) && !usedPlayers2.has(p2)) {
+
+                    let pairStr = [p1, p2].sort().join(' & ');
+
+                    pairs2.push(p1, p2);
+
+                    usedPlayers2.add(p1);
+
+                    usedPlayers2.add(p2);
+
+                }
+
+            }
+
+ 
+
+            // 6. Assign pairs to courts
+
+            // Shuffle pairs randomly first
+
+            const shuffledPairs = [...pairs, ...pairs2].sort(() => Math.random() - 0.5);
+
+            let games = [];
+
+            for (let i = 0; i < numCourts; i++) {
+
+                const pair1 = shuffledPairs[i * 2];
+
+                const pair2 = shuffledPairs[i * 2 + 1];
+
+                if (!pair1 || !pair2) continue; // skip incomplete court
+
+                games.push({ court: i + 1, pair1, pair2 });
+
+            }
+
+ 
+
+            // 7. Save round info
+
+            rounds.push({
+
+                round: round + 1,
+
+                cycle: cycle,
+
+                resting: resting,
+
+                playing: playing,
+
+                games: games
+
+            });
+
+ 
+
+            // 8. Rotate: move resting to front for next round
+
+            rotatedPlayers = numResting > 0 ? resting.concat(playing) : rotatedPlayers;
+
+        }
+
+ 
+
+        return rounds;
+
+    }
+
+
     function scheduleDoublesRoundsWithRestart(players, numCourts, totalRounds = 100, fixedPairs = []) {
       const numPlayersPerRound = numCourts * 4;
       const totalPlayers = players.length;
@@ -951,3 +1204,4 @@ function showRound(index) {
   </script>
 </body>
 </html>
+
