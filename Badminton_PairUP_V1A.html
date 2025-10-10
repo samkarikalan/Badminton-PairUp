@@ -618,24 +618,73 @@ function Aischeduler(players, numCourts, totalRounds = 100, fixedPairs = []) {
     const shuffledPairs = [...pairs].sort(() => Math.random() - 0.5);
 
     // 5. Assign pairs to courts
-    let games = [];
-    let courtNo = 0;
-    for (let i = 0; i < shuffledPairs.length - 1 && courtNo < numCourts; i += 2) {
-      let pair1 = shuffledPairs[i];
-      let pair2 = shuffledPairs[i + 1];
+const allPossiblePairs = []; // assume already filled
+const completedGames = new Set();
+const playedPairs = new Set();
+
+const totalRounds = 20;
+const numCourts = 3;
+
+for (let round = 1; round <= totalRounds; round++) {
+  let games = [];
+  let success = false;
+  let attempts = 0;
+  const maxAttempts = 200;
+
+  while (!success && attempts < maxAttempts) {
+    attempts++;
+
+    const shuffledPairs = [...allPossiblePairs].sort(() => Math.random() - 0.5);
+    let tempGames = [];
+    let tempPlayedPlayers = new Set();
+
+    for (let i = 0; i < shuffledPairs.length - 1 && tempGames.length < numCourts; i += 2) {
+      const pair1 = shuffledPairs[i];
+      const pair2 = shuffledPairs[i + 1];
       if (!pair2) break;
 
-      let pairStr1 = pair1.slice().sort().join(' & ');
-      let pairStr2 = pair2.slice().sort().join(' & ');
+      const pairStr1 = pair1.slice().sort().join(' & ');
+      const pairStr2 = pair2.slice().sort().join(' & ');
+      const gameKey = [pairStr1, pairStr2].sort().join(' vs ');
 
-      let gameKey = [pairStr1, pairStr2].sort().join(' vs ');
-      if (!completedGames.has(gameKey)) {
-        completedGames.add(gameKey);
-        playedPairs.add(pairStr1);
-        playedPairs.add(pairStr2);
-        games.push({ court: ++courtNo, pair1, pair2 });
+      // --- Skip if players overlap in this same round ---
+      const allPlayers = [...pair1, ...pair2];
+      const hasRepeat = allPlayers.some(p => tempPlayedPlayers.has(p));
+      if (hasRepeat) continue;
+
+      // --- Prefer new games; fallback to old if needed ---
+      if (!completedGames.has(gameKey) || attempts > maxAttempts / 2) {
+        // Accept game (even if repeated when stuck too long)
+        tempGames.push({ court: tempGames.length + 1, pair1, pair2 });
+        allPlayers.forEach(p => tempPlayedPlayers.add(p));
       }
     }
+
+    // ✅ If enough games found, commit this round
+    if (tempGames.length === numCourts) {
+      games = tempGames;
+      games.forEach(g => {
+        const pairStr1 = g.pair1.slice().sort().join(' & ');
+        const pairStr2 = g.pair2.slice().sort().join(' & ');
+        const gameKey = [pairStr1, pairStr2].sort().join(' vs ');
+        completedGames.add(gameKey); // add to global record
+      });
+      success = true;
+    }
+  }
+
+  if (!success) {
+    console.warn(`⚠️ Round ${round}: could not fill all courts even with fallbacks.`);
+    break;
+  }
+
+  console.log(`Round ${round}`);
+  games.forEach(g => {
+    const pair1 = g.pair1.join(' & ');
+    const pair2 = g.pair2.join(' & ');
+    console.log(`  Court ${g.court}: ${pair1} vs ${pair2}`);
+  });
+}
 
     // 6. Save round info
     rounds.push({
@@ -753,4 +802,5 @@ function showRound(index) {
   </script>
 </body>
 </html>
+
 
