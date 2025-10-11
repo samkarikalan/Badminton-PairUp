@@ -422,9 +422,20 @@ h4 {
       document.getElementById("page2").style.display = 'block';
     }
     function goBack() {
-      document.getElementById("page1").style.display = 'block';
-      document.getElementById("page2").style.display = 'none';
-    }
+  const pin = prompt("Enter 4-digit code to go back:");
+
+  if (pin === null) {
+    // User clicked Cancel → do nothing
+    return;
+  }
+
+  if (pin === "0000") {
+    document.getElementById("page1").style.display = 'block';
+    document.getElementById("page2").style.display = 'none';
+  } else {
+    alert("Incorrect PIN! Cannot go back.");
+  }
+}
     function initPage() {
       document.getElementById("page1").style.display = 'block';
       document.getElementById("page2").style.display = 'none';
@@ -618,52 +629,64 @@ function Aischeduler(players, numCourts, totalRounds = 100, fixedPairs = []) {
 
     // 5. Assign pairs to courts
     let maxiteration = 0;
-let games = [];
-let courtNoLocal = 0;
+    let games = [];
+    let courtNoLocal = 0;
 
-while (courtNoLocal < numCourts && maxiteration < 200) {
-  maxiteration++;
-  courtNoLocal = 0;
+    while (courtNoLocal < numCourts && maxiteration < 200) {
+      maxiteration++;
+      courtNoLocal = 0;
 
-  let tmpgames = [];
-  let tmpplayedPairs = new Set();
-  let tmpcompletedGames = new Set();
+      let tmpgames = [];
+      let tmpplayedPairs = new Set([...playedPairs]);
+      
+      let tmpcompletedGames = new Set([...completedGames]);      
+      let shuffledPairs = [...pairs].sort(() => Math.random() - 0.5);
 
-  let shuffledPairs = [...pairs].sort(() => Math.random() - 0.5);
+      for (let i = 0; i < shuffledPairs.length - 1 && courtNoLocal < numCourts; i++) {
+        let pair1 = shuffledPairs[i];
+        let pairStr1 = pair1.slice().sort().join(' & ');
 
-  for (let i = 0; i < shuffledPairs.length - 1 && courtNoLocal < numCourts; i += 2) {
-    let pair1 = shuffledPairs[i];
-    let pair2 = shuffledPairs[i + 1];
-    if (!pair2) break;
+        if (tmpplayedPairs.has(pairStr1)) continue; // just skip this pair
 
-    let pairStr1 = pair1.slice().sort().join(' & ');
-    let pairStr2 = pair2.slice().sort().join(' & ');
+        let pair2 = null;
+        let pairStr2 = '';
 
-    let gameKey = [pairStr1, pairStr2].sort().join(' vs ');
+        // find the next fresh pair2
+        for (let j = i + 1; j < shuffledPairs.length; j++) {
+          let candidate = shuffledPairs[j];
+          let candidateStr = candidate.slice().sort().join(' & ');
+          if (!tmpplayedPairs.has(candidateStr)) {
+            pair2 = candidate;
+            pairStr2 = candidateStr;
+            break;
+          }
+        }
 
-    // ✅ Use logical AND (&&)
-    if (!completedGames.has(gameKey) && !tmpcompletedGames.has(gameKey)) {
-      tmpcompletedGames.add(gameKey);
-      tmpplayedPairs.add(pairStr1);
-      tmpplayedPairs.add(pairStr2);
-      tmpgames.push({ court: ++courtNoLocal, pair1, pair2 });
+        if (!pair2) continue; // no fresh pair2 found, skip
+
+        let gameKey = [pairStr1, pairStr2].sort().join(' vs ');
+
+        if (!tmpcompletedGames.has(gameKey)) {
+          tmpcompletedGames.add(gameKey);
+          tmpplayedPairs.add(pairStr1);
+          tmpplayedPairs.add(pairStr2);
+          tmpgames.push({ court: ++courtNoLocal, pair1, pair2 });
+        }
+      }
+
+      // ✅ Correct comparison
+      if (courtNoLocal === numCourts) {
+        games = [...tmpgames];
+        completedGames = new Set([...completedGames, ...tmpcompletedGames]);
+        playedPairs = new Set([...playedPairs, ...tmpplayedPairs]);
+      }
+
+      // ✅ Reset when too many iterations but not enough courts filled
+      if (maxiteration >= 199 && courtNoLocal < numCourts) {
+        completedGames = new Set();
+        playedPairs = new Set();
+      }
     }
-  }
-
-  // ✅ Correct comparison
-  if (courtNoLocal === numCourts) {
-    games = [...tmpgames];
-
-    completedGames = new Set([...completedGames, ...tmpcompletedGames]);
-    playedPairs = new Set([...playedPairs, ...tmpplayedPairs]);
-  }
-
-  // ✅ Reset when too many iterations but not enough courts filled
-  if (maxiteration >= 200 && courtNoLocal < numCourts) {
-    completedGames = new Set();
-    playedPairs = new Set();
-  }
-}
 
 
 
