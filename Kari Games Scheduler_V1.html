@@ -570,7 +570,87 @@ h4 {
       document.getElementById('prevBtn').disabled = true;
       document.getElementById('nextBtn').disabled = allRounds.length <= 1;
     }
+
 function Aischeduler(players, numCourts, totalRounds = 100, fixedPairs = []) {
+  const numPlayersPerRound = numCourts * 4;
+  const totalPlayers = players.length;
+  const numResting = totalPlayers > numPlayersPerRound ? totalPlayers - numPlayersPerRound : 0;
+
+  const rounds = [];
+  const playedTogether = new Map(); // pairKey -> last round index
+  const restCount = new Map(players.map(p => [p, 0])); // player -> how many times rested
+
+  for (let round = 0; round < totalRounds; round++) {
+    // === 1️⃣ Choose players fairly ===
+    const sortedByRest = [...players].sort((a, b) => restCount.get(a) - restCount.get(b));
+
+    let resting = [];
+    let playing = [];
+    if (numResting > 0) {
+      resting = sortedByRest.slice(0, numResting);
+      playing = sortedByRest.slice(numResting, numResting + numPlayersPerRound);
+    } else {
+      playing = [...sortedByRest];
+    }
+
+    // ✅ Prepare resting display and increment count only once
+    const restingWithNumber = resting.map(p => {
+      const currentCount = restCount.get(p) || 0;
+      restCount.set(p, currentCount + 1); // increment for next round
+      return `${p}#${currentCount + 1}`; // display as Name#N
+    });
+
+    // === 2️⃣ Pair selection (fresh pairs prioritized) ===
+    const pairs = [];
+    const usedPlayers = new Set();
+    const pairScores = [];
+
+    for (let i = 0; i < playing.length - 1; i++) {
+      for (let j = i + 1; j < playing.length; j++) {
+        const key = [playing[i], playing[j]].sort().join(' & ');
+        const score = playedTogether.has(key) ? round - playedTogether.get(key) : Infinity;
+        pairScores.push({ key, players: [playing[i], playing[j]], score });
+      }
+    }
+
+    pairScores.sort((a, b) => {
+      const sa = a.score === Infinity ? 999999 : a.score;
+      const sb = b.score === Infinity ? 999999 : b.score;
+      return sb - sa;
+    });
+
+    for (const { players: [p1, p2], key } of pairScores) {
+      if (!usedPlayers.has(p1) && !usedPlayers.has(p2)) {
+        pairs.push([p1, p2]);
+        usedPlayers.add(p1);
+        usedPlayers.add(p2);
+        playedTogether.set(key, round);
+      }
+    }
+
+    // === 3️⃣ Form games (pair vs pair) ===
+    const games = [];
+    for (let i = 0; i < pairs.length - 1 && games.length < numCourts; i += 2) {
+      const pair1 = pairs[i];
+      const pair2 = pairs[i + 1];
+      if (pair2) games.push({ court: games.length + 1, pair1, pair2 });
+    }
+
+    // === 4️⃣ Save the round ===
+    rounds.push({
+      round: round + 1,
+      resting: restingWithNumber,
+      playing,
+      games,
+    });
+  }
+
+  return rounds;
+}
+
+
+
+function Aischeduler2(players, numCourts, totalRounds = 100, fixedPairs = []) {
   const numPlayersPerRound = numCourts * 4;
   const totalPlayers = players.length;
   const numResting = totalPlayers > numPlayersPerRound ? totalPlayers - numPlayersPerRound : 0;
