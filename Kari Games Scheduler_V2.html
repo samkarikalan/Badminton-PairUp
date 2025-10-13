@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Badminton Pair-UP</title>
+  <style>
+   /* === GLOBAL === */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #3b0073, #7d00b8);
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
+}
+header {
+  padding: 10px;
+}
+h1 {
+  font-size: 25px;
+  margin: 0;
+  font-weight: bold;  
+  letter-spacing: 2px;
+}
+h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #3a1818;
+}
+h4 {
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+/* === PAGE 1: Player Entry / Setup === */
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+.card {
+  background: white;
+  color: purple;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.card input, .card select, .card button, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+.card button {
+  background: purple;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+.card button:hover {
+  background: #5e009c;
+  transform: scale(1.05);
+}
+#player-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2px;
+}
+#player-list-table th, #player-list-table td {
+  border: 1px solid #ccc;
+  padding: 2px 4px;
+  text-align: left;
+  font-size: 12px;
+}
+#player-list-table th {
+  background: #f2f2f2;
+}
+.delete-btn {
+  background: none;
+  border: none;
+  color: #d11a2a;
+  font-size: 16px;
+  cursor: pointer;
+}
+.delete-btn:hover {
+  color: #a00;
+}
+.fixed-pairs-list {
+  margin-top: 10px;
+}
+.fixed-pair-item {
+  background: #eee;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.fixed-pair-remove {
+  color: #d11a2a;
+  cursor: pointer;
+  margin-left: 12px;
+}
+.fixed-pair-remove:hover {
+  color: #a00;
+}
+.main-action {
+  display: block;
+  width: 100%;
+  background: orange;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s, transform 0.2s;
+}
+.main-action:hover {
+  background: #ffb84d;
+  transform: scale(1.05);
+}
+
+/* === Modal === */
+#importModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+}
+#importModal .modal-content {
+  background: white;
+  color: black;
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+#importModal button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* === PAGE 2: Match Results / Court Layout === */
+#game-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 5px 5px;
+  background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
+  min-height: 40vh;
+}
+
+.match-card {
+  background: white;
+  color: #3b0073;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.match-card h3 {
+  color: #3b0073;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.match-card .teams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+}
+
+.Lplayer-btn {
+  background: #009c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.Lplayer-btn:hover {
+  background: #34995b;
+  transform: scale(1.03);
+}
+.Rplayer-btn {
+  background: #0494ad;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.Rplayer-btn:hover {
+  background: #3f8e9c;
+  transform: scale(1.03);
+}
+
+.vs-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #3b0073;
+}
+
+.match-time {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #3b0073;
+  font-weight: 600;
+}
+
+.swipe-hint {
+  font-size: 14px;
+  color: #ccc;
+  margin-top: 30px;
+  text-align: center;
+}
+
+/* === NEW: Round Navigation (Improved) === */
+.round-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-top: 15px;
+  padding: 5px;
+  background: linear-gradient(135deg, #2a2a72, #009ffd);
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.round-navigation .round-label {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.round-navigation button {
+  background: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-width: 50px;
+}
+
+.round-navigation button:hover:enabled {
+  background: #009ffd;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.round-navigation button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .match-card {
+    width: 95%;
+    padding: 18px;
+  }
+  .teams {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .team {
+    width: 48%;
+  }
+  .round-navigation {    
+    gap: 10px;
+  }
+  .round-navigation .round-label {
+    font-size: 0.9rem;
+  }
+}
+
+.completed-round {
+  background: #c8e6c9; /* soft green */
+  opacity: 0.7;
+  transition: background 0.4s ease, opacity 0.4s ease;
+}
+html, body {
+  overscroll-behavior-y: contain; /* Prevent pull-to-refresh and scroll chaining */
+  touch-action: none;             /* Prevent swipe-down gestures */
+}
+  </style>
+</head>
+<body onload="initPage()">
+
+  <!-- Page 1 -->
+  <div id="page1">
+    <div class="container">
+      <h1>Kari Games Scheduler</h1>
+
+      <!-- Import Players -->
+      <div class="card">
+        <h3>Import Players</h3>
+        <button onclick="showImportModal()">Paste All Players</button>
+      </div>
+
+      <!-- Modal -->
+      <div id="importModal">
+        <div class="modal-content">
+          <h3>Paste Players List</h3>
+          <textarea id="players-textarea" rows="8" placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
+          <button onclick="addPlayersFromText()">OK</button>
+          <button onclick="hideImportModal()" style="background:#d11a2a; color:white;">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Add Player Form -->
+      <div class="card">
+        <h3>Add Players</h3>
+        <input type="text" id="player-name" placeholder="Enter Player Name">
+        <select id="player-gender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        <button onclick="addPlayer()">Add Player</button>
+      </div>
+
+      <!-- Players List -->
+      <div class="card">
+        <h3>Players List</h3>
+        <table id="player-list-table"></table>
+      </div>
+
+      <!-- Fixed Pairs -->
+       
+      <div class="card">
+        <h3>Set Fixed Pairs (Optional)</h3>
+        <select id="fixed-pair-1"></select>
+        <select id="fixed-pair-2"></select>
+        <button onclick="addFixedPair()">Add Fixed Pair</button>
+        <div id="fixed-pair-list" class="fixed-pairs-list"></div>
+      </div>
+
+      <!-- Game Setup -->
+      <div class="card">
+        <!--<h3>Setup Matches</h3> -->
+        <input type="number" id="num-courts" placeholder="Enter Number of Courts" min="1">
+        
+        <button onclick="
+  initScheduler(
+    players.map(p => p.name),
+    parseInt(document.getElementById('num-courts').value),
+    fixedPairs
+  );
+  goToRounds();
+">
+  Go to Rounds
+</button>
+
+
+        <!--<button onclick="generateGames(); enableRoundsButton(); goToRounds(); ">Generate Games</button> -->
+      </div>
+
+      <!-- Go to Rounds -->    
+       <button id="goToRoundsBtn" class="main-action" onclick="goToRounds()" style="display:none;">Go to Rounds ➡️</button>
+
+      <!--<button class="main-action" onclick="goToRounds()" style="display:none;">Go to Rounds ➡️</button>            -->
+    </div>
+  </div>
+
+  <!-- Page 2 -->
+  <div id="page2" style="display:none;">
+    <header>
+      <!--<h1>BADMINTON</h1> -->
+      <h4 id="roundTitle">Championship</h4>
+    </header>
+
+    <div id="game-results"></div>
+
+    <div class="round-navigation">      
+      <button id="prevBtn" onclick="prevRound()" disabled>Prev Round</button>
+      <button id="nextBtn" onclick="nextRound()" disabled>NextRound</button>      
+    </div>
+
+    <!-- Back button -->
+     <button class="main-action" onclick="goBack()">Back</button>    
+  </div>
+<!DOCTYPE html>
+<script>
+/* =========================
+   GLOBAL STATE
+========================= */
+let players = [];
+let fixedPairs = [];
+let allRounds = [];
+let currentRoundIndex = 0;
+
+let schedulerState = {
+  players: [],
+  numCourts: 0,
+  fixedPairs: [],
+  restCount: new Map(),
+  playedTogether: new Map(),
+  fixedMap: new Map(),
+  roundIndex: 0,
+};
+
+/* =========================
+   INITIALIZATION
+========================= */
+function initPage() {
+  document.getElementById("page1").style.display = 'block';
+  document.getElementById("page2").style.display = 'none';
+}
+
+/* =========================
+   PLAYER MANAGEMENT
+========================= */
+function showImportModal() {
+  document.getElementById('importModal').style.display = 'block';
+}
+function hideImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  document.getElementById('players-textarea').value = '';
+}
+function addPlayersFromText() {
+  const text = document.getElementById('players-textarea').value.trim();
+  if (!text) return;
+
+  const lines = text.split(/\r?\n/);
+  lines.forEach(line => {
+    const [nameRaw, genderRaw] = line.split(',');
+    const name = nameRaw?.trim();
+    const gender = genderRaw?.trim() || "Male";
+    if (name) players.push({ name, gender });
+  });
+  updatePlayerList();
+  updateFixedPairSelectors();
+  hideImportModal();
+}
+
+function addPlayer() {
+  const name = document.getElementById('player-name').value.trim();
+  const gender = document.getElementById('player-gender').value;
+  if (name) {
+    players.push({ name, gender });
+    updatePlayerList();
+    updateFixedPairSelectors();
+    document.getElementById('player-name').value = '';
+  }
+}
+
+function editPlayer(i, field, val) {
+  players[i][field] = val.trim();
+  updateFixedPairSelectors();
+}
+
+function deletePlayer(i) {
+  players.splice(i, 1);
+  updatePlayerList();
+  updateFixedPairSelectors();
+}
+
+function updatePlayerList() {
+  const table = document.getElementById('player-list-table');
+  table.innerHTML = '<tr><th>Name</th><th>Gender</th><th>Action</th></tr>';
+  players.forEach((p, i) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="text" value="${p.name}" onchange="editPlayer(${i}, 'name', this.value)"></td>
+      <td>
+        <select onchange="editPlayer(${i}, 'gender', this.value)">
+          <option value="Male" ${p.gender === 'Male' ? 'selected' : ''}>Male</option>
+          <option value="Female" ${p.gender === 'Female' ? 'selected' : ''}>Female</option>
+        </select>
+      </td>
+      <td><button class="delete-btn" onclick="deletePlayer(${i})">Delete</button></td>
+    `;
+    table.appendChild(row);
+  });
+}
+
+/* =========================
+   FIXED PAIRS
+========================= */
+function updateFixedPairSelectors() {
+  const sel1 = document.getElementById('fixed-pair-1');
+  const sel2 = document.getElementById('fixed-pair-2');
+  sel1.innerHTML = sel2.innerHTML = '';
+  players.forEach(p => {
+    sel1.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+    sel2.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+  });
+}
+
+function addFixedPair() {
+  const p1 = document.getElementById('fixed-pair-1').value;
+  const p2 = document.getElementById('fixed-pair-2').value;
+  if (p1 && p2 && p1 !== p2) {
+    fixedPairs.push([p1, p2]);
+    const div = document.createElement('div');
+    div.classList.add('fixed-pair-item');
+    div.innerHTML = `${p1} & ${p2} <span class="fixed-pair-remove" onclick="removeFixedPair(this, '${p1}', '${p2}')">Remove</span>`;
+    document.getElementById('fixed-pair-list').appendChild(div);
+  }
+}
+
+function removeFixedPair(el, p1, p2) {
+  fixedPairs = fixedPairs.filter(pair => !(pair[0] === p1 && pair[1] === p2));
+  el.parentElement.remove();
+}
+
+/* =========================
+   SCHEDULER INIT
+========================= */
+function initScheduler(playersList, numCourts, fixedPairs = []) {
+  schedulerState.players = playersList;
+  schedulerState.numCourts = numCourts;
+  schedulerState.fixedPairs = fixedPairs;
+  schedulerState.restCount = new Map(playersList.map(p => [p, 0]));
+  schedulerState.playedTogether = new Map();
+  schedulerState.fixedMap = new Map();
+  fixedPairs.forEach(([a, b]) => {
+    schedulerState.fixedMap.set(a, b);
+    schedulerState.fixedMap.set(b, a);
+  });
+  schedulerState.roundIndex = 0;
+}
+
+/* =========================
+   ROUND GENERATOR
+========================= */
+function AischedulerNextRound() {
+  const { players, numCourts, fixedPairs, restCount, playedTogether, fixedMap } = schedulerState;
+  const totalPlayers = players.length;
+  const numPlayersPerRound = numCourts * 4;
+  const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
+  schedulerState.roundIndex++;
+
+  // Pick resting (lowest rest count)
+  let resting = [...players].sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0)).slice(0, numResting);
+
+  // Ensure fixed pairs rest together
+  for (const p of [...resting]) {
+    if (fixedMap.has(p)) {
+      const partner = fixedMap.get(p);
+      if (!resting.includes(partner)) resting.push(partner);
+    }
+  }
+
+  // Ensure enough players remain
+  while (players.length - resting.length < numPlayersPerRound) {
+    const maxRest = resting.reduce((maxP, p) => restCount.get(p) > restCount.get(maxP) ? p : maxP, resting[0]);
+    resting = resting.filter(p => p !== maxRest);
+  }
+
+  const playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
+  const restingWithNumber = resting.map(p => `${p}#${(restCount.set(p, (restCount.get(p) || 0) + 1), restCount.get(p))}`);
+
+  // Pair logic
+  const pairs = [];
+  const used = new Set();
+
+  // Add fixed pairs first
+  for (const [p1, p2] of fixedPairs) {
+    if (playing.includes(p1) && playing.includes(p2)) {
+      pairs.push([p1, p2]);
+      used.add(p1); used.add(p2);
+    }
+  }
+
+  // Pair remaining players (avoid repeat)
+  //const free = playing.filter(p => !used.has(p));
+  const free = playing
+  .filter(p => !used.has(p))
+  .sort(() => Math.random() - 0.5);
+
+  const scores = [];
+  for (let i = 0; i < free.length - 1; i++) {
+    for (let j = i + 1; j < free.length; j++) {
+      const key = [free[i], free[j]].sort().join("&");
+      const score = playedTogether.has(key) ? schedulerState.roundIndex - playedTogether.get(key) : Infinity;
+      scores.push({ key, p1: free[i], p2: free[j], score });
+    }
+  }
+  scores.sort((a, b) => (b.score === Infinity ? 99999 : b.score) - (a.score === Infinity ? 99999 : a.score));
+
+  for (const { key, p1, p2 } of scores) {
+    if (!used.has(p1) && !used.has(p2)) {
+      pairs.push([p1, p2]);
+      used.add(p1); used.add(p2);
+      playedTogether.set(key, schedulerState.roundIndex);
+    }
+  }
+
+  const games = [];
+  for (let i = 0; i < pairs.length - 1 && games.length < numCourts; i += 2)
+    games.push({ court: games.length + 1, pair1: pairs[i], pair2: pairs[i + 1] });
+
+  return { round: schedulerState.roundIndex, resting: restingWithNumber, playing, games };
+}
+
+/* =========================
+   ROUND DISPLAY
+========================= */
+function showRound(index) {
+  const resultsDiv = document.getElementById('game-results');
+  resultsDiv.innerHTML = '';
+  const data = allRounds[index];
+  if (!data) return;
+
+  document.getElementById("roundTitle").innerText = `Round ${data.round}`;
+  const restDiv = document.createElement('div');
+  restDiv.className = 'round-header';
+  restDiv.innerText = `Resting: ${data.resting.join(', ') || 'None'}`;
+  resultsDiv.appendChild(restDiv);
+
+  data.games.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    const team1 = document.createElement('div');
+    team1.className = 'team';
+    g.pair1.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'Lplayer-btn';
+      btn.innerText = p;
+      team1.appendChild(btn);
+    });
+
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = 'VS';
+
+    const team2 = document.createElement('div');
+    team2.className = 'team';
+    g.pair2.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'Rplayer-btn';
+      btn.innerText = p;
+      team2.appendChild(btn);
+    });
+
+    teamsDiv.append(team1, vs, team2);
+    card.appendChild(teamsDiv);
+    resultsDiv.appendChild(card);
+  });
+
+  document.getElementById('prevBtn').disabled = index === 0;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+function goToRounds() {
+  const numCourts = parseInt(document.getElementById('num-courts').value);
+  if (!players.length || !numCourts) {
+    alert('Please add players and number of courts!');
+    return;
+  }
+  initScheduler(players.map(p => p.name), numCourts, fixedPairs);
+  allRounds = [AischedulerNextRound()];
+  currentRoundIndex = 0;
+  showRound(0);
+  document.getElementById('page1').style.display = 'none';
+  document.getElementById('page2').style.display = 'block';
+}
+
+function goBack() {
+  const pin = prompt("Enter 4-digit code to go back:");
+  if (pin === "0000") {
+    document.getElementById('page1').style.display = 'block';
+    document.getElementById('page2').style.display = 'none';
+  } else if (pin !== null) alert("Incorrect PIN!");
+}
+
+function nextRound() {
+  if (currentRoundIndex + 1 < allRounds.length) {
+    currentRoundIndex++;
+    showRound(currentRoundIndex);
+  } else {
+    const newRound = AischedulerNextRound();
+    allRounds.push(newRound);
+    currentRoundIndex = allRounds.length - 1;
+    showRound(currentRoundIndex);
+  }
+}
+
+function prevRound() {
+  if (currentRoundIndex > 0) {
+    currentRoundIndex--;
+    showRound(currentRoundIndex);
+  }
+}
+
+// Prevent pull-to-refresh and accidental reload on mobile
+document.addEventListener('touchmove', function (event) {
+  if (event.touches.length > 1) {
+    event.preventDefault(); // Disable multi-touch zoom
+  }
+}, { passive: false });
+
+window.addEventListener('beforeunload', function (e) {
+  // Optional: warn if they try to reload or close
+  e.preventDefault();
+  e.returnValue = ''; // Chrome requires returnValue to show prompt
+});
+</script>
+
+
+</body>
+</html>
+
