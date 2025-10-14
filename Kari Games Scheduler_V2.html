@@ -695,6 +695,8 @@ function AischedulerNextRound() {
       ((!playedTogether.has(b.pair1.join("&")) || !playedTogether.has(b.pair2.join("&"))) ? 1 : 0);
     return bScore - aScore;
   });
+  
+  
 
   // Pick best ones until courts filled
   const usedPairs = new Set();
@@ -711,28 +713,23 @@ function AischedulerNextRound() {
     [...g.pair1, ...g.pair2].forEach(p => usedPairs.add(p));
     playedAgainst.add(key);
   }
+  
+  // Check if everything scored 0 → then reset
+  const allFalse = rankedGames.every(g => !g.bothNew);
 
+  if (allFalse) {
+    schedulerState.playedTogether = new Map();
+    schedulerState.playedAgainst = new Set();
+    //schedulerState.roundIndex = 0;
+  }
   // === 4️⃣ Return finalized round ===
   const roundData = {
     round: schedulerState.roundIndex,
     resting: restingWithNumber,
     playing,
     games: finalGames
-  };
-
-  // === ⚙️ 5️⃣ Check if all combinations played; if so, reset everything except resting ===
-  const totalPairs = (totalPlayers * (totalPlayers - 1)) / 2;  // number of possible pairs
-  const totalMatchups = (totalPairs * (totalPairs - 1)) / 2;   // rough max of matchups
-
-  if (playedAgainst.size >= totalMatchups) {
-    console.log("✅ All combinations played. Resetting game history...");
-
-    // Preserve restCount, reset the rest
-    schedulerState.playedTogether = new Map();
-    schedulerState.playedAgainst = new Set();
-    schedulerState.roundIndex = 0;
-  }
-
+  }; 
+  
   return roundData;
 }
 
