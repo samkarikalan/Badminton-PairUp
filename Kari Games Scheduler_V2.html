@@ -157,7 +157,16 @@ h4 {
   padding: 8px 12px;
   border-radius: 6px;
 }
-
+.ok-btn {
+  background: #009c3c;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+.ok-btn:hover {
+  background: #00b84d;
+}
 /* === PAGE 2: Match Results / Court Layout === */
 #game-results {
   display: flex;
@@ -340,7 +349,7 @@ h4 {
         <button onclick="showImportModal()">Paste All Players</button>
       </div>
 
-      <!-- Modal -->
+      <!-- Modal 
       <div id="importModal">
         <div class="modal-content">
           <h3>Paste Players List</h3>
@@ -349,7 +358,15 @@ h4 {
           <button onclick="hideImportModal()" style="background:#d11a2a; color:white;">Cancel</button>
         </div>
       </div>
-
+      -->
+      <div id="importModal">
+  <div class="modal-content">
+    <h3>Paste Players List</h3>
+    <textarea id="players-textarea" rows="8" placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
+    <button class="ok-btn" onclick="addPlayersFromText()">Import</button>
+    <button onclick="hideImportModal()" style="background:#d11a2a; color:white;">Cancel</button>
+  </div>
+</div>
       <!-- Add Player Form -->
       <div class="card">
         <h3>Add Players</h3>
