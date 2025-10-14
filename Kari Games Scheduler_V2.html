@@ -676,7 +676,6 @@ function AischedulerNextRound() {
   const games = [];
   const attempted = new Set();
 
-  // Generate all possible pair combinations
   for (let i = 0; i < pairs.length - 1; i++) {
     for (let j = i + 1; j < pairs.length; j++) {
       const matchupKey = [...pairs[i], ...pairs[j]].sort().join(" vs ");
@@ -686,10 +685,7 @@ function AischedulerNextRound() {
     }
   }
 
-  // Sort preference:
-  // 1. Both pairs new
-  // 2. One pair new
-  // 3. Old matchup
+  // Sort by newness
   const rankedGames = games.sort((a, b) => {
     const aScore =
       (a.bothNew ? 3 : 0) +
@@ -717,13 +713,29 @@ function AischedulerNextRound() {
   }
 
   // === 4️⃣ Return finalized round ===
-  return {
+  const roundData = {
     round: schedulerState.roundIndex,
     resting: restingWithNumber,
     playing,
     games: finalGames
   };
+
+  // === ⚙️ 5️⃣ Check if all combinations played; if so, reset everything except resting ===
+  const totalPairs = (totalPlayers * (totalPlayers - 1)) / 2;  // number of possible pairs
+  const totalMatchups = (totalPairs * (totalPairs - 1)) / 2;   // rough max of matchups
+
+  if (playedAgainst.size >= totalMatchups) {
+    console.log("✅ All combinations played. Resetting game history...");
+
+    // Preserve restCount, reset the rest
+    schedulerState.playedTogether = new Map();
+    schedulerState.playedAgainst = new Set();
+    schedulerState.roundIndex = 0;
+  }
+
+  return roundData;
 }
+
 
 /* =========================
    ROUND DISPLAY
