@@ -443,23 +443,19 @@ let schedulerState = {
 };
 
 
-let disableRefresh = false;
+let isOnPage2 = false;
 
-// Detect pull-to-refresh gesture
-let touchStartY = 0;
-let touchEndY = 0;
+// Disable pull-to-refresh by forcing overscroll-behavior
+function disablePullToRefresh() {
+  document.body.style.overscrollBehaviorY = 'none';
+  document.documentElement.style.overscrollBehaviorY = 'none';
+}
 
-document.addEventListener("touchstart", (e) => {
-  touchStartY = e.touches[0].clientY;
-}, { passive: false });
-
-document.addEventListener("touchmove", (e) => {
-  // Prevent pull-to-refresh when on page2 and swiping down from top
-  if (disableRefresh && window.scrollY === 0 && e.touches[0].clientY > touchStartY) {
-    e.preventDefault();
-  }
-}, { passive: false });
-
+// Re-enable normal scroll
+function enablePullToRefresh() {
+  document.body.style.overscrollBehaviorY = '';
+  document.documentElement.style.overscrollBehaviorY = '';
+}
 /* =========================
    INITIALIZATION
 ========================= */
@@ -779,7 +775,8 @@ function goToRounds() {
   showRound(0);
   document.getElementById('page1').style.display = 'none';
   document.getElementById('page2').style.display = 'block';
-   disableRefresh = true;
+  isOnPage2 = true;
+   disablePullToRefresh();
 }
 
 function goBack() {
@@ -787,7 +784,8 @@ function goBack() {
   if (pin === "0000") {
     document.getElementById('page1').style.display = 'block';
     document.getElementById('page2').style.display = 'none';
-    disableRefresh = false;
+    isOnPage2 = false;
+  enablePullToRefresh(); // 🔓 re-enables refresh
   } else if (pin !== null) alert("Incorrect PIN!");
 }
 
