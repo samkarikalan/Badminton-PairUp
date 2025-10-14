@@ -430,6 +430,7 @@ let players = [];
 let fixedPairs = [];
 let allRounds = [];
 let currentRoundIndex = 0;
+let playedAgainst = new Set();
 
 let schedulerState = {
   players: [],
@@ -440,6 +441,24 @@ let schedulerState = {
   fixedMap: new Map(),
   roundIndex: 0,
 };
+
+
+let disableRefresh = false;
+
+// Detect pull-to-refresh gesture
+let touchStartY = 0;
+let touchEndY = 0;
+
+document.addEventListener("touchstart", (e) => {
+  touchStartY = e.touches[0].clientY;
+}, { passive: false });
+
+document.addEventListener("touchmove", (e) => {
+  // Prevent pull-to-refresh when on page2 and swiping down from top
+  if (disableRefresh && window.scrollY === 0 && e.touches[0].clientY > touchStartY) {
+    e.preventDefault();
+  }
+}, { passive: false });
 
 /* =========================
    INITIALIZATION
@@ -549,32 +568,42 @@ function removeFixedPair(el, p1, p2) {
 /* =========================
    SCHEDULER INIT
 ========================= */
+
 function initScheduler(playersList, numCourts, fixedPairs = []) {
-  schedulerState.players = playersList;
+  // Reverse and store the player list
+  schedulerState.players = [...playersList].reverse();
+
   schedulerState.numCourts = numCourts;
   schedulerState.fixedPairs = fixedPairs;
   schedulerState.restCount = new Map(playersList.map(p => [p, 0]));
   schedulerState.playedTogether = new Map();
   schedulerState.fixedMap = new Map();
+  schedulerState.playedAgainst = new Set();
+
+  // Map fixed pairs for quick lookups
   fixedPairs.forEach(([a, b]) => {
     schedulerState.fixedMap.set(a, b);
     schedulerState.fixedMap.set(b, a);
   });
+
   schedulerState.roundIndex = 0;
 }
+
 
 /* =========================
    ROUND GENERATOR
 ========================= */
 function AischedulerNextRound() {
-  const { players, numCourts, fixedPairs, restCount, playedTogether, fixedMap } = schedulerState;
+  const { players, numCourts, fixedPairs, restCount, playedTogether, playedAgainst, fixedMap } = schedulerState;
   const totalPlayers = players.length;
   const numPlayersPerRound = numCourts * 4;
   const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
   schedulerState.roundIndex++;
 
-  // Pick resting (lowest rest count)
-  let resting = [...players].sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0)).slice(0, numResting);
+  // === 1️⃣ Pick resting players (fairly) ===
+  let resting = [...players]
+    .sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0))
+    .slice(0, numResting);
 
   // Ensure fixed pairs rest together
   for (const p of [...resting]) {
@@ -586,14 +615,17 @@ function AischedulerNextRound() {
 
   // Ensure enough players remain
   while (players.length - resting.length < numPlayersPerRound) {
-    const maxRest = resting.reduce((maxP, p) => restCount.get(p) > restCount.get(maxP) ? p : maxP, resting[0]);
+    const maxRest = resting.reduce(
+      (maxP, p) => restCount.get(p) > restCount.get(maxP) ? p : maxP,
+      resting[0]
+    );
     resting = resting.filter(p => p !== maxRest);
   }
 
   const playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
   const restingWithNumber = resting.map(p => `${p}#${(restCount.set(p, (restCount.get(p) || 0) + 1), restCount.get(p))}`);
 
-  // Pair logic
+  // === 2️⃣ Build pairs (prefer unplayed ones) ===
   const pairs = [];
   const used = new Set();
 
@@ -605,23 +637,21 @@ function AischedulerNextRound() {
     }
   }
 
-  // Pair remaining players (avoid repeat)
-  //const free = playing.filter(p => !used.has(p));
-  const free = playing
-  .filter(p => !used.has(p))
-  .sort(() => Math.random() - 0.5);
+  const free = playing.filter(p => !used.has(p)).sort(() => Math.random() - 0.5);
+  const pairScores = [];
 
-  const scores = [];
   for (let i = 0; i < free.length - 1; i++) {
     for (let j = i + 1; j < free.length; j++) {
       const key = [free[i], free[j]].sort().join("&");
       const score = playedTogether.has(key) ? schedulerState.roundIndex - playedTogether.get(key) : Infinity;
-      scores.push({ key, p1: free[i], p2: free[j], score });
+      pairScores.push({ key, p1: free[i], p2: free[j], score });
     }
   }
-  scores.sort((a, b) => (b.score === Infinity ? 99999 : b.score) - (a.score === Infinity ? 99999 : a.score));
 
-  for (const { key, p1, p2 } of scores) {
+  // Prefer new pairs first
+  pairScores.sort((a, b) => (b.score === Infinity ? 99999 : b.score) - (a.score === Infinity ? 99999 : a.score));
+
+  for (const { key, p1, p2 } of pairScores) {
     if (!used.has(p1) && !used.has(p2)) {
       pairs.push([p1, p2]);
       used.add(p1); used.add(p2);
@@ -629,11 +659,57 @@ function AischedulerNextRound() {
     }
   }
 
+  // === 3️⃣ Form games — using 3-level preference ===
   const games = [];
-  for (let i = 0; i < pairs.length - 1 && games.length < numCourts; i += 2)
-    games.push({ court: games.length + 1, pair1: pairs[i], pair2: pairs[i + 1] });
+  const attempted = new Set();
 
-  return { round: schedulerState.roundIndex, resting: restingWithNumber, playing, games };
+  // Generate all possible pair combinations
+  for (let i = 0; i < pairs.length - 1; i++) {
+    for (let j = i + 1; j < pairs.length; j++) {
+      const matchupKey = [...pairs[i], ...pairs[j]].sort().join(" vs ");
+      const bothNew = !playedAgainst.has(matchupKey);
+      attempted.add(matchupKey);
+      games.push({ pair1: pairs[i], pair2: pairs[j], matchupKey, bothNew });
+    }
+  }
+
+  // Sort preference:
+  // 1. Both pairs new
+  // 2. One pair new
+  // 3. Old matchup
+  const rankedGames = games.sort((a, b) => {
+    const aScore =
+      (a.bothNew ? 3 : 0) +
+      ((!playedTogether.has(a.pair1.join("&")) || !playedTogether.has(a.pair2.join("&"))) ? 1 : 0);
+    const bScore =
+      (b.bothNew ? 3 : 0) +
+      ((!playedTogether.has(b.pair1.join("&")) || !playedTogether.has(b.pair2.join("&"))) ? 1 : 0);
+    return bScore - aScore;
+  });
+
+  // Pick best ones until courts filled
+  const usedPairs = new Set();
+  const finalGames = [];
+  for (const g of rankedGames) {
+    const key = g.matchupKey;
+    if (finalGames.length >= numCourts) break;
+    if ([...g.pair1, ...g.pair2].some(p => usedPairs.has(p))) continue;
+    finalGames.push({
+      court: finalGames.length + 1,
+      pair1: g.pair1,
+      pair2: g.pair2
+    });
+    [...g.pair1, ...g.pair2].forEach(p => usedPairs.add(p));
+    playedAgainst.add(key);
+  }
+
+  // === 4️⃣ Return finalized round ===
+  return {
+    round: schedulerState.roundIndex,
+    resting: restingWithNumber,
+    playing,
+    games: finalGames
+  };
 }
 
 /* =========================
@@ -703,6 +779,7 @@ function goToRounds() {
   showRound(0);
   document.getElementById('page1').style.display = 'none';
   document.getElementById('page2').style.display = 'block';
+   disableRefresh = true;
 }
 
 function goBack() {
@@ -710,6 +787,7 @@ function goBack() {
   if (pin === "0000") {
     document.getElementById('page1').style.display = 'block';
     document.getElementById('page2').style.display = 'none';
+    disableRefresh = false;
   } else if (pin !== null) alert("Incorrect PIN!");
 }
 
