@@ -789,21 +789,93 @@ function showRound(index) {
 /* =========================
    NAVIGATION
 ========================= */
+
 function goToRounds() {
-  const numCourts = parseInt(document.getElementById('num-courts').value);
-  if (!players.length || !numCourts) {
-    alert('Please add players and number of courts!');
-    return;
-  }
-  initScheduler(players.map(p => p.name), numCourts, fixedPairs);
-  allRounds = [AischedulerNextRound()];
-  currentRoundIndex = 0;
-  showRound(0);
-  document.getElementById('page1').style.display = 'none';
-  document.getElementById('page2').style.display = 'block';
-  isOnPage2 = true;
-   disablePullToRefresh();
+
+const numCourts = parseInt(document.getElementById('num-courts').value);
+
+if (!players.length || !numCourts) {
+
+alert('Please add players and number of courts!');
+
+return;
+
 }
+
+    if (allRounds.length = 0) {
+
+        initScheduler(players.map(p => p.name), numCourts, fixedPairs);
+
+        allRounds = [AischedulerNextRound()];
+
+        currentRoundIndex = 0;
+
+        showRound(0);
+
+    } else {
+
+        if (currentRoundIndex + 1 <= allRounds.length) {
+
+            showRound(currentRoundIndex);
+
+        } else {
+
+            const playersList = players.map(p => p.name);
+
+            schedulerState.players = [...playersList].reverse();
+
+            schedulerState.numCourts = numCourts;
+
+            schedulerState.fixedPairs = fixedPairs;
+
+            schedulerState.fixedMap = new Map();
+
+            // Add new players (who are not already in restCount)
+
+            for (const p of playersList) {
+
+                if (!schedulerState.restCount.has(p)) {
+
+                    schedulerState.restCount.set(p, 0); // initialize new player
+
+                }
+
+            }
+
+ 
+
+            // Optionally, remove restCount entries for players no longer in playersList
+
+            for (const p of Array.from(schedulerState.restCount.keys())) {
+
+                if (!playersList.includes(p)) {
+
+                    schedulerState.restCount.delete(p);
+
+                }
+
+            }           
+
+            allRounds = [AischedulerNextRound()];
+
+            currentRoundIndex = currentRoundIndex + 1;
+
+            showRound(currentRoundIndex);
+
+}
+
+    }
+
+document.getElementById('page1').style.display = 'none';
+
+document.getElementById('page2').style.display = 'block';
+
+isOnPage2 = true;
+
+disablePullToRefresh();
+
+}
+
 
 function goBack() {
   const pin = prompt("Enter 4-digit code to go back:");
@@ -851,4 +923,5 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
