@@ -397,25 +397,11 @@ h4 {
       <!-- Game Setup -->
       <div class="card">
         <!--<h3>Setup Matches</h3> -->
-        <input type="number" id="num-courts" placeholder="Enter Number of Courts" min="1">
-        
-        <button onclick="
-  initScheduler(
-    players.map(p => p.name),
-    parseInt(document.getElementById('num-courts').value),
-    fixedPairs
-  );
-  goToRounds();
-">
-  Go to Rounds
-</button>
-
-
-        <!--<button onclick="generateGames(); enableRoundsButton(); goToRounds(); ">Generate Games</button> -->
+        <input type="number" id="num-courts" placeholder="Enter Number of Courts" min="1">        
       </div>
 
       <!-- Go to Rounds -->    
-       <button id="goToRoundsBtn" class="main-action" onclick="goToRounds()" style="display:none;">Go to Rounds ➡️</button>
+       <button id="goToRoundsBtn" class="main-action" onclick="goToRounds()">Go to Rounds ➡️</button>
 
       <!--<button class="main-action" onclick="goToRounds()" style="display:none;">Go to Rounds ➡️</button>            -->
     </div>
@@ -813,13 +799,6 @@ return;
         showRound(0);
 
     } else {
-
-        if (currentRoundIndex + 1 <= allRounds.length) {
-
-            showRound(currentRoundIndex);
-
-        } else {
-
             const playersList = players.map(p => p.name);
 
             schedulerState.players = [...playersList].reverse();
@@ -831,12 +810,27 @@ return;
             schedulerState.fixedMap = new Map();
 
             // Add new players (who are not already in restCount)
+            let highestRestCount = -Infinity;
+            let highestPlayers = [];
+
+            for (const p of playersList) {
+              if (schedulerState.restCount.has(p)) {
+              const count = schedulerState.restCount.get(p);
+
+                if (count > highestRestCount) {
+                  highestRestCount = count;
+                  highestPlayers = [p]; // reset with new highest
+                } else if (count === highestRestCount) {
+                  highestPlayers.push(p); // tie — add player
+                }
+              }
+            }
 
             for (const p of playersList) {
 
                 if (!schedulerState.restCount.has(p)) {
 
-                    schedulerState.restCount.set(p, 0); // initialize new player
+                    schedulerState.restCount.set(p, highestRestCount+1); // initialize new player
 
                 }
 
@@ -856,6 +850,13 @@ return;
 
             }           
 
+        if (currentRoundIndex + 1 <= allRounds.length) {
+
+            showRound(currentRoundIndex);
+
+        } else {
+
+           
             allRounds.push(AischedulerNextRound());
 
             currentRoundIndex = currentRoundIndex + 1;
