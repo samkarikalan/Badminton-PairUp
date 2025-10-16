@@ -168,115 +168,93 @@ h4 {
   background: #00b84d;
 }
 /* === PAGE 2: Match Results / Court Layout === */
+/* === PAGE 2: Match Results / Court Layout === */
 #game-results {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  padding: 5px 5px 5px;
+  gap: 12px; /* uniform spacing between match cards */
+  padding: 16px;
   background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
   min-height: 40vh;
 }
 
+/* === Match Card === */
 .match-card {
-  background: white;
+  background: #fff;
   color: #3b0073;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 600px;
+  padding: 16px 20px; /* ✅ consistent padding */
   text-align: center;
   font-weight: bold;
-}
-.Rest-card h3 {
-  color: #3b0073;
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-.RestPlayer {
   display: flex;
-  flex-direction: row;
-  width: 45%;
+  flex-direction: column;
+  gap: 12px; /* uniform internal spacing */
 }
+
 .match-card h3 {
-  color: #3b0073;
   font-size: 22px;
-  margin-bottom: 8px;
+  margin: 0; /* reset */
 }
 
 .match-card .teams {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px; /* consistent gap between teams */
 }
 
 .team {
   display: flex;
   flex-direction: column;
-  width: 45%;
-}
-
-.Lplayer-btn {
-  background: #009c3c;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  padding: 10px;
-  margin: 4px 0;
-  text-align: center;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.Lplayer-btn:hover {
-  background: #34995b;
-  transform: scale(1.03);
-}
-.Rplayer-btn {
-  background: #0494ad;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  padding: 10px;
-  margin: 4px 0;
-  text-align: center;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.Rplayer-btn:hover {
-  background: #3f8e9c;
-  transform: scale(1.03);
+  flex: 1;
+  min-width: 120px;
 }
 
 .vs-text {
   font-size: 20px;
   font-weight: bold;
   color: #3b0073;
+  flex: 0 0 auto;
+  margin: 0 8px; /* balanced spacing */
 }
 
+.Lplayer-btn,
+.Rplayer-btn {
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  color: #fff;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.Lplayer-btn { background: #009c3c; }
+.Rplayer-btn { background: #0494ad; }
+
+.Lplayer-btn:hover { background: #34995b; transform: scale(1.03); }
+.Rplayer-btn:hover { background: #3f8e9c; transform: scale(1.03); }
+
 .match-time {
-  margin-top: 8px;
   font-size: 16px;
   color: #3b0073;
   font-weight: 600;
+  margin-top: 4px;
 }
 
-.swipe-hint {
-  font-size: 14px;
-  color: #ccc;
-  margin-top: 8px;
-  text-align: center;
-}
-
-/* === NEW: Round Navigation (Improved) === */
+/* === Round Navigation === */
 .round-navigation {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 25px;
-  margin-top: 8px;
-  padding: 5px;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 8px 16px;
   background: linear-gradient(135deg, #2a2a72, #009ffd);
   border-radius: 12px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
@@ -313,16 +291,17 @@ h4 {
   cursor: not-allowed;
 }
 
+/* === Rest Section === */
 .rest-box {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   background: #ddd;
   border: 2px solid #666;
   border-radius: 12px;
   padding: 12px;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .rest-btn {
@@ -339,33 +318,22 @@ h4 {
   opacity: 0.9;
 }
 
+/* === Mobile Adjustments === */
 @media (max-width: 600px) {
   .match-card {
     width: 95%;
-    padding: 18px;
+    padding: 14px;
   }
   .teams {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
   }
-  .team {
-    width: 48%;
-  }
-  .round-navigation {    
+  .round-navigation {
     gap: 10px;
   }
   .round-navigation .round-label {
     font-size: 0.9rem;
   }
 }
-
-.completed-round {
-  background: #c8e6c9; /* soft green */
-  opacity: 0.7;
-  transition: background 0.4s ease, opacity 0.4s ease;
-}
-
   </style>
 </head>
 <body onload="initPage()">
@@ -1123,6 +1091,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
