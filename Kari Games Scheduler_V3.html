@@ -725,15 +725,7 @@ function AischedulerNextRound() {
   }
   
   // Check if everything scored 0 → then reset
-    rankedGames = games.sort((a, b) => {
-    aScore =
-      (a.bothNew ? 3 : 0) +
-      ((!playedTogether.has(a.pair1.join("&")) || !playedTogether.has(a.pair2.join("&"))) ? 1 : 0);
-    bScore =
-      (b.bothNew ? 3 : 0) +
-      ((!playedTogether.has(b.pair1.join("&")) || !playedTogether.has(b.pair2.join("&"))) ? 1 : 0);
-    return bScore - aScore;
-  });
+    
   
   const allFalse = rankedGames.every(g => !g.bothNew);
 
@@ -998,6 +990,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
