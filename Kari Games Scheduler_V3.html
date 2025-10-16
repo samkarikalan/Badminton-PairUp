@@ -341,16 +341,14 @@ h4 {
   <!-- Page 1 -->
   <div id="page1">
     <div class="container">
-      <h1>Kari Games Scheduler</h1>
+      <h1>Kari Scheduler</h1>
 
       <!-- Import Players -->
       <div class="card">
-        <h3>Import Players</h3>
         <button onclick="showImportModal()">Paste All Players</button>
       </div>
       <div id="importModal">
         <div class="modal-content">
-          <h3>Paste Players List</h3>
           <textarea id="players-textarea" rows="8" placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
           <button class="ok-btn" onclick="addPlayersFromText()">Import</button>
           <button onclick="hideImportModal()" style="background:#d11a2a; color:white;">Cancel</button>
@@ -358,7 +356,6 @@ h4 {
       </div>
       <!-- Add Player Form -->
       <div class="card">
-        <h3>Add Players</h3>
         <input type="text" id="player-name" placeholder="Enter Player Name">
         <select id="player-gender">
           <option value="Male">Male</option>
@@ -1091,6 +1088,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
