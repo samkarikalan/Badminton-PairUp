@@ -726,10 +726,10 @@ function AischedulerNextRound() {
   
   // Check if everything scored 0 → then reset
     rankedGames = games.sort((a, b) => {
-    const aScore =
+    aScore =
       (a.bothNew ? 3 : 0) +
       ((!playedTogether.has(a.pair1.join("&")) || !playedTogether.has(a.pair2.join("&"))) ? 1 : 0);
-    const bScore =
+    bScore =
       (b.bothNew ? 3 : 0) +
       ((!playedTogether.has(b.pair1.join("&")) || !playedTogether.has(b.pair2.join("&"))) ? 1 : 0);
     return bScore - aScore;
@@ -998,6 +998,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
