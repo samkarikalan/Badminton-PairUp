@@ -948,62 +948,176 @@ function showRound(index) {
       const teamDiv = document.createElement('div');
       teamDiv.className = 'team';
 
-      pair.forEach((p, playerIndex) => {
-        const btn = document.createElement('button');
-        btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
-        btn.innerText = p;
-        btn.draggable = true;
+function showRound(index) {
+  const resultsDiv = document.getElementById('game-results');
+  resultsDiv.innerHTML = '';
+  const data = allRounds[index];
+  if (!data) return;
 
-        // start drag
-        btn.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', JSON.stringify({
-            type: 'team',
-            gameIndex,
-            teamSide,
-            playerIndex,
-            player: p
-          }));
-        });
+  document.getElementById("roundTitle").innerText = `Round ${data.round}`;
 
-        // allow drop
-        btn.addEventListener('dragover', (e) => e.preventDefault());
+  // --- Resting Players Section ---
+  const restDiv = document.createElement('div');
+  restDiv.className = 'round-header';
 
-        // handle drop
-        btn.addEventListener('drop', (e) => {
-          e.preventDefault();
-          const dataObj = JSON.parse(e.dataTransfer.getData('text/plain'));
+  const title = document.createElement('div');
+  title.innerText = 'Resting:';
+  restDiv.appendChild(title);
 
-          // Case 1: Rest -> Team swap
-          if (dataObj.type === 'rest') {
-            const restingPlayer = dataObj.player;
-            const teamPlayer = g[teamSide === 'L' ? 'pair1' : 'pair2'][playerIndex];
-            const restIdx = data.resting.indexOf(restingPlayer);
-            if (restIdx > -1) data.resting[restIdx] = teamPlayer;
-            g[teamSide === 'L' ? 'pair1' : 'pair2'][playerIndex] = restingPlayer;
-            showRound(index);
-          }
+  const restBox = document.createElement('div');
+  restBox.className = 'rest-box';
 
-          // Case 2: Team -> Team swap (optional extension)
-          if (dataObj.type === 'team' && (dataObj.gameIndex !== gameIndex || dataObj.playerIndex !== playerIndex)) {
-            const fromTeam = dataObj.teamSide === 'L' ? 'pair1' : 'pair2';
-            const toTeam = teamSide === 'L' ? 'pair1' : 'pair2';
-            const temp = g[toTeam][playerIndex];
-            g[toTeam][playerIndex] = data.games[dataObj.gameIndex][fromTeam][dataObj.playerIndex];
-            data.games[dataObj.gameIndex][fromTeam][dataObj.playerIndex] = temp;
-            showRound(index);
-          }
-        });
+  // Create draggable buttons for resting players
+  data.resting.forEach(player => {
+    const btn = document.createElement('button');
+    btn.innerText = player;
+    btn.className = 'rest-btn';
+    btn.draggable = true;
 
-        teamDiv.appendChild(btn);
-      });
-      return teamDiv;
+    // Give each resting player a color
+    const match = player.match(/\.?#(\d+)/);
+    if (match) {
+      const hue = (parseInt(match[1]) * 40) % 360;
+      btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
+    } else {
+      btn.style.backgroundColor = '#777';
     }
+    btn.style.color = 'white';
 
-    const team1 = createTeam(g.pair1, 'L');
+    // Drag start (resting player → team)
+    btn.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', JSON.stringify({
+        type: 'rest',
+        player
+      }));
+    });
+
+    restBox.appendChild(btn);
+  });
+
+  // --- Drop handler (team player → resting) ---
+  restBox.addEventListener('dragover', (e) => e.preventDefault());
+  restBox.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const dropData = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+    if (dropData.type === 'team') {
+      const { gameIndex, teamSide, playerIndex, player } = dropData;
+      const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+      const team = data.games[gameIndex][teamKey];
+      const outgoingPlayer = team[playerIndex];
+
+      // Choose first resting player to swap (if any)
+      const swapIn = data.resting.length > 0 ? data.resting[0] : null;
+
+      if (swapIn) {
+        team[playerIndex] = swapIn;
+        const swapIndex = data.resting.indexOf(swapIn);
+        data.resting[swapIndex] = outgoingPlayer;
+      } else {
+        // If no one resting, just add this player
+        team[playerIndex] = '(Empty)';
+        data.resting.push(outgoingPlayer);
+      }
+
+      showRound(index);
+    }
+  });
+
+  restDiv.appendChild(restBox);
+  resultsDiv.appendChild(restDiv);
+
+  // --- Games Section ---
+  data.games.forEach((g, gameIndex) => {
+    const card = document.createElement('div');
+    card.className = 'match-card';
+
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    // TEAM 1
+    const team1 = document.createElement('div');
+    team1.className = 'team';
+    g.pair1.forEach((p, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'Lplayer-btn';
+      btn.innerText = p;
+      btn.draggable = true;
+
+      btn.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          type: 'team',
+          player: p,
+          gameIndex,
+          teamSide: 'L',
+          playerIndex: i
+        }));
+      });
+
+      // Allow drop from resting
+      btn.addEventListener('dragover', (e) => e.preventDefault());
+      btn.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const dropData = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+        if (dropData.type === 'rest') {
+          const restPlayer = dropData.player;
+          const oldPlayer = g.pair1[i];
+
+          // Swap in data
+          g.pair1[i] = restPlayer;
+          const restIndex = data.resting.indexOf(restPlayer);
+          data.resting[restIndex] = oldPlayer;
+
+          showRound(index);
+        }
+      });
+
+      team1.appendChild(btn);
+    });
+
     const vs = document.createElement('span');
     vs.className = 'vs';
     vs.innerText = 'VS';
-    const team2 = createTeam(g.pair2, 'R');
+
+    // TEAM 2
+    const team2 = document.createElement('div');
+    team2.className = 'team';
+    g.pair2.forEach((p, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'Rplayer-btn';
+      btn.innerText = p;
+      btn.draggable = true;
+
+      btn.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          type: 'team',
+          player: p,
+          gameIndex,
+          teamSide: 'R',
+          playerIndex: i
+        }));
+      });
+
+      btn.addEventListener('dragover', (e) => e.preventDefault());
+      btn.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const dropData = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+        if (dropData.type === 'rest') {
+          const restPlayer = dropData.player;
+          const oldPlayer = g.pair2[i];
+
+          g.pair2[i] = restPlayer;
+          const restIndex = data.resting.indexOf(restPlayer);
+          data.resting[restIndex] = oldPlayer;
+
+          showRound(index);
+        }
+      });
+
+      team2.appendChild(btn);
+    });
 
     teamsDiv.append(team1, vs, team2);
     card.appendChild(teamsDiv);
@@ -1013,8 +1127,6 @@ function showRound(index) {
   document.getElementById('prevBtn').disabled = index === 0;
   document.getElementById('nextBtn').disabled = false;
 }
-
-  
 function showRoundold(index) {
   const resultsDiv = document.getElementById('game-results');
   resultsDiv.innerHTML = '';
@@ -1256,6 +1368,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
