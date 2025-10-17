@@ -859,7 +859,7 @@ function AischedulerNextRoundold() {
    ROUND DISPLAY
 ========================= */
 
-function showRound(index) {
+  function showRound(index) {
   const resultsDiv = document.getElementById('game-results');
   resultsDiv.innerHTML = '';
   const data = allRounds[index];
@@ -867,7 +867,7 @@ function showRound(index) {
 
   document.getElementById("roundTitle").innerText = `Round ${data.round}`;
 
-  // Build sections separately
+  // Build both sections
   const restDiv = renderRestingPlayers(data, index);
   const gamesDiv = renderGames(data, index);
 
@@ -877,6 +877,7 @@ function showRound(index) {
   document.getElementById('nextBtn').disabled = false;
 }
 
+/* -------------------- RESTING PLAYERS -------------------- */
 function renderRestingPlayers(data, index) {
   const restDiv = document.createElement('div');
   restDiv.className = 'round-header';
@@ -888,7 +889,7 @@ function renderRestingPlayers(data, index) {
   const restBox = document.createElement('div');
   restBox.className = 'rest-box';
 
-  // Drop empty area handler
+  // Drop area for adding from team → rest
   restBox.addEventListener('dragover', (e) => e.preventDefault());
   restBox.addEventListener('drop', (e) => handleDropToRestArea(e, data, index));
 
@@ -907,6 +908,7 @@ function renderRestingPlayers(data, index) {
   return restDiv;
 }
 
+/* -------------------- GAMES -------------------- */
 function renderGames(data, index) {
   const wrapper = document.createElement('div');
 
@@ -941,19 +943,21 @@ function renderGames(data, index) {
   return wrapper;
 }
 
-
+/* -------------------- BUTTON CREATION -------------------- */
 function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
   const btn = document.createElement('button');
   btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
   btn.innerText = name;
   btn.draggable = true;
 
+  // Drag from team
   btn.addEventListener('dragstart', (e) => {
     e.dataTransfer.setData('text/plain', JSON.stringify({
       type: 'team', player: name, gameIndex, teamSide, playerIndex
     }));
   });
 
+  // Allow drop from rest → team
   btn.addEventListener('dragover', (e) => e.preventDefault());
   btn.addEventListener('drop', (e) => handleDropToTeam(e, teamSide, gameIndex, playerIndex, data, index));
 
@@ -966,61 +970,86 @@ function makeRestButton(player, data, index) {
   btn.className = 'rest-btn';
   btn.draggable = true;
 
+  // 🎨 Keep original color logic
+  const match = player.match(/\.?#(\d+)/);
+  if (match) {
+    const num = parseInt(match[1]);
+    const hue = (num * 40) % 360;
+    btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
+    btn.style.color = 'white';
+  } else {
+    btn.style.backgroundColor = '#777';
+    btn.style.color = 'white';
+  }
+
+  // Drag start from rest
   btn.addEventListener('dragstart', (e) => {
     e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'rest', player }));
   });
 
+  // Allow swapping rest → rest
   btn.addEventListener('dragover', (e) => e.preventDefault());
   btn.addEventListener('drop', (e) => handleDropToSpecificRest(e, player, data, index));
 
   return btn;
 }
 
+/* -------------------- DRAG HANDLERS -------------------- */
 
+// When dropping a playing player into the resting area
 function handleDropToRestArea(e, data, index) {
   const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
   if (drop.type !== 'team') return;
-  const { player } = drop;
 
+  const { gameIndex, teamSide, playerIndex, player } = drop;
+  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+  const team = data.games[gameIndex][teamKey];
+
+  // Remove from team
+  team[playerIndex] = '(Empty)';
+
+  // Add to resting if not already there
   if (!data.resting.includes(player)) data.resting.push(player);
+
   showRound(index);
 }
 
-  
+// When dropping a resting player onto a team button
 function handleDropToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
   const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
   if (drop.type !== 'rest') return;
+
+  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
   const restIndex = data.resting.indexOf(drop.player);
   if (restIndex === -1) return;
 
-  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
   const oldPlayer = data.games[gameIndex][teamKey][playerIndex];
-
-  // Swap
   data.games[gameIndex][teamKey][playerIndex] = drop.player;
-  data.resting[restIndex] = oldPlayer;
+
+  // Replace the resting slot with the outgoing player
+  data.resting[restIndex] = oldPlayer === '(Empty)' ? null : oldPlayer;
+  data.resting = data.resting.filter(p => p && p !== '(Empty)');
 
   showRound(index);
 }
 
-
-
+// When swapping one resting player with another resting player
 function handleDropToSpecificRest(e, restPlayer, data, index) {
   const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
   if (drop.type !== 'team') return;
+
   const { gameIndex, teamSide, playerIndex, player } = drop;
   const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
   const team = data.games[gameIndex][teamKey];
   const restIndex = data.resting.indexOf(restPlayer);
-
   if (restIndex === -1) return;
 
-  data.games[gameIndex][teamKey][playerIndex] = restPlayer;
+  // Swap them
+  team[playerIndex] = restPlayer;
   data.resting[restIndex] = player;
 
   showRound(index);
 }
-  
 
       
 function showRoundold(index) {
@@ -1264,6 +1293,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
