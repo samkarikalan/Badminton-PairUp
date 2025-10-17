@@ -589,6 +589,29 @@ function initScheduler(playersList, numCourts, fixedPairs = []) {
 /* =========================
    ROUND GENERATOR
 ========================= */
+
+function shuffle(array) {
+
+  for (let i = array.length - 1; i > 0; i--) {
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [array[i], array[j]] = [array[j], array[i]];
+
+  }
+
+  return array;
+
+}
+
+ 
+
+
+ 
+
+
+
+  
 function AischedulerNextRound() {
   const { players, numCourts, fixedPairs, restCount, playedTogether, playedAgainst, fixedMap } = schedulerState;
   const totalPlayers = players.length;
@@ -640,7 +663,10 @@ function AischedulerNextRound() {
   }
 
   // Remaining free players
-  let free = playing.filter(p => !used.has(p)).sort(() => Math.random() - 0.5);
+  //let free = playing.filter(p => !used.has(p)).sort(() => Math.random() - 0.5);
+  let free = shuffle(playing.filter(p => !used.has(p)));
+
+  
   if (free.length % 2 !== 0) free.pop(); // ensure even number
 
   const pairScores = [];
@@ -1293,6 +1319,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
