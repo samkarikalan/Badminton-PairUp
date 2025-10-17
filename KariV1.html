@@ -26,7 +26,7 @@
       letter-spacing: 2px;
     }
 
-    h3, h4 {
+    h3 {
       font-size: 15px;
       margin: 8px 0;
       color: #3a1818;
@@ -82,7 +82,27 @@
       transform: scale(1.05);
     }
 
-    /* === PAGE 2: Match Results / Court Layout === */
+    /* === TABLE === */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      color: purple;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f5e1ff;
+      font-weight: bold;
+    }
+
+    /* === PAGE 2 === */
     #game-results {
       display: flex;
       flex-direction: column;
@@ -112,17 +132,12 @@
       color: #eee;
     }
 
-    /* === MOBILE ADJUSTMENTS === */
+    /* === MOBILE === */
     @media (max-width: 600px) {
       h1 { font-size: 18px; }
-      .card, .match-card {
-        padding: 6px;
-        margin: 6px;
-      }
-      .card input, .card select, .card button {
-        font-size: 14px;
-        padding: 6px;
-      }
+      .card, .match-card { padding: 6px; margin: 6px; }
+      .card input, .card select, .card button { font-size: 14px; padding: 6px; }
+      th, td { font-size: 12px; padding: 4px; }
     }
   </style>
 </head>
@@ -139,6 +154,21 @@
       <textarea id="playerList" rows="5" placeholder="Enter player names..."></textarea>
       <input id="numCourts" type="number" min="1" placeholder="Number of Courts">
       <button id="generateBtn">Generate Schedule</button>
+    </div>
+
+    <div class="card">
+      <h3>Players List</h3>
+      <table id="playersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled dynamically -->
+        </tbody>
+      </table>
     </div>
 
     <div class="card">
