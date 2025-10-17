@@ -976,6 +976,17 @@ function makeRestButton(player, data, index) {
   return btn;
 }
 
+
+function handleDropToRestArea(e, data, index) {
+  const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
+  if (drop.type !== 'team') return;
+  const { player } = drop;
+
+  if (!data.resting.includes(player)) data.resting.push(player);
+  showRound(index);
+}
+
+  
 function handleDropToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
   const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
   if (drop.type !== 'rest') return;
@@ -992,18 +1003,7 @@ function handleDropToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
   showRound(index);
 }
 
-function handleDropToRestArea(e, data, index) {
-  const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
-  if (drop.type !== 'team') return;
-  const { gameIndex, teamSide, playerIndex, player } = drop;
-  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
-  const team = data.games[gameIndex][teamKey];
 
-  team[playerIndex] = '(Empty)';
-  if (!data.resting.includes(player)) data.resting.push(player);
-
-  showRound(index);
-}
 
 function handleDropToSpecificRest(e, restPlayer, data, index) {
   const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
@@ -1264,6 +1264,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
