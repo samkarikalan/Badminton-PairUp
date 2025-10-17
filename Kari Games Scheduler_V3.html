@@ -317,7 +317,19 @@ h4 {
   transform: scale(1.05);
   opacity: 0.9;
 }
+    
+.rest-box.drag-over {
+  outline: 3px dashed #ff9800;
+}
 
+.rest-box:empty {
+  min-height: 40px;
+}
+
+.rest-btn, .Lplayer-btn, .Rplayer-btn {
+  cursor: grab;
+  margin: 2px;
+}
 /* === Mobile Adjustments === */
 @media (max-width: 600px) {
   .match-card {
@@ -853,6 +865,163 @@ function showRound(index) {
   if (!data) return;
 
   document.getElementById("roundTitle").innerText = `Round ${data.round}`;
+
+  // ------------------ RESTING AREA ------------------
+  const restDiv = document.createElement('div');
+  restDiv.className = 'round-header';
+
+  const title = document.createElement('div');
+  title.innerText = 'Resting:';
+  restDiv.appendChild(title);
+
+  const restBox = document.createElement('div');
+  restBox.className = 'rest-box';
+  restBox.addEventListener('dragover', (e) => e.preventDefault()); // allow drop
+  restBox.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const dropData = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+    // If dropping a team player → move them to rest
+    if (dropData.type === 'team') {
+      const { gameIndex, teamSide, playerIndex, player } = dropData;
+      const swappedPlayer = data.resting.pop(); // take last resting (optional)
+      const team = teamSide === 'L' ? 'pair1' : 'pair2';
+
+      // Replace team player with a resting one (if exists)
+      if (swappedPlayer) {
+        data.resting.push(player);
+        data.games[gameIndex][team][playerIndex] = swappedPlayer;
+      } else {
+        // No resting player? Just move player to rest.
+        data.resting.push(player);
+        data.games[gameIndex][team][playerIndex] = '(Empty)';
+      }
+      showRound(index);
+    }
+  });
+
+  // ---- Create Rest Buttons ----
+  if (data.resting.length > 0) {
+    data.resting.forEach(player => {
+      const btn = document.createElement('button');
+      btn.innerText = player;
+      btn.className = 'rest-btn';
+      btn.draggable = true;
+
+      // color by number pattern
+      const match = player.match(/\.?#(\d+)/);
+      if (match) {
+        const num = parseInt(match[1]);
+        const hue = (num * 40) % 360;
+        btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
+        btn.style.color = 'white';
+      }
+
+      // drag start
+      btn.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          type: 'rest',
+          player
+        }));
+      });
+
+      restBox.appendChild(btn);
+    });
+  } else {
+    const noneSpan = document.createElement('span');
+    noneSpan.innerText = 'None';
+    restBox.appendChild(noneSpan);
+  }
+
+  restDiv.appendChild(restBox);
+  resultsDiv.appendChild(restDiv);
+
+  // ------------------ GAME CARDS ------------------
+  data.games.forEach((g, gameIndex) => {
+    const card = document.createElement('div');
+    card.className = 'match-card';
+
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    function createTeam(pair, teamSide) {
+      const teamDiv = document.createElement('div');
+      teamDiv.className = 'team';
+
+      pair.forEach((p, playerIndex) => {
+        const btn = document.createElement('button');
+        btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
+        btn.innerText = p;
+        btn.draggable = true;
+
+        // start drag
+        btn.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', JSON.stringify({
+            type: 'team',
+            gameIndex,
+            teamSide,
+            playerIndex,
+            player: p
+          }));
+        });
+
+        // allow drop
+        btn.addEventListener('dragover', (e) => e.preventDefault());
+
+        // handle drop
+        btn.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const dataObj = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+          // Case 1: Rest -> Team swap
+          if (dataObj.type === 'rest') {
+            const restingPlayer = dataObj.player;
+            const teamPlayer = g[teamSide === 'L' ? 'pair1' : 'pair2'][playerIndex];
+            const restIdx = data.resting.indexOf(restingPlayer);
+            if (restIdx > -1) data.resting[restIdx] = teamPlayer;
+            g[teamSide === 'L' ? 'pair1' : 'pair2'][playerIndex] = restingPlayer;
+            showRound(index);
+          }
+
+          // Case 2: Team -> Team swap (optional extension)
+          if (dataObj.type === 'team' && (dataObj.gameIndex !== gameIndex || dataObj.playerIndex !== playerIndex)) {
+            const fromTeam = dataObj.teamSide === 'L' ? 'pair1' : 'pair2';
+            const toTeam = teamSide === 'L' ? 'pair1' : 'pair2';
+            const temp = g[toTeam][playerIndex];
+            g[toTeam][playerIndex] = data.games[dataObj.gameIndex][fromTeam][dataObj.playerIndex];
+            data.games[dataObj.gameIndex][fromTeam][dataObj.playerIndex] = temp;
+            showRound(index);
+          }
+        });
+
+        teamDiv.appendChild(btn);
+      });
+      return teamDiv;
+    }
+
+    const team1 = createTeam(g.pair1, 'L');
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = 'VS';
+    const team2 = createTeam(g.pair2, 'R');
+
+    teamsDiv.append(team1, vs, team2);
+    card.appendChild(teamsDiv);
+    resultsDiv.appendChild(card);
+  });
+
+  document.getElementById('prevBtn').disabled = index === 0;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+  
+function showRoundold(index) {
+  const resultsDiv = document.getElementById('game-results');
+  resultsDiv.innerHTML = '';
+  const data = allRounds[index];
+  if (!data) return;
+
+  document.getElementById("roundTitle").innerText = `Round ${data.round}`;
   //const restDiv = document.createElement('div');
   //restDiv.className = 'round-header';
   //restDiv.innerText = `Resting: ${data.resting.join(', ') || 'None'}`;
@@ -1087,6 +1256,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
