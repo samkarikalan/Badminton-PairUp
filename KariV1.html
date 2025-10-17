@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Badminton Scheduler</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* === GLOBAL === */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #3b0073, #7d00b8);
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 8px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    h3, h4 {
+      font-size: 15px;
+      margin: 8px 0;
+      color: #3a1818;
+    }
+
+    /* === CONTAINER & CARD === */
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 8px;
+    }
+
+    .card {
+      background: white;
+      color: purple;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* === FORM ELEMENTS === */
+    .card input,
+    .card select,
+    .card textarea,
+    .card button {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      font-size: 16px;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .card input,
+    .card select,
+    .card textarea {
+      border: 1px solid #ccc;
+    }
+
+    /* === BUTTONS === */
+    .card button {
+      background: purple;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .card button:hover {
+      background: #5e009c;
+      transform: scale(1.05);
+    }
+
+    /* === PAGE 2: Match Results / Court Layout === */
+    #game-results {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
+      min-height: 40vh;
+    }
+
+    .match-card {
+      background: white;
+      color: purple;
+      border-radius: 10px;
+      padding: 8px;
+      width: 95%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    .rest-box {
+      border: 2px dashed #fff;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 5px;
+      color: #eee;
+    }
+
+    /* === MOBILE ADJUSTMENTS === */
+    @media (max-width: 600px) {
+      h1 { font-size: 18px; }
+      .card, .match-card {
+        padding: 6px;
+        margin: 6px;
+      }
+      .card input, .card select, .card button {
+        font-size: 14px;
+        padding: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Badminton Scheduler</h1>
+  </header>
+
+  <!-- === PAGE 1: Player Entry / Setup === -->
+  <div id="page1" class="container">
+    <div class="card">
+      <h3>Player Entry</h3>
+      <textarea id="playerList" rows="5" placeholder="Enter player names..."></textarea>
+      <input id="numCourts" type="number" min="1" placeholder="Number of Courts">
+      <button id="generateBtn">Generate Schedule</button>
+    </div>
+
+    <div class="card">
+      <h3>Options</h3>
+      <select id="modeSelect">
+        <option value="normal">Normal</option>
+        <option value="ranked">Ranked</option>
+      </select>
+      <button id="goToRoundsBtn">Go to Rounds</button>
+    </div>
+  </div>
+
+  <!-- === PAGE 2: Match Results / Court Layout === -->
+  <div id="page2" class="container" style="display:none;">
+    <div class="card">
+      <h3>Match Results</h3>
+      <div id="game-results"></div>
+      <button id="backBtn">Back</button>
+    </div>
+  </div>
+
+  <!-- === IMPORT MODAL (kept in case script uses it) === -->
+  <div id="importModal" style="display:none;">
+    <div class="card">
+      <h3>Import Data</h3>
+      <textarea id="importData" rows="4" placeholder="Paste data here..."></textarea>
+      <button id="importBtn">Import</button>
+      <button id="closeModal">Close</button>
+    </div>
+  </div>
+
+  <!-- === SCRIPTS === -->
+  <script src="your-script.js"></script>
+</body>
+</html>
