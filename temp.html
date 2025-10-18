@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Badminton Pair-UP</title>
+  <style>
+/* === GLOBAL === */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #3b0073, #7d00b8);
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 8px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    h3 {
+      font-size: 15px;
+      margin: 8px 0;
+      color: #3a1818;
+    }
+
+    /* === CONTAINER & CARD === */
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 8px;
+    }
+
+    .card,
+.match-card,
+.rest-box {
+  background: white;
+  color: black;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 550px;
+  max-width: 95vw;
+  box-sizing: border-box;
+}
+
+    /* === FORM ELEMENTS === */
+    .card input,
+    .card select,
+    .card textarea,
+    .card button {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      font-size: 16px;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .card input,
+    .card select,
+    .card textarea {
+      border: 1px solid #ccc;
+    }
+
+     /* === BUTTONS === */
+    .card button {
+      background: purple;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .card button:hover {
+      background: #5e009c;
+      transform: scale(1.05);
+    }
+
+    /* === TABLE === */  
+
+    #player-list-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2px;
+    }
+    
+    #player-list-table th, #player-list-table td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+      font-size: 14px;
+    }
+    #player-list-table th {
+      background: #f2f2f2;
+    }
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #d11a2a;
+      font-size: 8px;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      color: #a00;
+    }
+    .fixed-pairs-list {
+      margin-top: 8px;
+    }
+    .fixed-pair-item {
+      background: #eee;
+      color: black;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fixed-pair-remove {
+      color: #d11a2a;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .fixed-pair-remove:hover {
+      color: #a00;
+    }
+        
+    /* === Modal === */
+    #importModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+    }
+    #importModal .modal-content {
+      background: white;
+      color: black;
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #importModal button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .ok-btn {
+      background: #009c3c;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .ok-btn:hover {
+      background: #00b84d;
+    }
+
+/* === PAGE 2: Match Results / Court Layout === */
+    .main-action {
+      display: block;
+      width: 100%;
+      background: orange;
+      color: black;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 8px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .main-action:hover {
+      background: #ffb84d;
+      transform: scale(1.05);
+    }
+    #game-results {      
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px; /* uniform spacing between match cards */
+      padding: 16px;
+      background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
+      min-height: 40vh;
+    }
+
+/* === Match Card === */
+  
+
+    .match-card h3 {
+      font-size: 22px;
+      margin: 0; /* reset */
+    }
+
+    .match-card .teams {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8x; /* consistent gap between teams */
+    }
+
+.team {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 120px;
+}
+
+.vs-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #3b0073;
+  flex: 0 0 auto;
+  margin: 0 8px; /* balanced spacing */
+}
+
+.Lplayer-btn,
+.Rplayer-btn {
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  color: #fff;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.Lplayer-btn { background: #009c3c; }
+.Rplayer-btn { background: #0494ad; }
+
+.Lplayer-btn:hover { background: #34995b; transform: scale(1.03); }
+.Rplayer-btn:hover { background: #3f8e9c; transform: scale(1.03); }
+
+.match-time {
+  font-size: 16px;
+  color: #3b0073;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* === Round Navigation === */
+.round-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #2a2a72, #009ffd);
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.round-navigation .round-label {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.round-navigation button {
+  background: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-width: 50px;
+}
+
+.round-navigation button:hover:enabled {
+  background: #009ffd;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.round-navigation button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === Rest Section === */
+
+.rest-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.1s, opacity 0.2s;
+}
+.rest-btn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+    
+.rest-box.drag-over {
+  outline: 3px dashed #ff9800;
+}
+
+.rest-box:empty {
+  min-height: 40px;
+}
+
+.rest-btn, .Lplayer-btn, .Rplayer-btn {
+  cursor: grab;
+  margin: 2px;
+}
+/* === Mobile Adjustments === */
+@media (max-width: 600px) {
+  .match-card {
+    width: 95%;
+    padding: 14px;
+  }
+  .teams {
+    gap: 6px;
+  }
+  .round-navigation {
+    gap: 10px;
+  }
+  .round-navigation .round-label {
+    font-size: 0.9rem;
+  }
+
+ 
+}
+  </style>
+</head>
+<body onload="initPage()">
+
+  <!-- Page 1 -->
+  <div id="page1">
+    <div class="container">
+      <h1>Kari Scheduler</h1>
+
+      <!-- Import Players -->
+      <div class="card">
+        <button onclick="showImportModal()">Paste All Players</button>
+      </div>
+      <div id="importModal">
+        <div class="modal-content">
+          <textarea id="players-textarea" rows="8" placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
+          <button class="ok-btn" onclick="addPlayersFromText()">Import</button>
+          <button onclick="hideImportModal()" style="background:#d11a2a; color:white;">Cancel</button>
+        </div>
+      </div>
+      <!-- Add Player Form -->
+      <div class="card">
+        <input type="text" id="player-name" placeholder="Enter Player Name">
+        <select id="player-gender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        <button onclick="addPlayer()">Add Player</button>
+      </div>
+
+      <!-- Players List -->
+      <div class="card">
+        <table id="player-list-table"></table>
+      </div>
+
+      <!-- Fixed Pairs -->
+       
+      <div class="card">
+        <h3>Set Fixed Pairs (Optional)</h3>
+        <select id="fixed-pair-1"></select>
+        <select id="fixed-pair-2"></select>
+        <button onclick="addFixedPair()">Add Fixed Pair</button>
+        <div id="fixed-pair-list" class="fixed-pairs-list"></div>
+      </div>
+
+      <!-- Game Setup -->
+      <div class="card">
+        <!--<h3>Setup Matches</h3> -->
+        <input type="number" id="num-courts" placeholder="Enter Number of Courts" min="1">        
+      </div>
+
+      <!-- Go to Rounds -->    
+       <button id="goToRoundsBtn" class="main-action" onclick="goToRounds()">Go to Rounds ➡️</button>
+
+      <!--<button class="main-action" onclick="goToRounds()" style="display:none;">Go to Rounds ➡️</button>            -->
+    </div>
+  </div>
+
+  <!-- Page 2 -->
+  <div id="page2" style="display:none;">
+    <header>
+      <!--<h1>BADMINTON</h1> -->
+      <h4 id="roundTitle">Championship</h4>
+    </header>
+
+    <div id="game-results"></div>
+     
+    <div class="round-navigation">      
+      <button id="prevBtn" onclick="prevRound()" disabled>Prev Round</button>
+      <button id="nextBtn" onclick="nextRound()" disabled>NextRound</button>      
+    </div>
+    
+    <!-- Back button -->
+     <button class="main-action" onclick="goBack()">Back</button>    
+  </div>
+<!DOCTYPE html>
+<script>
+/* =========================
+   GLOBAL STATE
+========================= */
+let players = [];
+let fixedPairs = [];
+let allRounds = [];
+let currentRoundIndex = 0;
+let playedAgainst = new Set();
+
+let schedulerState = {
+  players: [],
+  numCourts: 0,
+  fixedPairs: [],
+  restCount: new Map(),
+  playedTogether: new Map(),
+  fixedMap: new Map(),
+  roundIndex: 0,
+};
+
+
+let isOnPage2 = false;
+
+// Disable pull-to-refresh by forcing overscroll-behavior
+function disablePullToRefresh() {
+  document.body.style.overscrollBehaviorY = 'none';
+  document.documentElement.style.overscrollBehaviorY = 'none';
+}
+
+// Re-enable normal scroll
+function enablePullToRefresh() {
+  document.body.style.overscrollBehaviorY = '';
+  document.documentElement.style.overscrollBehaviorY = '';
+}
+/* =========================
+   INITIALIZATION
+========================= */
+function initPage() {
+  document.getElementById("page1").style.display = 'block';
+  document.getElementById("page2").style.display = 'none';
+}
+
+/* =========================
+   PLAYER MANAGEMENT
+========================= */
+function showImportModal() {
+  document.getElementById('importModal').style.display = 'block';
+}
+function hideImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  document.getElementById('players-textarea').value = '';
+}
+function addPlayersFromText() {
+  const text = document.getElementById('players-textarea').value.trim();
+  if (!text) return;
+
+  const lines = text.split(/\r?\n/);
+  lines.forEach(line => {
+    const [nameRaw, genderRaw] = line.split(',');
+    const name = nameRaw?.trim();
+    const gender = genderRaw?.trim() || "Male";
+    if (name) players.push({ name, gender });
+  });
+  updatePlayerList();
+  updateFixedPairSelectors();
+  hideImportModal();
+}
+
+function addPlayer() {
+  const name = document.getElementById('player-name').value.trim();
+  const gender = document.getElementById('player-gender').value;
+  if (name) {
+    players.push({ name, gender });
+    updatePlayerList();
+    updateFixedPairSelectors();
+    document.getElementById('player-name').value = '';
+  }
+}
+
+function editPlayer(i, field, val) {
+  players[i][field] = val.trim();
+  updateFixedPairSelectors();
+}
+
+function deletePlayer(i) {
+  players.splice(i, 1);
+  updatePlayerList();
+  updateFixedPairSelectors();
+}
+
+function updatePlayerList() {
+  const table = document.getElementById('player-list-table');
+  table.innerHTML = '<tr><th>Name</th><th>Gender</th><th>Action</th></tr>';
+  players.forEach((p, i) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="text" value="${p.name}" onchange="editPlayer(${i}, 'name', this.value)"></td>
+      <td>
+        <select onchange="editPlayer(${i}, 'gender', this.value)">
+          <option value="Male" ${p.gender === 'Male' ? 'selected' : ''}>Male</option>
+          <option value="Female" ${p.gender === 'Female' ? 'selected' : ''}>Female</option>
+        </select>
+      </td>
+      <td><button class="delete-btn" onclick="deletePlayer(${i})">Delete</button></td>
+    `;
+    table.appendChild(row);
+  });
+}
+
+/* =========================
+   FIXED PAIRS
+========================= */
+function updateFixedPairSelectors() {
+  const sel1 = document.getElementById('fixed-pair-1');
+  const sel2 = document.getElementById('fixed-pair-2');
+  sel1.innerHTML = sel2.innerHTML = '';
+  players.forEach(p => {
+    sel1.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+    sel2.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+  });
+}
+
+function addFixedPair() {
+  const p1 = document.getElementById('fixed-pair-1').value;
+  const p2 = document.getElementById('fixed-pair-2').value;
+  if (p1 && p2 && p1 !== p2) {
+    fixedPairs.push([p1, p2]);
+    const div = document.createElement('div');
+    div.classList.add('fixed-pair-item');
+    div.innerHTML = `${p1} & ${p2} <span class="fixed-pair-remove" onclick="removeFixedPair(this, '${p1}', '${p2}')">Remove</span>`;
+    document.getElementById('fixed-pair-list').appendChild(div);
+  }
+}
+
+function removeFixedPair(el, p1, p2) {
+  fixedPairs = fixedPairs.filter(pair => !(pair[0] === p1 && pair[1] === p2));
+  el.parentElement.remove();
+}
+
+/* =========================
+   SCHEDULER INIT
+========================= */
+
+function initScheduler(playersList, numCourts, fixedPairs = []) {
+  // Reverse and store the player list
+  schedulerState.players = [...playersList].reverse();
+
+  schedulerState.numCourts = numCourts;
+  schedulerState.fixedPairs = fixedPairs;
+  schedulerState.restCount = new Map(playersList.map(p => [p, 0]));
+  schedulerState.playedTogether = new Map();
+  schedulerState.fixedMap = new Map();
+  schedulerState.playedAgainst = new Set();
+
+  // Map fixed pairs for quick lookups
+  fixedPairs.forEach(([a, b]) => {
+    schedulerState.fixedMap.set(a, b);
+    schedulerState.fixedMap.set(b, a);
+  });
+
+  schedulerState.roundIndex = 0;
+}
+
+
+/* =========================
+   ROUND GENERATOR
+========================= */
+
+function shuffle(array) {
+
+  for (let i = array.length - 1; i > 0; i--) {
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [array[i], array[j]] = [array[j], array[i]];
+
+  }
+
+  return array;
+
+}
+
+ 
+
+
+ 
+
+
+
+  
+function AischedulerNextRound() {
+  const { players, numCourts, fixedPairs, restCount, playedTogether, playedAgainst, fixedMap } = schedulerState;
+  const totalPlayers = players.length;
+  const numPlayersPerRound = numCourts * 4;
+  const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
+  schedulerState.roundIndex++;
+
+  // === 1️⃣ Pick resting players (fairly) ===
+  let resting = [...players]
+    .sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0))
+    .slice(0, numResting);
+
+  // Ensure fixed pairs rest together
+  for (const p of [...resting]) {
+    if (fixedMap.has(p)) {
+      const partner = fixedMap.get(p);
+      if (!resting.includes(partner)) resting.push(partner);
+    }
+  }
+
+  // Prevent over-resting
+  while (players.length - resting.length < numPlayersPerRound && resting.length > 0) {
+    const maxRest = resting.reduce(
+      (maxP, p) => (restCount.get(p) > restCount.get(maxP) ? p : maxP),
+      resting[0]
+    );
+    resting = resting.filter(p => p !== maxRest);
+  }
+
+  // Players participating in this round
+  const playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
+  const restingWithNumber = resting.map(p => {
+    restCount.set(p, (restCount.get(p) || 0) + 1);
+    return `${p}#${restCount.get(p)}`;
+  });
+
+  // === 2️⃣ Build pairs (prefer unplayed ones) ===
+  const pairs = [];
+  const used = new Set();
+
+  // Fixed pairs first
+  for (const [p1, p2] of fixedPairs) {
+    if (playing.includes(p1) && playing.includes(p2)) {
+      pairs.push([p1, p2]);
+      used.add(p1);
+      used.add(p2);
+      playedTogether.set([p1, p2].sort().join("&"), schedulerState.roundIndex);
+    }
+  }
+
+  // Remaining free players
+  //let free = playing.filter(p => !used.has(p)).sort(() => Math.random() - 0.5);
+  let free = shuffle(playing.filter(p => !used.has(p)));
+
+  
+  if (free.length % 2 !== 0) free.pop(); // ensure even number
+
+  const pairScores = [];
+  for (let i = 0; i < free.length - 1; i++) {
+    for (let j = i + 1; j < free.length; j++) {
+      const key = [free[i], free[j]].sort().join("&");
+      const lastPlayed = playedTogether.get(key);
+      const score = lastPlayed ? schedulerState.roundIndex - lastPlayed : Infinity; // Infinity = never played
+      pairScores.push({ key, p1: free[i], p2: free[j], score });
+    }
+  }
+
+  // Sort by freshness (newer = higher priority)
+  pairScores.sort((a, b) => {
+    if (a.score === Infinity && b.score !== Infinity) return -1;
+    if (b.score === Infinity && a.score !== Infinity) return 1;
+    return b.score - a.score;
+  });
+
+  // Select pairs without overlap
+  for (const { key, p1, p2 } of pairScores) {
+    if (!used.has(p1) && !used.has(p2)) {
+      pairs.push([p1, p2]);
+      used.add(p1);
+      used.add(p2);
+      playedTogether.set(key, schedulerState.roundIndex);
+    }
+  }
+
+  // === 3️⃣ Form games — prioritize new matchups ===
+  const games = [];
+  const playedAgainstSnapshot = new Set(playedAgainst);
+
+  for (let i = 0; i < pairs.length - 1; i++) {
+    for (let j = i + 1; j < pairs.length; j++) {
+      const matchupKey = [...pairs[i], ...pairs[j]].map(p => p.toLowerCase()).sort().join("&");
+      const bothNew = !playedAgainstSnapshot.has(matchupKey);
+      games.push({ pair1: pairs[i], pair2: pairs[j], matchupKey, bothNew });
+    }
+  }
+
+  // Rank games: prefer new matchups and unplayed pairs
+  games.sort((a, b) => {
+    const aScore =
+      (a.bothNew ? 3 : 0) +
+      ((!playedTogether.has(a.pair1.join("&")) || !playedTogether.has(a.pair2.join("&"))) ? 1 : 0);
+    const bScore =
+      (b.bothNew ? 3 : 0) +
+      ((!playedTogether.has(b.pair1.join("&")) || !playedTogether.has(b.pair2.join("&"))) ? 1 : 0);
+    return bScore - aScore;
+  });
+
+  // === 4️⃣ Select final games (up to numCourts) ===
+  const usedPairs = new Set();
+  const finalGames = [];
+  for (const g of games) {
+    if (finalGames.length >= numCourts) break;
+    if ([...g.pair1, ...g.pair2].some(p => usedPairs.has(p))) continue;
+    finalGames.push({
+      court: finalGames.length + 1,
+      pair1: g.pair1,
+      pair2: g.pair2
+    });
+    [...g.pair1, ...g.pair2].forEach(p => usedPairs.add(p));
+    playedAgainst.add(g.matchupKey);
+  }
+
+  // === 5️⃣ Fallback if too repetitive ===
+  if (finalGames.length < numCourts) {
+    console.warn("⚠️ Not enough new games found — resetting history...");
+    schedulerState.playedTogether = new Map();
+    schedulerState.playedAgainst = new Set();
+  }
+
+  // === 6️⃣ Return finalized round ===
+  return {
+    round: schedulerState.roundIndex,
+    resting: restingWithNumber,
+    playing,
+    games: finalGames
+  };
+}
+
+  
+function AischedulerNextRoundold() {
+  const { players, numCourts, fixedPairs, restCount, playedTogether, playedAgainst, fixedMap } = schedulerState;
+  const totalPlayers = players.length;
+  const numPlayersPerRound = numCourts * 4;
+  const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
+  schedulerState.roundIndex++;
+
+  // === 1️⃣ Pick resting players (fairly) ===
+  let resting = [...players]
+    .sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0))
+    .slice(0, numResting);
+
+  // Ensure fixed pairs rest together
+  for (const p of [...resting]) {
+    if (fixedMap.has(p)) {
+      const partner = fixedMap.get(p);
+      if (!resting.includes(partner)) resting.push(partner);
+    }
+  }
+
+  // Ensure enough players remain
+  while (players.length - resting.length < numPlayersPerRound) {
+    const maxRest = resting.reduce(
+      (maxP, p) => restCount.get(p) > restCount.get(maxP) ? p : maxP,
+      resting[0]
+    );
+    resting = resting.filter(p => p !== maxRest);
+  }
+
+  const playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
+  const restingWithNumber = resting.map(p => `${p}#${(restCount.set(p, (restCount.get(p) || 0) + 1), restCount.get(p))}`);
+
+  // === 2️⃣ Build pairs (prefer unplayed ones) ===
+  const pairs = [];
+  const used = new Set();
+
+  // Add fixed pairs first
+  for (const [p1, p2] of fixedPairs) {
+    if (playing.includes(p1) && playing.includes(p2)) {
+      pairs.push([p1, p2]);
+      used.add(p1); used.add(p2);
+    }
+  }
+
+  const free = playing.filter(p => !used.has(p)).sort(() => Math.random() - 0.5);
+  const pairScores = [];
+
+  for (let i = 0; i < free.length - 1; i++) {
+    for (let j = i + 1; j < free.length; j++) {
+      const key = [free[i], free[j]].sort().join("&");
+      const score = playedTogether.has(key) ? schedulerState.roundIndex - playedTogether.get(key) : Infinity;
+      pairScores.push({ key, p1: free[i], p2: free[j], score });
+    }
+  }
+
+  // Prefer new pairs first
+  pairScores.sort((a, b) => (b.score === Infinity ? 99999 : b.score) - (a.score === Infinity ? 99999 : a.score));
+
+  for (const { key, p1, p2 } of pairScores) {
+    if (!used.has(p1) && !used.has(p2)) {
+      pairs.push([p1, p2]);
+      used.add(p1); used.add(p2);
+      playedTogether.set(key, schedulerState.roundIndex);
+    }
+  }
+
+  // === 3️⃣ Form games — using 3-level preference ===
+  const games = [];
+  const attempted = new Set();
+
+  for (let i = 0; i < pairs.length - 1; i++) {
+    for (let j = i + 1; j < pairs.length; j++) {
+      const matchupKey = [...pairs[i], ...pairs[j]].sort().join(" vs ");
+      const bothNew = !playedAgainst.has(matchupKey);
+      attempted.add(matchupKey);
+      games.push({ pair1: pairs[i], pair2: pairs[j], matchupKey, bothNew });
+    }
+  }
+
+  // Sort by newness
+  const rankedGames = games.sort((a, b) => {
+    const aScore =
+      (a.bothNew ? 3 : 0) +
+      ((!playedTogether.has(a.pair1.join("&")) || !playedTogether.has(a.pair2.join("&"))) ? 1 : 0);
+    const bScore =
+      (b.bothNew ? 3 : 0) +
+      ((!playedTogether.has(b.pair1.join("&")) || !playedTogether.has(b.pair2.join("&"))) ? 1 : 0);
+    return bScore - aScore;
+  });
+  
+  
+
+  // Pick best ones until courts filled
+  const usedPairs = new Set();
+  const finalGames = [];
+  for (const g of rankedGames) {
+    const key = g.matchupKey;
+    if (finalGames.length >= numCourts) break;
+    if ([...g.pair1, ...g.pair2].some(p => usedPairs.has(p))) continue;
+    finalGames.push({
+      court: finalGames.length + 1,
+      pair1: g.pair1,
+      pair2: g.pair2
+    });
+    [...g.pair1, ...g.pair2].forEach(p => usedPairs.add(p));
+    playedAgainst.add(key);
+  }
+  
+  // Check if everything scored 0 → then reset
+    
+  
+  const allFalse = rankedGames.every(g => !g.bothNew);
+
+  if (allFalse) {
+    schedulerState.playedTogether = new Map();
+    schedulerState.playedAgainst = new Set();
+    //schedulerState.roundIndex = 0;
+  }
+  // === 4️⃣ Return finalized round ===
+  const roundData = {
+    round: schedulerState.roundIndex,
+    resting: restingWithNumber,
+    playing,
+    games: finalGames
+  }; 
+  
+  return roundData;
+}
+
+
+/* =========================
+   ROUND DISPLAY
+========================= */
+
+  function showRound(index) {
+  const resultsDiv = document.getElementById('game-results');
+  resultsDiv.innerHTML = '';
+  const data = allRounds[index];
+  if (!data) return;
+
+  document.getElementById("roundTitle").innerText = `Round ${data.round}`;
+
+  // Build both sections
+  const restDiv = renderRestingPlayers(data, index);
+  const gamesDiv = renderGames(data, index);
+
+  resultsDiv.append(restDiv, gamesDiv);
+
+  document.getElementById('prevBtn').disabled = index === 0;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+/* -------------------- RESTING PLAYERS -------------------- */
+function renderRestingPlayers(data, index) {
+  const restDiv = document.createElement('div');
+  restDiv.className = 'round-header';
+
+  const title = document.createElement('div');
+  title.innerText = 'Resting:';
+  restDiv.appendChild(title);
+
+  const restBox = document.createElement('div');
+  restBox.className = 'rest-box';
+
+  // Drop area for adding from team → rest
+  restBox.addEventListener('dragover', (e) => e.preventDefault());
+  restBox.addEventListener('drop', (e) => handleDropToRestArea(e, data, index));
+
+  if (data.resting.length === 0) {
+    const span = document.createElement('span');
+    span.innerText = 'None';
+    restBox.appendChild(span);
+  } else {
+    data.resting.forEach(player => {
+      const btn = makeRestButton(player, data, index);
+      restBox.appendChild(btn);
+    });
+  }
+
+  restDiv.appendChild(restBox);
+  return restDiv;
+}
+
+/* -------------------- GAMES -------------------- */
+function renderGames(data, index) {
+  const wrapper = document.createElement('div');
+
+  data.games.forEach((game, gameIndex) => {
+    const card = document.createElement('div');
+    card.className = 'match-card';
+
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    const team1 = document.createElement('div');
+    team1.className = 'team';
+    game.pair1.forEach((p, i) =>
+      team1.appendChild(makePlayerButton(p, 'L', gameIndex, i, data, index))
+    );
+
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = 'VS';
+
+    const team2 = document.createElement('div');
+    team2.className = 'team';
+    game.pair2.forEach((p, i) =>
+      team2.appendChild(makePlayerButton(p, 'R', gameIndex, i, data, index))
+    );
+
+    teamsDiv.append(team1, vs, team2);
+    card.appendChild(teamsDiv);
+    wrapper.appendChild(card);
+  });
+
+  return wrapper;
+}
+
+/* -------------------- BUTTON CREATION -------------------- */
+function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
+  const btn = document.createElement('button');
+  btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
+  btn.innerText = name;
+  btn.draggable = true;
+
+  // Drag from team
+  btn.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({
+      type: 'team', player: name, gameIndex, teamSide, playerIndex
+    }));
+  });
+
+  // Allow drop from rest → team
+  btn.addEventListener('dragover', (e) => e.preventDefault());
+  btn.addEventListener('drop', (e) => handleDropToTeam(e, teamSide, gameIndex, playerIndex, data, index));
+
+  return btn;
+}
+
+function makeRestButton(player, data, index) {
+  const btn = document.createElement('button');
+  btn.innerText = player;
+  btn.className = 'rest-btn';
+  btn.draggable = true;
+
+  // 🎨 Keep original color logic
+  const match = player.match(/\.?#(\d+)/);
+  if (match) {
+    const num = parseInt(match[1]);
+    const hue = (num * 40) % 360;
+    btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
+    btn.style.color = 'white';
+  } else {
+    btn.style.backgroundColor = '#777';
+    btn.style.color = 'white';
+  }
+
+  // Drag start from rest
+  btn.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'rest', player }));
+  });
+
+  // Allow swapping rest → rest
+  btn.addEventListener('dragover', (e) => e.preventDefault());
+  btn.addEventListener('drop', (e) => handleDropToSpecificRest(e, player, data, index));
+
+  return btn;
+}
+
+/* -------------------- DRAG HANDLERS -------------------- */
+
+// When dropping a playing player into the resting area
+function handleDropToRestArea(e, data, index) {
+  const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
+  if (drop.type !== 'team') return;
+
+  const { gameIndex, teamSide, playerIndex, player } = drop;
+  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+  const team = data.games[gameIndex][teamKey];
+
+  // Remove from team
+  team[playerIndex] = '(Empty)';
+
+  // Add to resting if not already there
+  if (!data.resting.includes(player)) data.resting.push(player);
+
+  showRound(index);
+}
+
+// When dropping a resting player onto a team button
+function handleDropToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
+  const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
+  if (drop.type !== 'rest') return;
+
+  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+  const restIndex = data.resting.indexOf(drop.player);
+  if (restIndex === -1) return;
+
+  const oldPlayer = data.games[gameIndex][teamKey][playerIndex];
+  data.games[gameIndex][teamKey][playerIndex] = drop.player;
+
+  // Replace the resting slot with the outgoing player
+  data.resting[restIndex] = oldPlayer === '(Empty)' ? null : oldPlayer;
+  data.resting = data.resting.filter(p => p && p !== '(Empty)');
+
+  showRound(index);
+}
+
+// When swapping one resting player with another resting player
+function handleDropToSpecificRest(e, restPlayer, data, index) {
+  const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
+  if (drop.type !== 'team') return;
+
+  const { gameIndex, teamSide, playerIndex, player } = drop;
+  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+  const team = data.games[gameIndex][teamKey];
+  const restIndex = data.resting.indexOf(restPlayer);
+  if (restIndex === -1) return;
+
+  // Swap them
+  team[playerIndex] = restPlayer;
+  data.resting[restIndex] = player;
+
+  showRound(index);
+}
+
+      
+function showRoundold(index) {
+  const resultsDiv = document.getElementById('game-results');
+  resultsDiv.innerHTML = '';
+  const data = allRounds[index];
+  if (!data) return;
+
+  document.getElementById("roundTitle").innerText = `Round ${data.round}`;
+  //const restDiv = document.createElement('div');
+  //restDiv.className = 'round-header';
+  //restDiv.innerText = `Resting: ${data.resting.join(', ') || 'None'}`;
+  //resultsDiv.appendChild(restDiv);
+
+  const restDiv = document.createElement('div');
+restDiv.className = 'round-header';
+
+const title = document.createElement('div');
+title.innerText = 'Resting:';
+restDiv.appendChild(title);
+
+const restBox = document.createElement('div');
+restBox.className = 'rest-box';
+
+if (data.resting.length > 0) {
+  data.resting.forEach(player => {
+    const btn = document.createElement('button');
+    btn.innerText = player;
+    btn.className = 'rest-btn';
+
+    // Match either "#number" or ".#number" anywhere in the string
+    const match = player.match(/\.?#(\d+)/);
+    if (match) {
+      const num = parseInt(match[1]);
+      // create color based on number for uniqueness
+      const hue = (num * 40) % 360;
+      btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
+      btn.style.color = 'white';
+    } else {
+      // fallback color if no #number found
+      btn.style.backgroundColor = '#777';
+      btn.style.color = 'white';
+    }
+
+    restBox.appendChild(btn);
+  });
+} else {
+  const noneSpan = document.createElement('span');
+  noneSpan.innerText = 'None';
+  restBox.appendChild(noneSpan);
+}
+
+restDiv.appendChild(restBox);
+resultsDiv.appendChild(restDiv);
+  data.games.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    const team1 = document.createElement('div');
+    team1.className = 'team';
+    g.pair1.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'Lplayer-btn';
+      btn.innerText = p;
+      team1.appendChild(btn);
+    });
+
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = 'VS';
+
+    const team2 = document.createElement('div');
+    team2.className = 'team';
+    g.pair2.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'Rplayer-btn';
+      btn.innerText = p;
+      team2.appendChild(btn);
+    });
+
+    teamsDiv.append(team1, vs, team2);
+    card.appendChild(teamsDiv);
+    resultsDiv.appendChild(card);
+  });
+
+  document.getElementById('prevBtn').disabled = index === 0;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function goToRounds() {
+
+const numCourts = parseInt(document.getElementById('num-courts').value);
+
+if (!players.length || !numCourts) {
+
+alert('Please add players and number of courts!');
+
+return;
+
+}
+
+    if (allRounds.length === 0) {
+
+        initScheduler(players.map(p => p.name), numCourts, fixedPairs);
+
+        allRounds = [AischedulerNextRound()];
+
+        currentRoundIndex = 0;
+
+        showRound(0);
+
+    } else {
+            const playersList = players.map(p => p.name);
+
+            schedulerState.players = [...playersList].reverse();
+
+            schedulerState.numCourts = numCourts;
+
+            schedulerState.fixedPairs = fixedPairs;
+
+            schedulerState.fixedMap = new Map();
+
+            // Add new players (who are not already in restCount)
+            let highestRestCount = -Infinity;
+            let highestPlayers = [];
+
+            for (const p of playersList) {
+              if (schedulerState.restCount.has(p)) {
+              const count = schedulerState.restCount.get(p);
+
+                if (count > highestRestCount) {
+                  highestRestCount = count;
+                  highestPlayers = [p]; // reset with new highest
+                } else if (count === highestRestCount) {
+                  highestPlayers.push(p); // tie — add player
+                }
+              }
+            }
+
+            for (const p of playersList) {
+
+                if (!schedulerState.restCount.has(p)) {
+
+                    schedulerState.restCount.set(p, highestRestCount+1); // initialize new player
+
+                }
+
+            }
+
+ 
+
+            // Optionally, remove restCount entries for players no longer in playersList
+
+            for (const p of Array.from(schedulerState.restCount.keys())) {
+
+                if (!playersList.includes(p)) {
+
+                    schedulerState.restCount.delete(p);
+
+                }
+
+            }           
+
+        if (currentRoundIndex + 1 <= allRounds.length) {
+
+            showRound(currentRoundIndex);
+
+        } else {
+
+           
+            allRounds.push(AischedulerNextRound());
+
+            currentRoundIndex = currentRoundIndex + 1;
+
+            showRound(currentRoundIndex);
+
+}
+
+    }
+
+document.getElementById('page1').style.display = 'none';
+
+document.getElementById('page2').style.display = 'block';
+
+isOnPage2 = true;
+
+disablePullToRefresh();
+
+}
+
+
+function goBack() {
+  const pin = prompt("Enter 4-digit code to go back:");
+  if (pin === "0000") {
+    document.getElementById('page1').style.display = 'block';
+    document.getElementById('page2').style.display = 'none';
+    isOnPage2 = false;
+  enablePullToRefresh(); // 🔓 re-enables refresh
+  } else if (pin !== null) alert("Incorrect PIN!");
+}
+
+function nextRound() {
+  if (currentRoundIndex + 1 < allRounds.length) {
+    currentRoundIndex++;
+    showRound(currentRoundIndex);
+  } else {
+    const newRound = AischedulerNextRound();
+    allRounds.push(newRound);
+    currentRoundIndex = allRounds.length - 1;
+    showRound(currentRoundIndex);
+  }
+}
+
+function prevRound() {
+  if (currentRoundIndex > 0) {
+    currentRoundIndex--;
+    showRound(currentRoundIndex);
+  }
+}
+
+// Prevent pull-to-refresh and accidental reload on mobile
+document.addEventListener('touchmove', function (event) {
+  if (event.touches.length > 1) {
+    event.preventDefault(); // Disable multi-touch zoom
+  }
+}, { passive: false });
+
+window.addEventListener('beforeunload', function (e) {
+  // Optional: warn if they try to reload or close
+  e.preventDefault();
+  e.returnValue = ''; // Chrome requires returnValue to show prompt
+});
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
