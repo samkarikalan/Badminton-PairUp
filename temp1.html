@@ -836,8 +836,8 @@ function renderRestingPlayers(data, index) {
   restBox.className = 'rest-box';
 
   // Drop area for team → rest
-  restBox.addEventListener('dragover', (e) => e.preventDefault());
-  restBox.addEventListener('drop', (e) => handleDropToRestArea(e, data, index));
+  //restBox.addEventListener('dragover', (e) => e.preventDefault());
+  //restBox.addEventListener('drop', (e) => handleDropToRestArea(e, data, index));
 
   if (data.resting.length === 0) {
     const span = document.createElement('span');
