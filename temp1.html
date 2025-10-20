@@ -516,21 +516,28 @@ function initPage() {
 function showImportModal() {
   document.getElementById('importModal').style.display = 'block';
 }
+
 function hideImportModal() {
   document.getElementById('importModal').style.display = 'none';
   document.getElementById('players-textarea').value = '';
 }
+
 function addPlayersFromText() {
   const text = document.getElementById('players-textarea').value.trim();
   if (!text) return;
 
   const lines = text.split(/\r?\n/);
+
   lines.forEach(line => {
     const [nameRaw, genderRaw] = line.split(',');
     const name = nameRaw?.trim();
     const gender = genderRaw?.trim() || "Male";
-    if (name) players.push({ name, gender });
+
+    if (name && !players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+      players.push({ name, gender });
+    }
   });
+
   updatePlayerList();
   updateFixedPairSelectors();
   hideImportModal();
@@ -539,12 +546,16 @@ function addPlayersFromText() {
 function addPlayer() {
   const name = document.getElementById('player-name').value.trim();
   const gender = document.getElementById('player-gender').value;
-  if (name) {
+
+  if (name && !players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
     players.push({ name, gender });
     updatePlayerList();
     updateFixedPairSelectors();
-    document.getElementById('player-name').value = '';
+  } else if (name) {
+    alert(`Player "${name}" already exists!`);
   }
+
+  document.getElementById('player-name').value = '';
 }
 
 function editPlayer(i, field, val) {
@@ -583,23 +594,75 @@ function updatePlayerList() {
 function updateFixedPairSelectors() {
   const sel1 = document.getElementById('fixed-pair-1');
   const sel2 = document.getElementById('fixed-pair-2');
-  sel1.innerHTML = sel2.innerHTML = '';
+
+  // Get all players who are already fixed in pairs
+  const pairedPlayers = new Set(fixedPairs.flat());
+
+  sel1.innerHTML = '<option value="">-- Select Player 1 --</option>';
+  sel2.innerHTML = '<option value="">-- Select Player 2 --</option>';
+
   players.forEach(p => {
-    sel1.innerHTML += `<option value="${p.name}">${p.name}</option>`;
-    sel2.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+    if (!pairedPlayers.has(p.name)) {
+      const option1 = document.createElement('option');
+      const option2 = document.createElement('option');
+      option1.value = option2.value = p.name;
+      option1.textContent = option2.textContent = p.name;
+      sel1.appendChild(option1);
+      sel2.appendChild(option2);
+    }
   });
 }
 
 function addFixedPair() {
   const p1 = document.getElementById('fixed-pair-1').value;
   const p2 = document.getElementById('fixed-pair-2').value;
-  if (p1 && p2 && p1 !== p2) {
-    fixedPairs.push([p1, p2]);
-    const div = document.createElement('div');
-    div.classList.add('fixed-pair-item');
-    div.innerHTML = `${p1} & ${p2} <span class="fixed-pair-remove" onclick="removeFixedPair(this, '${p1}', '${p2}')">Remove</span>`;
-    document.getElementById('fixed-pair-list').appendChild(div);
+
+  if (!p1 || !p2) {
+    alert("Please select both players.");
+    return;
   }
+
+  if (p1 === p2) {
+    alert("You cannot pair the same player with themselves.");
+    return;
+  }
+
+  const pairKey = [p1, p2].sort().join('&');
+
+  // Check for duplicate pair
+  const alreadyExists = fixedPairs.some(pair => pair.sort().join('&') === pairKey);
+  if (alreadyExists) {
+    alert(`Fixed pair "${p1} & ${p2}" already exists.`);
+    return;
+  }
+
+  // Add the pair
+  fixedPairs.push([p1, p2]);
+
+  // Add to UI
+  const div = document.createElement('div');
+  div.classList.add('fixed-pair-item');
+  div.innerHTML = `
+    ${p1} & ${p2} 
+    <span class="fixed-pair-remove" onclick="removeFixedPair(this, '${p1}', '${p2}')">
+      Remove
+    </span>`;
+  document.getElementById('fixed-pair-list').appendChild(div);
+
+  // Refresh dropdowns to hide paired players
+  updateFixedPairSelectors();
+}
+
+function removeFixedPair(el, p1, p2) {
+  // Remove from data
+  const pairKey = [p1, p2].sort().join('&');
+  fixedPairs = fixedPairs.filter(pair => pair.sort().join('&') !== pairKey);
+
+  // Remove from UI
+  el.parentElement.remove();
+
+  // Refresh dropdowns to show players again
+  updateFixedPairSelectors();
 }
 
 function removeFixedPair(el, p1, p2) {
@@ -1445,6 +1508,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
