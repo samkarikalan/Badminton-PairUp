@@ -1484,7 +1484,7 @@ return;
 
         initScheduler(players.map(p => p.name), numCourts, fixedPairs);
 
-        allRounds = [AischedulerNextRound()];
+        allRounds = [AischedulerAdaptiveRound()];
 
         currentRoundIndex = 0;
 
@@ -1585,7 +1585,7 @@ function nextRound() {
     currentRoundIndex++;
     showRound(currentRoundIndex);
   } else {
-    const newRound = AischedulerNextRound();
+    const newRound = AischedulerAdaptiveRound();
     allRounds.push(newRound);
     currentRoundIndex = allRounds.length - 1;
     showRound(currentRoundIndex);
@@ -1616,6 +1616,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
