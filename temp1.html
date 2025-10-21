@@ -51,6 +51,7 @@
   max-width: 95vw;
   box-sizing: border-box;
 }
+
 .rest-box {
   background: transparent !important;
   color: black;
@@ -61,9 +62,14 @@
   width: 550px;
   max-width: 95vw;
   box-sizing: border-box;
-  gap: 12px;
+  
+  display: flex;          /* enables gap */
+  flex-wrap: wrap;        /* allows buttons to wrap to new lines */
+  justify-content: center;/* optional: center buttons */
+  align-items: center;    /* vertically align */
+  gap: 12px;              /* space between buttons */
 }
-
+    
     /* === FORM ELEMENTS === */
     .card input,
     .card select,   
@@ -1465,6 +1471,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
