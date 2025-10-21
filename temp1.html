@@ -389,7 +389,7 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
   margin: 10px 0;
 }
-}
+
   </style>
 </head>
 <body onload="initPage()">
@@ -486,7 +486,7 @@ let schedulerState = {
   playedTogether: new Map(),
   fixedMap: new Map(),
   roundIndex: 0,
-  pairPlayedSet = new Set();
+  pairPlayedSet :new Set(),
 };
 
 
@@ -714,235 +714,203 @@ function shuffle(array) {
 
 }
 
+function findDisjointPairs(playing, usedPairsSet, requiredPairsCount) {
+  // Build pair lists
+  const allPairs = [];
+  const unusedPairs = [];
+  const usedPairs = [];
 
+  for (let i = 0; i < playing.length; i++) {
+    for (let j = i + 1; j < playing.length; j++) {
+      const a = playing[i], b = playing[j];
+      const key = [a, b].slice().sort().join("&");
+      allPairs.push({ a, b, key });
+      if (!usedPairsSet || !usedPairsSet.has(key)) unusedPairs.push({ a, b, key });
+      else usedPairs.push({ a, b, key });
+    }
+  }
+
+  // Helper that runs backtracking on a candidate list (array of {a,b,key})
+  function backtrack(candidates) {
+    const result = [];
+    const usedPlayers = new Set();
+
+    function dfs(start) {
+      if (result.length === requiredPairsCount) return true;
+      for (let i = start; i < candidates.length; i++) {
+        const { a, b } = candidates[i];
+        if (usedPlayers.has(a) || usedPlayers.has(b)) continue;
+        usedPlayers.add(a); usedPlayers.add(b);
+        result.push([a, b]);
+        if (dfs(i + 1)) return true;
+        // backtrack
+        result.pop();
+        usedPlayers.delete(a); usedPlayers.delete(b);
+      }
+      return false;
+    }
+
+    return dfs(0) ? result.slice() : null;
+  }
+
+  // 1) Try with unused pairs only (preferred)
+  if (unusedPairs.length >= requiredPairsCount) {
+    const res = backtrack(unusedPairs);
+    if (res && res.length === requiredPairsCount) return res;
+  }
+
+  // 2) Try combination: unused pairs first then used pairs
+  const combined = [...unusedPairs, ...usedPairs];
+  if (combined.length >= requiredPairsCount) {
+    const res = backtrack(combined);
+    if (res && res.length === requiredPairsCount) return res;
+  }
+
+  // 3) As final fallback, try all pairs (same as combined but ensures full search)
+  if (allPairs.length >= requiredPairsCount) {
+    const res = backtrack(allPairs);
+    if (res && res.length === requiredPairsCount) return res;
+  }
+
+  // if still not possible, return empty array
+  return [];
+}
   
         
 
  
 
-function findDisjointPairs(playing, usedPairsSet) {
-
-  // Build all unused pairs
-
-  const pairs = [];
-
-  for (let i = 0; i < playing.length; i++) {
-
-    for (let j = i + 1; j < playing.length; j++) {
-
-      const key = [playing[i], playing[j]].sort().join("&");
-
-      if (!usedPairsSet.has(key)) {
-
-        pairs.push([playing[i], playing[j]]);
-
-      }
-
-    }
-
-  }
 
  
 
-  // Backtracking to find 4 disjoint pairs
 
-  function backtrack(selected, used, start) {
 
-    if (selected.length === 4) return selected;
-
-    for (let i = start; i < pairs.length; i++) {
-
-      const [a, b] = pairs[i];
-
-      if (used.has(a) || used.has(b)) continue;
-
-      used.add(a); used.add(b);
-
-      selected.push([a, b]);
-
-      const result = backtrack(selected, used, i + 1);
-
-      if (result) return result;
-
-      selected.pop();
-
-      used.delete(a); used.delete(b);
-
-    }
-
-    return null;
-
-  }
-
- 
-
-  const result = backtrack([], new Set(), 0);
-
-  if (result) return result;
-
- 
-
-  // If not possible, allow repeats
-
-  // Build all pairs, even used ones
-
-  const allPairs = [];
-
-  for (let i = 0; i < playing.length; i++) {
-
-    for (let j = i + 1; j < playing.length; j++) {
-
-      allPairs.push([playing[i], playing[j]]);
-
-    }
-
-  }
-
-  function backtrackAll(selected, used, start) {
-
-    if (selected.length === 4) return selected;
-
-    for (let i = start; i < allPairs.length; i++) {
-
-      const [a, b] = allPairs[i];
-
-      if (used.has(a) || used.has(b)) continue;
-
-      used.add(a); used.add(b);
-
-      selected.push([a, b]);
-
-      const result = backtrackAll(selected, used, i + 1);
-
-      if (result) return result;
-
-      selected.pop();
-
-      used.delete(a); used.delete(b);
-
-    }
-
-    return null;
-
-  }
-
-  return backtrackAll([], new Set(), 0);
-
-}
-
- 
-
-function AischedulerNextRound() {
-
+ function AischedulerNextRound() {
   const {
-
     players,
-
     numCourts,
-
+    fixedPairs = [],
     restCount,
-
-    pairPlayedSet // should be Set
-
+    playedTogether,
+    playedAgainst,
+    fixedMap = new Map(),
+    pairPlayedSet = new Set()
   } = schedulerState;
 
- 
-
   const totalPlayers = players.length;
-
   const numPlayersPerRound = numCourts * 4;
-
   const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
 
-  schedulerState.roundIndex++;
+  schedulerState.roundIndex = (schedulerState.roundIndex || 0) + 1;
+  const roundIdx = schedulerState.roundIndex;
 
- 
+  // 1) Fair resting selection: sort by restCount ascending
+  const sortedPlayers = [...players].sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0));
 
-  // Select resting and playing players (fair rotation)
+  // initial resting
+  let resting = sortedPlayers.slice(0, numResting);
 
-  const sortedPlayers = [...players].sort((a, b) =>
+  // ensure fixedMap partners rest together
+  for (const p of [...resting]) {
+    if (fixedMap.has(p)) {
+      const partner = fixedMap.get(p);
+      if (!resting.includes(partner)) resting.push(partner);
+    }
+  }
 
-    (restCount.get(a) || 0) - (restCount.get(b) || 0)
+  // if fixedMap caused too many resting, reduce by removing most-rested until fits
+  while (players.length - resting.length < numPlayersPerRound && resting.length > 0) {
+    let mostRested = resting[0];
+    for (const r of resting) {
+      if ((restCount.get(r) || 0) > (restCount.get(mostRested) || 0)) mostRested = r;
+    }
+    resting = resting.filter(p => p !== mostRested);
+  }
 
-  );
+  // final playing list
+  const playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
 
-  const resting = sortedPlayers.slice(0, numResting);
-
-  const playing = sortedPlayers.slice(numResting, numResting + numPlayersPerRound);
-
- 
-
-  // Update resting counts
-
+  // 2) Update restCount and build restingWithNumber
   const restingWithNumber = resting.map(p => {
-
     restCount.set(p, (restCount.get(p) || 0) + 1);
-
     return `${p}#${restCount.get(p)}`;
-
   });
 
- 
+  // 3) Determine required number of pairs
+  const requiredPairsCount = Math.floor(numPlayersPerRound / 2);
+  if (requiredPairsCount === 0) {
+    return { round: roundIdx, resting: restingWithNumber, playing, games: [] };
+  }
 
-  // Find 4 disjoint pairs for this round, no repeats unless impossible
+  // 4) Use findDisjointPairs to get disjoint pairs preferring unused
+  const selectedPairs = findDisjointPairs(playing, pairPlayedSet, requiredPairsCount);
 
-  const selectedPairs = findDisjointPairs(playing, pairPlayedSet);
+  // If helper failed (edge cases), fallback to greedy pairing without repeats where possible
+  let finalPairs = selectedPairs;
+  if (!finalPairs || finalPairs.length < requiredPairsCount) {
+    // Greedy fallback: attempt to build pairs by preferring unused pair keys
+    const free = playing.slice();
+    const usedPlayers = new Set();
+    finalPairs = [];
+    for (let i = 0; i < free.length; i++) {
+      const a = free[i];
+      if (usedPlayers.has(a)) continue;
+      // find best partner (prefer one not used with a)
+      let chosenIdx = -1;
+      for (let j = i + 1; j < free.length; j++) {
+        const b = free[j];
+        if (usedPlayers.has(b)) continue;
+        const key = [a, b].slice().sort().join("&");
+        // prefer not-in pairPlayedSet
+        if (!pairPlayedSet.has(key)) {
+          chosenIdx = j;
+          break;
+        }
+        if (chosenIdx === -1) chosenIdx = j; // keep a fallback
+      }
+      if (chosenIdx !== -1) {
+        const b = free[chosenIdx];
+        finalPairs.push([a, b]);
+        usedPlayers.add(a); usedPlayers.add(b);
+      }
+      if (finalPairs.length === requiredPairsCount) break;
+    }
+    // if still short, pad by pairing remaining sequentially
+    if (finalPairs.length < requiredPairsCount) {
+      const leftovers = playing.filter(p => !usedPlayers.has(p));
+      for (let i = 0; i + 1 < leftovers.length && finalPairs.length < requiredPairsCount; i += 2) {
+        finalPairs.push([leftovers[i], leftovers[i + 1]]);
+      }
+    }
+  }
 
- 
-
-  // Assign pairs to courts
-
+  // 5) Form games: pair pairs into games (two pairs per court)
   const games = [];
-
-  for (let i = 0; i < selectedPairs.length; i += 2) {
-
-    games.push({
-
-      court: games.length + 1,
-
-      pair1: selectedPairs[i],
-
-      pair2: selectedPairs[i + 1]
-
-    });
-
+  for (let i = 0; i < finalPairs.length; i += 2) {
+    if (i + 1 >= finalPairs.length) break; // need two pairs for a match
+    const pair1 = finalPairs[i].slice();
+    const pair2 = finalPairs[i + 1].slice();
+    const matchupKey = [...pair1, ...pair2].map(p => p.toLowerCase()).sort().join("&");
+    games.push({ court: games.length + 1, pair1, pair2 });
+    playedAgainst.add(matchupKey);
   }
 
- 
-
-  // Update pairPlayedSet
-
-  for (const pair of selectedPairs) {
-
-    const key = pair.slice().sort().join("&");
-
+  // 6) Update pair histories (pairPlayedSet, playedTogether)
+  for (const pr of finalPairs) {
+    const key = pr.slice().sort().join("&");
     pairPlayedSet.add(key);
-
+    playedTogether.set(key, roundIdx);
   }
 
- 
-
-  // Return round info
-
+  // 7) Return round
   return {
-
-    round: schedulerState.roundIndex,
-
+    round: roundIdx,
     resting: restingWithNumber,
-
     playing,
-
     games
-
   };
-
 }
 
- 
-
-                             
-
-  
 
 
 
