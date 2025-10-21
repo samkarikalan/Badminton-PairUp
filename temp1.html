@@ -53,16 +53,14 @@
 }
 .rest-box {
   background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  width: auto !important;
-  padding: 4px !important;
-  margin: 0 !important;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: flex-start;
-  align-items: center;
+  color: black;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 550px;
+  max-width: 95vw;
+  box-sizing: border-box;
 }
 
     /* === FORM ELEMENTS === */
@@ -311,14 +309,15 @@
 
 .rest-btn {
   border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 15px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: transform 0.1s, opacity 0.2s;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 4px 0;
+  color: #fff;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
 }
-.rest-btn:hover {
+.:hover {
   transform: scale(1.05);
   opacity: 0.9;
 }
@@ -331,7 +330,7 @@
   min-height: 40px;
 }
 
-.rest-btn, .Lplayer-btn, .Rplayer-btn {
+., .Lplayer-btn, .Rplayer-btn {
   cursor: grab;
   margin: 2px;
 }
@@ -1465,6 +1464,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
