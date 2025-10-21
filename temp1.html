@@ -55,20 +55,21 @@
 .rest-box {
   background: transparent !important;
   color: black;
-  padding: 8px;
+  padding: 6px;
   margin-bottom: 8px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   width: 550px;
   max-width: 95vw;
   box-sizing: border-box;
-  
-  display: flex;          /* enables gap */
-  flex-wrap: wrap;        /* allows buttons to wrap to new lines */
-  justify-content: center;/* optional: center buttons */
-  align-items: center;    /* vertically align */
-  gap: 8px;              /* space between buttons */
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* or flex-start */
+  align-items: center;
+  gap: 6px; /* equal gap between rows and between buttons */
 }
+    
     
     /* === FORM ELEMENTS === */
     .card input,
@@ -1471,6 +1472,7 @@ window.addEventListener('beforeunload', function (e) {
 
 </body>
 </html>
+
 
 
 
