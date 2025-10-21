@@ -803,6 +803,20 @@ function findDisjointPairs(playing, usedPairsSet, requiredPairsCount) {
 
   schedulerState.roundIndex = (schedulerState.roundIndex || 0) + 1;
   const roundIdx = schedulerState.roundIndex;
+// Total possible pairs = nC2
+const totalPossiblePairs = (schedulerState.players.length * (schedulerState.players.length - 1)) / 2;
+
+// If all pairs have been seen, reset for fresh scheduling
+if (schedulerState.pairPlayedSet.size >= totalPossiblePairs) {
+  console.log("♻️ All pairs have played together once. Resetting pairing memory...");
+
+  schedulerState.pairPlayedSet.clear();
+  schedulerState.playedTogether.clear();
+  schedulerState.playedAgainst.clear();
+
+  // Optional: also reset rest counts if you want a full cycle reset
+  // schedulerState.restCount = new Map();
+}
 
   // 1) Fair resting selection: sort by restCount ascending
   const sortedPlayers = [...players].sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0));
