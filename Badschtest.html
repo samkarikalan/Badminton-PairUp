@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Badminton Pair-UP</title>
+<style>
+/* ... (your existing CSS remains exactly the same) ... */
+</style>
+</head>
+<body onload="initPage()">
+
+<!-- ... (your existing HTML structure remains exactly the same) ... -->
+
+<script>
+/* =========================
+GLOBAL STATE & INITIALIZATION
+========================= */
+let players = [];
+let fixedPairs = [];
+let allRounds = [];
+let currentRoundIndex = 0;
+
+let schedulerState = {
+    players: [],
+    numCourts: 0,
+    fixedPairs: [],
+    restCount: new Map(),
+    playedTogether: new Map(),
+    fixedMap: new Map(),
+    roundIndex: 0,
+    pairPlayedSet: new Set(),
+    // NEW: Track opponent distribution
+    opponentTracking: new Map(), // player -> Map(opponent -> count)
+    playedAgainst: new Map(),    // player -> Set of opponents faced
+};
+let isOnPage2 = false;
+
+// Page initialization
+function initPage() {
+    document.getElementById("page1").style.display = 'block';
+    document.getElementById("page2").style.display = 'none';
+    
+    // Initialize opponent tracking
+    schedulerState.opponentTracking = new Map();
+    schedulerState.playedAgainst = new Map();
+}
+
+/* =========================
+PLAYER MANAGEMENT
+========================= */
+// ... (your existing player management functions remain the same) ...
+
+/* =========================
+FIXED PAIRS MANAGEMENT
+========================= */
+// ... (your existing fixed pairs functions remain the same) ...
+
+/* =========================
+SCHEDULER INIT & PAIR GENERATION
+========================= */
+function initScheduler(playersList, numCourts, fixedPairs = []) {
+    schedulerState.players = [...playersList].reverse();
+    schedulerState.numCourts = numCourts;
+    schedulerState.fixedPairs = fixedPairs;
+    schedulerState.restCount = new Map(playersList.map(p => [p, 0]));
+    schedulerState.playedTogether = new Map();
+    schedulerState.fixedMap = new Map();
+    schedulerState.pairPlayedSet = new Set();
+    
+    // NEW: Initialize opponent tracking for all players
+    schedulerState.opponentTracking = new Map();
+    schedulerState.playedAgainst = new Map();
+    playersList.forEach(player => {
+        schedulerState.opponentTracking.set(player, new Map());
+        schedulerState.playedAgainst.set(player, new Set());
+    });
+    
+    fixedPairs.forEach(([a, b]) => {
+        schedulerState.fixedMap.set(a, b);
+        schedulerState.fixedMap.set(b, a);
+    });
+    schedulerState.roundIndex = 0;
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// NEW: Intelligent opponent selection with 2-3 constraint
+function findOptimalOpponents(team, availableOpponents, playerToOptimize = null) {
+    if (availableOpponents.length < 2) return availableOpponents.slice(0, 2);
+    
+    const [p1, p2] = team;
+    const targetPlayer = playerToOptimize || p1;
+    
+    // Filter and prioritize opponents
+    const potentialOpponents = availableOpponents.filter(opp => {
+        const timesFaced = schedulerState.opponentTracking.get(targetPlayer)?.get(opp) || 0;
+        return timesFaced < 3; // Never exceed 3 times
+    });
+    
+    if (potentialOpponents.length >= 2) {
+        // Sort by times faced (prioritize least-faced opponents)
+        potentialOpponents.sort((a, b) => {
+            const countA = schedulerState.opponentTracking.get(targetPlayer)?.get(a) || 0;
+            const countB = schedulerState.opponentTracking.get(targetPlayer)?.get(b) || 0;
+            return countA - countB;
+        });
+        return potentialOpponents.slice(0, 2);
+    }
+    
+    // Fallback: use all available opponents
+    return availableOpponents.slice(0, 2);
+}
+
+// NEW: Update opponent tracking after match creation
+function updateOpponentTracking(team1, team2) {
+    team1.forEach(player1 => {
+        team2.forEach(player2 => {
+            // Update count
+            const player1Tracking = schedulerState.opponentTracking.get(player1);
+            const currentCount = player1Tracking.get(player2) || 0;
+            player1Tracking.set(player2, currentCount + 1);
+            
+            // Update set
+            schedulerState.playedAgainst.get(player1).add(player2);
+        });
+    });
+    
+    team2.forEach(player2 => {
+        team1.forEach(player1 => {
+            // Update count
+            const player2Tracking = schedulerState.opponentTracking.get(player2);
+            const currentCount = player2Tracking.get(player1) || 0;
+            player2Tracking.set(player1, currentCount + 1);
+        });
+    });
+}
+
+function findDisjointPairs(playing, usedPairsSet, requiredPairsCount) {
+    const allPairs = [];
+    const unusedPairs = [];
+    const usedPairs = [];
+    
+    for (let i = 0; i < playing.length; i++) {
+        for (let j = i + 1; j < playing.length; j++) {
+            const a = playing[i], b = playing[j];
+            const key = [a, b].slice().sort().join("&");
+            allPairs.push({ a, b, key });
+            if (!usedPairsSet || !usedPairsSet.has(key)) unusedPairs.push({ a, b, key });
+            else usedPairs.push({ a, b, key });
+        }
+    }
+
+    function backtrack(candidates) {
+        const result = [];
+        const usedPlayers = new Set();
+        function dfs(start) {
+            if (result.length === requiredPairsCount) return true;
+            for (let i = start; i < candidates.length; i++) {
+                const { a, b } = candidates[i];
+                if (usedPlayers.has(a) || usedPlayers.has(b)) continue;
+                usedPlayers.add(a); usedPlayers.add(b);
+                result.push([a, b]);
+                if (dfs(i + 1)) return true;
+                result.pop();
+                usedPlayers.delete(a); usedPlayers.delete(b);
+            }
+            return false;
+        }
+        return dfs(0) ? result.slice() : null;
+    }
+
+    if (unusedPairs.length >= requiredPairsCount) {
+        const res = backtrack(unusedPairs);
+        if (res && res.length === requiredPairsCount) return res;
+    }
+
+    const combined = [...unusedPairs, ...usedPairs];
+    if (combined.length >= requiredPairsCount) {
+        const res = backtrack(combined);
+        if (res && res.length === requiredPairsCount) return res;
+    }
+
+    if (allPairs.length >= requiredPairsCount) {
+        const res = backtrack(allPairs);
+        if (res && res.length === requiredPairsCount) return res;
+    }
+
+    return [];
+}
+
+function AischedulerNextRound() {
+    const {
+        players,
+        numCourts,
+        fixedPairs = [],
+        restCount,
+        playedTogether,
+        fixedMap = new Map(),
+        pairPlayedSet = new Set(),
+        opponentTracking,
+        playedAgainst
+    } = schedulerState;
+
+    const totalPlayers = players.length;
+    const numPlayersPerRound = numCourts * 4;
+    let numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
+    schedulerState.roundIndex = (schedulerState.roundIndex || 0) + 1;
+    const roundIdx = schedulerState.roundIndex;
+    const totalPossiblePairs = (schedulerState.players.length * (schedulerState.players.length - 1)) / 2;
+    
+    if (schedulerState.pairPlayedSet.size >= totalPossiblePairs) {
+        schedulerState.pairPlayedSet.clear();
+        schedulerState.playedTogether.clear();
+    }
+
+    // 1. Find all fixed pair members and free players
+    const fixedPairPlayers = new Set(fixedPairs.flat());
+    let freePlayers = players.filter(p => !fixedPairPlayers.has(p));
+    let sortedPlayers = [...players].sort((a, b) => (restCount.get(a) || 0) - (restCount.get(b) || 0));
+    let resting = sortedPlayers.slice(0, numResting);
+
+    // 2. If one member of fixed pair is resting, rest the partner too
+    for (const p of [...resting]) {
+        if (fixedMap.has(p)) {
+            const partner = fixedMap.get(p);
+            if (!resting.includes(partner)) resting.push(partner);
+        }
+    }
+    
+    // 3. Make sure we don't over-rest (if so, remove most-rested until count fits)
+    while (players.length - resting.length < numPlayersPerRound && resting.length > 0) {
+        let mostRested = resting[0];
+        for (const r of resting) {
+            if ((restCount.get(r) || 0) > (restCount.get(mostRested) || 0)) mostRested = r;
+        }
+        resting = resting.filter(p => p !== mostRested);
+    }
+
+    // 4. Playing list
+    const playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
+
+    // 5. Prepare pairs for the round
+    const playingSet = new Set(playing);
+    let fixedPairsThisRound = [];
+    for (const pair of fixedPairs) {
+        if (playingSet.has(pair[0]) && playingSet.has(pair[1])) {
+            fixedPairsThisRound.push([pair[0], pair[1]]);
+        }
+    }
+
+    // Remove fixed pair members from freePlayersThisRound
+    let freePlayersThisRound = playing.filter(p => !fixedPairPlayers.has(p));
+
+    // Free pairs with intelligent opponent matching
+    const requiredPairsCount = Math.floor(numPlayersPerRound / 2);
+    let neededFreePairs = requiredPairsCount - fixedPairsThisRound.length;
+    let selectedPairs = findDisjointPairs(freePlayersThisRound, pairPlayedSet, neededFreePairs);
+    let finalFreePairs = selectedPairs;
+
+    if (!finalFreePairs || finalFreePairs.length < neededFreePairs) {
+        const free = freePlayersThisRound.slice();
+        const usedPlayers = new Set();
+        finalFreePairs = [];
+        for (let i = 0; i < free.length; i++) {
+            const a = free[i];
+            if (usedPlayers.has(a)) continue;
+            let chosenIdx = -1;
+            for (let j = i + 1; j < free.length; j++) {
+                const b = free[j];
+                if (usedPlayers.has(b)) continue;
+                const key = [a, b].slice().sort().join("&");
+                if (!pairPlayedSet.has(key)) {
+                    chosenIdx = j;
+                    break;
+                }
+                if (chosenIdx === -1) chosenIdx = j;
+            }
+            if (chosenIdx !== -1) {
+                const b = free[chosenIdx];
+                finalFreePairs.push([a, b]);
+                usedPlayers.add(a); usedPlayers.add(b);
+            }
+            if (finalFreePairs.length === neededFreePairs) break;
+        }
+        if (finalFreePairs.length < neededFreePairs) {
+            const leftovers = freePlayersThisRound.filter(p => !usedPlayers.has(p));
+            for (let i = 0; i + 1 < leftovers.length && finalFreePairs.length < neededFreePairs; i += 2) {
+                finalFreePairs.push([leftovers[i], leftovers[i + 1]]);
+            }
+        }
+    }
+
+    // 6. Combine fixed pairs and free pairs for the round
+    let allPairs = fixedPairsThisRound.concat(finalFreePairs);
+
+    // 7. Create matches with intelligent opponent assignment
+    const games = [];
+    const usedPairs = new Set();
+    
+    for (let i = 0; i < allPairs.length; i++) {
+        if (usedPairs.has(i)) continue;
+        
+        const team1 = allPairs[i];
+        let bestTeam2 = null;
+        let bestScore = -Infinity;
+        
+        // Find the best opponent team for team1
+        for (let j = i + 1; j < allPairs.length; j++) {
+            if (usedPairs.has(j)) continue;
+            
+            const team2 = allPairs[j];
+            
+            // Calculate opponent distribution score
+            let score = 0;
+            team1.forEach(player => {
+                team2.forEach(opponent => {
+                    const timesFaced = opponentTracking.get(player)?.get(opponent) || 0;
+                    if (timesFaced < 2) score += 3; // Prioritize reaching minimum
+                    else if (timesFaced === 2) score += 1; // Good distribution
+                    else score -= 2; // Penalize exceeding ideal range
+                });
+            });
+            
+            if (score > bestScore) {
+                bestScore = score;
+                bestTeam2 = team2;
+                bestTeam2Index = j;
+            }
+        }
+        
+        if (bestTeam2) {
+            games.push({ 
+                court: games.length + 1, 
+                pair1: team1.slice(), 
+                pair2: bestTeam2.slice() 
+            });
+            usedPairs.add(i);
+            usedPairs.add(bestTeam2Index);
+            
+            // Update opponent tracking
+            updateOpponentTracking(team1, bestTeam2);
+        }
+    }
+
+    // 8. Track pairs played
+    for (const pr of allPairs) {
+        const key = pr.slice().sort().join("&");
+        pairPlayedSet.add(key);
+        playedTogether.set(key, roundIdx);
+    }
+
+    // 9. Rest tracking
+    const restingWithNumber = resting.map(p => {
+        restCount.set(p, (restCount.get(p) || 0) + 1);
+        return `${p}#${restCount.get(p)}`;
+    });
+
+    return {
+        round: roundIdx,
+        resting: restingWithNumber,
+        playing,
+        games
+    };
+}
+
+/* =========================
+DISPLAY & UI FUNCTIONS
+========================= */
+// ... (your existing display functions remain exactly the same) ...
+
+/* =========================
+PAGE NAVIGATION
+========================= */
+// ... (your existing navigation functions remain exactly the same) ...
+
+/* =========================
+MOBILE BEHAVIOR
+========================= */
+// ... (your existing mobile behavior remains exactly the same) ...
+</script>
+</body>
+</html>
