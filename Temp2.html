@@ -1581,6 +1581,8 @@ function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
 
 }
 
+
+    
 function makeRestButton(player, data, index) {
 
     const btn = document.createElement('button');
@@ -1606,5 +1608,270 @@ function makeRestButton(player, data, index) {
         btn.style.backgroundColor = '#777';
 
     }
+
+    btn.style.color = 'white';
+
+    btn.addEventListener('dragstart', (e) => {
+
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'rest', player }));
+
+    });
+
+    return btn;
+
+}
+
+function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
+
+    const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+    if (drop.type !== 'rest') return;
+
+    const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+
+    const restIndex = data.resting.indexOf(drop.player);
+
+    if (restIndex === -1) return;
+
+    const baseNewPlayer = drop.player.replace(/#\d+$/, '');
+
+    const oldPlayer = data.games[gameIndex][teamKey][playerIndex];
+
+    data.games[gameIndex][teamKey][playerIndex] = baseNewPlayer;
+
+    const { restCount } = schedulerState;
+
+    if (oldPlayer && oldPlayer !== '(Empty)') {
+
+        const cleanOld = oldPlayer.replace(/#\d+$/, '');
+
+        const newCount = (restCount.get(cleanOld) || 0) + 1;
+
+        restCount.set(cleanOld, newCount);
+
+        data.resting[restIndex] = `${cleanOld}#${newCount}`;
+
+    } else {
+
+        data.resting[restIndex] = null;
+
+    }
+
+    restCount.set(baseNewPlayer, Math.max((restCount.get(baseNewPlayer) || 0) - 1, 0));
+
+    data.resting = data.resting.filter(p => p && p !== '(Empty)');
+
+    showRound(index);
+
+}
+
+function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index) {
+
+    const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+    if (drop.type !== 'team') return;
+
+    const { fromTeamSide, fromGameIndex, fromPlayerIndex, player } = drop;
+
+    if (!player || player === '(Empty)') return;
+
+    const fromTeamKey = fromTeamSide === 'L' ? 'pair1' : 'pair2';
+
+    const toTeamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+
+    const fromTeam = data.games[fromGameIndex][fromTeamKey];
+
+    const toTeam = data.games[gameIndex][toTeamKey];
+
+    const movedPlayer = player.replace(/#\d+$/, '');
+
+    const targetPlayer = toTeam[playerIndex];
+
+    toTeam[playerIndex] = movedPlayer;
+
+    fromTeam[fromPlayerIndex] = targetPlayer && targetPlayer !== '(Empty)' ? targetPlayer : '(Empty)';
+
+    showRound(index);
+
+}
+
+ 
+
+/* =========================
+
+PAGE NAVIGATION
+
+========================= */
+
+function goToRounds() {
+
+    const numCourts = parseInt(document.getElementById('num-courts').value);
+
+    if (!players.length || !numCourts) {
+
+        alert('Please add players and number of courts!');
+
+        return;
+
+    }
+
+    if (allRounds.length === 0) {
+
+        initScheduler(players.map(p => p.name), numCourts, fixedPairs);
+
+        allRounds = [AischedulerNextRound()];
+
+        currentRoundIndex = 0;
+
+        showRound(0);
+
+    } else {
+
+        const playersList = players.map(p => p.name);
+
+        schedulerState.players = [...playersList].reverse();
+
+        schedulerState.numCourts = numCourts;
+
+        schedulerState.fixedPairs = fixedPairs;
+
+        schedulerState.fixedMap = new Map();
+
+        let highestRestCount = -Infinity;
+
+        for (const p of playersList) {
+
+            if (schedulerState.restCount.has(p)) {
+
+                const count = schedulerState.restCount.get(p);
+
+                if (count > highestRestCount) highestRestCount = count;
+
+            }
+
+        }
+
+        for (const p of playersList) {
+
+            if (!schedulerState.restCount.has(p)) {
+
+                schedulerState.restCount.set(p, highestRestCount + 1);
+
+            }
+
+        }
+
+        for (const p of Array.from(schedulerState.restCount.keys())) {
+
+            if (!playersList.includes(p)) schedulerState.restCount.delete(p);
+
+        }
+
+        if (currentRoundIndex + 1 <= allRounds.length) {
+
+            showRound(currentRoundIndex);
+
+        } else {
+
+            allRounds.push(AischedulerNextRound());
+
+            currentRoundIndex = currentRoundIndex + 1;
+
+            showRound(currentRoundIndex);
+
+        }
+
+    }
+
+    document.getElementById('page1').style.display = 'none';
+
+    document.getElementById('page2').style.display = 'block';
+
+    isOnPage2 = true;
+
+}
+
+function goBack() {
+
+    const pin = prompt("Enter 4-digit code to go back:");
+
+    if (pin === "0000") {
+
+        document.getElementById('page1').style.display = 'block';
+
+        document.getElementById('page2').style.display = 'none';
+
+        isOnPage2 = false;
+
+    } else if (pin !== null) alert("Incorrect PIN!");
+
+}
+
+function nextRound() {
+
+    if (currentRoundIndex + 1 < allRounds.length) {
+
+        currentRoundIndex++;
+
+        showRound(currentRoundIndex);
+
+    } else {
+
+        const newRound = AischedulerNextRound();
+
+        allRounds.push(newRound);
+
+        currentRoundIndex = allRounds.length - 1;
+
+        showRound(currentRoundIndex);
+
+    }
+
+}
+
+function prevRound() {
+
+    if (currentRoundIndex > 0) {
+
+        currentRoundIndex--;
+
+        showRound(currentRoundIndex);
+
+    }
+
+}
+
+ 
+
+/* =========================
+
+MOBILE BEHAVIOR
+
+========================= */
+
+document.addEventListener('touchmove', function (event) {
+
+    if (event.touches.length > 1) {
+
+        event.preventDefault();
+
+    }
+
+}, { passive: false });
+
+window.addEventListener('beforeunload', function (e) {
+
+    e.preventDefault();
+
+    e.returnValue = '';
+
+});
+
+</script>
+
+</body>
+
+</html>
+
 
 
