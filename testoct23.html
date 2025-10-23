@@ -572,21 +572,22 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
 }
 
     /* Highlight the latest (active) round visually */
+/* Highlight the latest (active) round visually */
 .latest-round .match-card {
-  border: 3px solid black;
-  box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+  border: 2px solid black;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .latest-round .rest-btn,
 .latest-round .Lplayer-btn,
 .latest-round .Rplayer-btn {
-  animation: pulse 1.2s infinite alternate;
+  animation: subtlePulse 1.5s infinite alternate;
 }
 
-/* simple pulsing animation for active buttons */
-@keyframes pulse {
+/* subtle pulsing effect for active buttons */
+@keyframes subtlePulse {
   from { transform: scale(1); opacity: 1; }
-  to { transform: scale(1.01); opacity: 0.75; }
+  to { transform: scale(1.01); opacity: 0.95; }
 }
 
 </style>
