@@ -1134,10 +1134,12 @@ function AischedulerNextRound() {
     pairPlayedSet,
     opponentMap,
   } = schedulerState;
+
+    // ✅ Ensure number of courts doesn’t exceed available players
 if (players.length / 4 < numCourts) {
-        numCourts = Math.floor(players.length / 4);
-        if (numCourts < 1) numCourts = 1;
-      }
+  numCourts = Math.floor(players.length / 4);
+  if (numCourts < 1) numCourts = 1; // At least one court must be active
+}
   const totalPlayers = players.length;
   const numPlayersPerRound = numCourts * 4;
   let numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
