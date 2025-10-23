@@ -571,24 +571,24 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
 
 }
 
+
 /* Highlight the latest (active) round visually */
 .latest-round .match-card {
-  border: 2px solid black;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+  border: 3px solid #ffcc00;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
 }
 
 .latest-round .rest-btn,
 .latest-round .Lplayer-btn,
 .latest-round .Rplayer-btn {
-  animation: subtlePulse 1.5s infinite alternate;
+  animation: pulse 1.2s infinite alternate;
 }
 
-/* subtle pulsing effect for active buttons */
-@keyframes subtlePulse {
+/* simple pulsing animation for active buttons */
+@keyframes pulse {
   from { transform: scale(1); opacity: 1; }
-  to { transform: scale(1.01); opacity: 0.95; }
+  to { transform: scale(1.1); opacity: 0.85; }
 }
-
     
 
 </style>
@@ -1326,6 +1326,7 @@ DISPLAY & UI FUNCTIONS
 ========================= */
 
 // Main round display
+
 function showRound(index) {
   const resultsDiv = document.getElementById('game-results');
   resultsDiv.innerHTML = '';
@@ -1349,8 +1350,6 @@ function showRound(index) {
   document.getElementById('prevBtn').disabled = index === 0;
   document.getElementById('nextBtn').disabled = false;
 }
-
-
 
     
 
