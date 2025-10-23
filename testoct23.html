@@ -571,6 +571,24 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
 
 }
 
+    /* Highlight the latest (active) round visually */
+.latest-round .match-card {
+  border: 3px solid #ffcc00;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+}
+
+.latest-round .rest-btn,
+.latest-round .Lplayer-btn,
+.latest-round .Rplayer-btn {
+  animation: pulse 1.2s infinite alternate;
+}
+
+/* simple pulsing animation for active buttons */
+@keyframes pulse {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(1.1); opacity: 0.85; }
+}
+
 </style>
 
 </head>
@@ -1313,6 +1331,32 @@ DISPLAY & UI FUNCTIONS
 // Main round display
 
 function showRound(index) {
+  const resultsDiv = document.getElementById('game-results');
+  resultsDiv.innerHTML = '';
+
+  const data = allRounds[index];
+  if (!data) return;
+
+  document.getElementById("roundTitle").className = "round-title";
+  document.getElementById("roundTitle").innerText = `Round ${data.round}`;
+
+  const restDiv = renderRestingPlayers(data, index);
+  const gamesDiv = renderGames(data, index);
+
+  // ✅ Wrap everything for latest-round distinction
+  const wrapper = document.createElement('div');
+  wrapper.className = (index === allRounds.length - 1) ? 'latest-round' : 'past-round';
+
+  wrapper.append(restDiv, gamesDiv);
+  resultsDiv.append(wrapper);
+
+  document.getElementById('prevBtn').disabled = index === 0;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+
+    
+function showRound2(index) {
 
     const resultsDiv = document.getElementById('game-results');
 
