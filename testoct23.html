@@ -1136,9 +1136,9 @@ function AischedulerNextRound() {
   } = schedulerState;
 
     // ✅ Ensure number of courts doesn’t exceed available players
-if (players.length / 4 < numCourts) {
-  numCourts = Math.floor(players.length / 4);
-  if (numCourts < 1) numCourts = 1; // At least one court must be active
+ if (players.length / 4 < schedulerState.numCourts) {
+  schedulerState.numCourts = Math.floor(players.length / 4);
+  if (schedulerState.numCourts < 1) schedulerState.numCourts = 1;
 }
   const totalPlayers = players.length;
   const numPlayersPerRound = numCourts * 4;
