@@ -1,16 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Badminton Pair-UP</title>
-<style>
-/* ... (your existing CSS remains exactly the same) ... */
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Badminton Pair-UP</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #3b0073, #7d00b8);
+            color: white;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        header { padding: 8px; }
+        h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
+        .container { max-width: 800px; margin: auto; padding: 8px; }
+        .card,
+        .match-card {
+            background: white;
+            color: black;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 550px;
+            max-width: 95vw;
+            box-sizing: border-box;
+        }
+        .rest-box {
+            background: transparent !important;
+            color: black;
+            padding: 8px;
+            margin-bottom: 6px;
+            border-radius: 12px;
+            width: 550px;
+            max-width: 95vw;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+        .card input,
+        .card select,
+        .card button {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 16px;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .card input,
+        .card select { border: 1px solid #ccc; }
+        .card button {
+            background: purple;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .card button:hover {
+            background: #5e009c;
+            transform: scale(1.05);
+        }
+        #player-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2px;
+        }
+        #player-list-table th, #player-list-table td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+            font-size: 14px;
+        }
+        #player-list-table th { background: #f2f2f2; }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #d11a2a;
+            font-size: 8px;
+            cursor: pointer;
+        }
+        .delete-btn:hover { color: #a00; }
+        .fixed-pairs-list { margin-top: 8px; }
+        .fixed-pair-item {
+            background: #eee;
+            color: black;
+            padding: 6px 8px;
+            border-radius: 6px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .fixed-pair-remove {
+            color: #d11a2a;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .fixed-pair-remove:hover { color: #a00; }
+        #importModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+        }
+        #importModal .modal-content {
+            background: white;
+            color: black;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        #importModal textarea {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            padding: 8px;
+            border-radius: 6px;
+            resize: vertical;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .ok-btn {
+            background: #009c3c;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        .ok-btn:hover { background: #00b84d; }
+        .cancel-btn {
+            background: #d11a2a;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        .cancel-btn:hover { background: #ff3b3b; }
+        .main-action {
+            display: block;
+            width: 100%;
+            background: orange;
+            color: black;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 8px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .main-action:hover {
+            background: #ffb84d;
+            transform: scale(1.05);
+        }
+        #game-results {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
+            min-height: 40vh;
+        }
+        .match-card h3 { font-size: 22px; margin: 0; }
+        .match-card .teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .team {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 120px;
+        }
+        .vs-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #3b0073;
+            flex: 0 0 auto;
+            margin: 0 8px;
+        }
+        .Lplayer-btn, .Rplayer-btn {
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            padding: 10px;
+            margin: 4px 0;
+            color: #fff;
+            text-align: center;
+            transition: transform 0.2s, background 0.2s;
+            cursor: grab;
+        }
+        .Lplayer-btn { background: #009c3c; }
+        .Rplayer-btn { background: #0494ad; }
+        .Lplayer-btn:hover { background: #34995b; transform: scale(1.03); }
+        .Rplayer-btn:hover { background: #3f8e9c; transform: scale(1.03); }
+        .match-time { font-size: 16px; color: #3b0073; font-weight: 600; margin-top: 4px; }
+        .round-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #2a2a72, #009ffd);
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+        .round-navigation .round-label {
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .round-navigation button {
+            background: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            min-width: 50px;
+        }
+        .round-navigation button:hover:enabled {
+            background: #009ffd;
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+        .round-navigation button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .rest-btn {
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            padding: 6px;
+            margin: 4px 0;
+            color: #fff;
+            text-align: center;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .rest-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        .rest-box.drag-over { outline: 3px dashed #ff9800; }
+        .rest-box:empty { min-height: 40px; }
+        .round-title {
+            display: inline-block;
+            background: #007BFF;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+            margin: 10px 0;
+        }
+        .stats-panel {
+            background: white;
+            color: black;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        .stats-table th, .stats-table td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .stats-table th {
+            background: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body onload="initPage()">
 
-<!-- ... (your existing HTML structure remains exactly the same) ... -->
+<!-- Page 1 -->
+<div id="page1">
+    <div class="container">
+        <h1>Kari Scheduler</h1>
+        
+        <!-- Import Players -->
+        <div class="card">
+            <button onclick="showImportModal()">Paste All Players</button>
+        </div>
+        
+        <div id="importModal">
+            <div class="modal-content">
+                <textarea id="players-textarea" rows="8" placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
+                <div class="modal-buttons">
+                    <button class="ok-btn" onclick="addPlayersFromText()">Import</button>
+                    <button class="cancel-btn" onclick="hideImportModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Player Form -->
+        <div class="card">
+            <input type="text" id="player-name" placeholder="Enter Player Name">
+            <select id="player-gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+            <button onclick="addPlayer()">Add Player</button>
+        </div>
+        
+        <!-- Players List -->
+        <div class="card">
+            <table id="player-list-table"></table>
+        </div>
+        
+        <!-- Fixed Pairs -->
+        <div class="card">
+            <h3>Set Fixed Pairs (Optional)</h3>
+            <select id="fixed-pair-1"></select>
+            <select id="fixed-pair-2"></select>
+            <button onclick="addFixedPair()">Add Fixed Pair</button>
+            <div id="fixed-pair-list" class="fixed-pairs-list"></div>
+        </div>
+        
+        <!-- Game Setup -->
+        <div class="card">
+            <input type="number" id="num-courts" placeholder="Enter Number of Courts" min="1">
+        </div>
+        
+        <!-- Go to Rounds -->
+        <button id="goToRoundsBtn" class="main-action" onclick="goToRounds()">Go to Rounds ➡️</button>
+    </div>
+</div>
+
+<!-- Page 2 -->
+<div id="page2" style="display:none;">
+    <header>
+        <h4 id="roundTitle">Championship</h4>
+    </header>
+    
+    <!-- Stats Panel -->
+    <div class="stats-panel" id="statsPanel" style="display: none;">
+        <h3>Player Statistics</h3>
+        <table class="stats-table" id="statsTable">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Matches</th>
+                    <th>Rests</th>
+                    <th>Partners</th>
+                    <th>Opponents</th>
+                </tr>
+            </thead>
+            <tbody id="statsBody"></tbody>
+        </table>
+        <button onclick="toggleStats()" style="margin-top: 8px; padding: 6px 12px;">Hide Stats</button>
+    </div>
+    
+    <button onclick="toggleStats()" style="margin: 8px; padding: 6px 12px;">Show Stats</button>
+    
+    <div id="game-results"></div>
+    
+    <div class="round-navigation">
+        <button id="prevBtn" onclick="prevRound()" disabled>Prev Round</button>
+        <button id="nextBtn" onclick="nextRound()" disabled>Next Round</button>
+    </div>
+    
+    <button class="main-action" onclick="goBack()">Back</button>
+</div>
 
 <script>
 /* =========================
@@ -30,9 +419,8 @@ let schedulerState = {
     fixedMap: new Map(),
     roundIndex: 0,
     pairPlayedSet: new Set(),
-    // NEW: Track opponent distribution
-    opponentTracking: new Map(), // player -> Map(opponent -> count)
-    playedAgainst: new Map(),    // player -> Set of opponents faced
+    opponentTracking: new Map(),
+    playedAgainst: new Map(),
 };
 let isOnPage2 = false;
 
@@ -40,8 +428,6 @@ let isOnPage2 = false;
 function initPage() {
     document.getElementById("page1").style.display = 'block';
     document.getElementById("page2").style.display = 'none';
-    
-    // Initialize opponent tracking
     schedulerState.opponentTracking = new Map();
     schedulerState.playedAgainst = new Map();
 }
@@ -49,12 +435,130 @@ function initPage() {
 /* =========================
 PLAYER MANAGEMENT
 ========================= */
-// ... (your existing player management functions remain the same) ...
+function showImportModal() {
+    document.getElementById('importModal').style.display = 'block';
+}
+
+function hideImportModal() {
+    document.getElementById('importModal').style.display = 'none';
+    document.getElementById('players-textarea').value = '';
+}
+
+function addPlayersFromText() {
+    const text = document.getElementById('players-textarea').value.trim();
+    if (!text) return;
+    const lines = text.split(/\r?\n/);
+    lines.forEach(line => {
+        const [nameRaw, genderRaw] = line.split(',');
+        const name = nameRaw?.trim();
+        const gender = genderRaw?.trim() || "Male";
+        if (name && !players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+            players.push({ name, gender });
+        }
+    });
+    updatePlayerList();
+    updateFixedPairSelectors();
+    hideImportModal();
+}
+
+function addPlayer() {
+    const name = document.getElementById('player-name').value.trim();
+    const gender = document.getElementById('player-gender').value;
+    if (name && !players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        players.push({ name, gender });
+        updatePlayerList();
+        updateFixedPairSelectors();
+    } else if (name) {
+        alert(`Player "${name}" already exists!`);
+    }
+    document.getElementById('player-name').value = '';
+}
+
+function editPlayer(i, field, val) {
+    players[i][field] = val.trim();
+    updateFixedPairSelectors();
+}
+
+function deletePlayer(i) {
+    players.splice(i, 1);
+    updatePlayerList();
+    updateFixedPairSelectors();
+}
+
+function updatePlayerList() {
+    const table = document.getElementById('player-list-table');
+    table.innerHTML = '<tr><th>Name</th><th>Gender</th><th>Action</th></tr>';
+    players.forEach((p, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+        <td><input type="text" value="${p.name}" onchange="editPlayer(${i}, 'name', this.value)"></td>
+        <td>
+        <select onchange="editPlayer(${i}, 'gender', this.value)">
+        <option value="Male" ${p.gender === 'Male' ? 'selected' : ''}>Male</option>
+        <option value="Female" ${p.gender === 'Female' ? 'selected' : ''}>Female</option>
+        </select>
+        </td>
+        <td><button class="delete-btn" onclick="deletePlayer(${i})">Delete</button></td>
+        `;
+        table.appendChild(row);
+    });
+}
 
 /* =========================
 FIXED PAIRS MANAGEMENT
 ========================= */
-// ... (your existing fixed pairs functions remain the same) ...
+function updateFixedPairSelectors() {
+    const sel1 = document.getElementById('fixed-pair-1');
+    const sel2 = document.getElementById('fixed-pair-2');
+    const pairedPlayers = new Set(fixedPairs.flat());
+    sel1.innerHTML = '<option value="">-- Select Player 1 --</option>';
+    sel2.innerHTML = '<option value="">-- Select Player 2 --</option>';
+    players.forEach(p => {
+        if (!pairedPlayers.has(p.name)) {
+            const option1 = document.createElement('option');
+            const option2 = document.createElement('option');
+            option1.value = option2.value = p.name;
+            option1.textContent = option2.textContent = p.name;
+            sel1.appendChild(option1);
+            sel2.appendChild(option2);
+        }
+    });
+}
+
+function addFixedPair() {
+    const p1 = document.getElementById('fixed-pair-1').value;
+    const p2 = document.getElementById('fixed-pair-2').value;
+    if (!p1 || !p2) {
+        alert("Please select both players.");
+        return;
+    }
+    if (p1 === p2) {
+        alert("You cannot pair the same player with themselves.");
+        return;
+    }
+    const pairKey = [p1, p2].sort().join('&');
+    const alreadyExists = fixedPairs.some(pair => pair.sort().join('&') === pairKey);
+    if (alreadyExists) {
+        alert(`Fixed pair "${p1} & ${p2}" already exists.`);
+        return;
+    }
+    fixedPairs.push([p1, p2]);
+    const div = document.createElement('div');
+    div.classList.add('fixed-pair-item');
+    div.innerHTML = `
+    ${p1} & ${p2}
+    <span class="fixed-pair-remove" onclick="removeFixedPair(this, '${p1}', '${p2}')">
+    Remove
+    </span>`;
+    document.getElementById('fixed-pair-list').appendChild(div);
+    updateFixedPairSelectors();
+}
+
+function removeFixedPair(el, p1, p2) {
+    fixedPairs = fixedPairs.filter(pair => !(pair[0] === p1 && pair[1] === p2));
+    el.parentElement.remove();
+    updateFixedPairSelectors();
+}
 
 /* =========================
 SCHEDULER INIT & PAIR GENERATION
@@ -68,7 +572,7 @@ function initScheduler(playersList, numCourts, fixedPairs = []) {
     schedulerState.fixedMap = new Map();
     schedulerState.pairPlayedSet = new Set();
     
-    // NEW: Initialize opponent tracking for all players
+    // Initialize opponent tracking for all players
     schedulerState.opponentTracking = new Map();
     schedulerState.playedAgainst = new Map();
     playersList.forEach(player => {
@@ -91,7 +595,7 @@ function shuffle(array) {
     return array;
 }
 
-// NEW: Intelligent opponent selection with 2-3 constraint
+// Intelligent opponent selection with 2-3 constraint
 function findOptimalOpponents(team, availableOpponents, playerToOptimize = null) {
     if (availableOpponents.length < 2) return availableOpponents.slice(0, 2);
     
@@ -118,7 +622,7 @@ function findOptimalOpponents(team, availableOpponents, playerToOptimize = null)
     return availableOpponents.slice(0, 2);
 }
 
-// NEW: Update opponent tracking after match creation
+// Update opponent tracking after match creation
 function updateOpponentTracking(team1, team2) {
     team1.forEach(player1 => {
         team2.forEach(player2 => {
@@ -310,6 +814,7 @@ function AischedulerNextRound() {
         const team1 = allPairs[i];
         let bestTeam2 = null;
         let bestScore = -Infinity;
+        let bestTeam2Index = -1;
         
         // Find the best opponent team for team1
         for (let j = i + 1; j < allPairs.length; j++) {
@@ -371,478 +876,329 @@ function AischedulerNextRound() {
 }
 
 /* =========================
-
 DISPLAY & UI FUNCTIONS
-
 ========================= */
-
 // Main round display
-
 function showRound(index) {
-
     const resultsDiv = document.getElementById('game-results');
-
     resultsDiv.innerHTML = '';
-
     const data = allRounds[index];
-
     if (!data) return;
-
     document.getElementById("roundTitle").className = "round-title";
-
     document.getElementById("roundTitle").innerText = `Round ${data.round}`;
-
     const restDiv = renderRestingPlayers(data, index);
-
     const gamesDiv = renderGames(data, index);
-
     resultsDiv.append(restDiv, gamesDiv);
-
     document.getElementById('prevBtn').disabled = index === 0;
-
     document.getElementById('nextBtn').disabled = false;
-
+    updateStats();
 }
-
- 
 
 // Resting players display
-
 function renderRestingPlayers(data, index) {
-
     const restDiv = document.createElement('div');
-
     restDiv.className = 'round-header';
-
     const title = document.createElement('div');
-
     title.innerText = 'Resting:';
-
     restDiv.appendChild(title);
-
     const restBox = document.createElement('div');
-
     restBox.className = 'rest-box';
-
     if (data.resting.length === 0) {
-
         const span = document.createElement('span');
-
         span.innerText = 'None';
-
         restBox.appendChild(span);
-
     } else {
-
         data.resting.forEach(player => {
-
             restBox.appendChild(makeRestButton(player, data, index));
-
         });
-
     }
-
     restDiv.appendChild(restBox);
-
     return restDiv;
-
 }
 
- 
-
 // Games display
-
 function renderGames(data, index) {
-
     const wrapper = document.createElement('div');
-
     data.games.forEach((game, gameIndex) => {
-
         const card = document.createElement('div');
-
         card.className = 'match-card';
-
         const teamsDiv = document.createElement('div');
-
         teamsDiv.className = 'teams';
-
         const team1 = document.createElement('div');
-
         team1.className = 'team';
-
         game.pair1.forEach((p, i) =>
-
             team1.appendChild(makePlayerButton(p, 'L', gameIndex, i, data, index))
-
         );
-
         const vs = document.createElement('span');
-
-        vs.className = 'vs';
-
+        vs.className = 'vs-text';
         vs.innerText = 'VS';
-
         const team2 = document.createElement('div');
-
         team2.className = 'team';
-
         game.pair2.forEach((p, i) =>
-
             team2.appendChild(makePlayerButton(p, 'R', gameIndex, i, data, index))
-
         );
-
         teamsDiv.append(team1, vs, team2);
-
         card.appendChild(teamsDiv);
-
         wrapper.appendChild(card);
-
     });
-
     return wrapper;
-
 }
 
 function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
-
     const btn = document.createElement('button');
-
     btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
-
     btn.innerText = name;
-
     btn.draggable = true;
-
     btn.addEventListener('dragstart', (e) => {
-
         e.dataTransfer.setData('text/plain', JSON.stringify({
-
             type: 'team',
-
             player: name,
-
             fromTeamSide: teamSide,
-
             fromGameIndex: gameIndex,
-
             fromPlayerIndex: playerIndex
-
         }));
-
     });
-
     btn.addEventListener('dragover', (e) => e.preventDefault());
-
     btn.addEventListener('drop', (e) => {
-
         const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
-
         if (drop.type === 'rest') {
-
             handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index);
-
         } else if (drop.type === 'team') {
-
             handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index);
-
         }
-
     });
-
     return btn;
-
 }
 
-
-    
 function makeRestButton(player, data, index) {
-
     const btn = document.createElement('button');
-
     btn.innerText = player;
-
     btn.className = 'rest-btn';
-
     btn.draggable = true;
-
     const match = player.match(/\.?#(\d+)/);
-
     if (match) {
-
         const num = parseInt(match[1]);
-
         const hue = (num * 40) % 360;
-
         btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
-
     } else {
-
         btn.style.backgroundColor = '#777';
-
     }
-
     btn.style.color = 'white';
-
     btn.addEventListener('dragstart', (e) => {
-
         e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'rest', player }));
-
     });
-
     return btn;
-
 }
 
 function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
-
     const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
-
     if (drop.type !== 'rest') return;
-
     const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
-
     const restIndex = data.resting.indexOf(drop.player);
-
     if (restIndex === -1) return;
-
     const baseNewPlayer = drop.player.replace(/#\d+$/, '');
-
     const oldPlayer = data.games[gameIndex][teamKey][playerIndex];
-
     data.games[gameIndex][teamKey][playerIndex] = baseNewPlayer;
-
     const { restCount } = schedulerState;
-
     if (oldPlayer && oldPlayer !== '(Empty)') {
-
         const cleanOld = oldPlayer.replace(/#\d+$/, '');
-
         const newCount = (restCount.get(cleanOld) || 0) + 1;
-
         restCount.set(cleanOld, newCount);
-
         data.resting[restIndex] = `${cleanOld}#${newCount}`;
-
     } else {
-
         data.resting[restIndex] = null;
-
     }
-
     restCount.set(baseNewPlayer, Math.max((restCount.get(baseNewPlayer) || 0) - 1, 0));
-
     data.resting = data.resting.filter(p => p && p !== '(Empty)');
-
     showRound(index);
-
 }
 
 function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index) {
-
     const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
-
     if (drop.type !== 'team') return;
-
     const { fromTeamSide, fromGameIndex, fromPlayerIndex, player } = drop;
-
     if (!player || player === '(Empty)') return;
-
     const fromTeamKey = fromTeamSide === 'L' ? 'pair1' : 'pair2';
-
     const toTeamKey = teamSide === 'L' ? 'pair1' : 'pair2';
-
     const fromTeam = data.games[fromGameIndex][fromTeamKey];
-
     const toTeam = data.games[gameIndex][toTeamKey];
-
     const movedPlayer = player.replace(/#\d+$/, '');
-
     const targetPlayer = toTeam[playerIndex];
-
     toTeam[playerIndex] = movedPlayer;
-
     fromTeam[fromPlayerIndex] = targetPlayer && targetPlayer !== '(Empty)' ? targetPlayer : '(Empty)';
-
     showRound(index);
-
 }
 
- 
+// Statistics functions
+function toggleStats() {
+    const statsPanel = document.getElementById('statsPanel');
+    const isVisible = statsPanel.style.display !== 'none';
+    statsPanel.style.display = isVisible ? 'none' : 'block';
+    document.querySelector('#page2 button').textContent = isVisible ? 'Show Stats' : 'Hide Stats';
+}
+
+function updateStats() {
+    const statsBody = document.getElementById('statsBody');
+    statsBody.innerHTML = '';
+    
+    const playerStats = new Map();
+    
+    // Initialize stats for all players
+    players.forEach(p => {
+        playerStats.set(p.name, {
+            matches: 0,
+            rests: 0,
+            partners: new Set(),
+            opponents: new Set()
+        });
+    });
+    
+    // Calculate stats from all rounds
+    allRounds.forEach(round => {
+        // Count rests
+        round.resting.forEach(restPlayer => {
+            const cleanName = restPlayer.replace(/#\d+$/, '');
+            if (playerStats.has(cleanName)) {
+                playerStats.get(cleanName).rests++;
+            }
+        });
+        
+        // Count matches and track partners/opponents
+        round.games.forEach(game => {
+            // Team 1 players
+            game.pair1.forEach(player => {
+                const stats = playerStats.get(player);
+                if (stats) {
+                    stats.matches++;
+                    // Add partner
+                    game.pair1.forEach(partner => {
+                        if (partner !== player) stats.partners.add(partner);
+                    });
+                    // Add opponents
+                    game.pair2.forEach(opponent => stats.opponents.add(opponent));
+                }
+            });
+            
+            // Team 2 players
+            game.pair2.forEach(player => {
+                const stats = playerStats.get(player);
+                if (stats) {
+                    stats.matches++;
+                    // Add partner
+                    game.pair2.forEach(partner => {
+                        if (partner !== player) stats.partners.add(partner);
+                    });
+                    // Add opponents
+                    game.pair1.forEach(opponent => stats.opponents.add(opponent));
+                }
+            });
+        });
+    });
+    
+    // Display stats
+    players.forEach(p => {
+        const stats = playerStats.get(p.name);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${p.name}</td>
+            <td>${stats.matches}</td>
+            <td>${stats.rests}</td>
+            <td>${stats.partners.size}</td>
+            <td>${stats.opponents.size}</td>
+        `;
+        statsBody.appendChild(row);
+    });
+}
 
 /* =========================
-
 PAGE NAVIGATION
-
 ========================= */
-
 function goToRounds() {
-
     const numCourts = parseInt(document.getElementById('num-courts').value);
-
     if (!players.length || !numCourts) {
-
         alert('Please add players and number of courts!');
-
         return;
-
     }
-
     if (allRounds.length === 0) {
-
         initScheduler(players.map(p => p.name), numCourts, fixedPairs);
-
         allRounds = [AischedulerNextRound()];
-
         currentRoundIndex = 0;
-
         showRound(0);
-
     } else {
-
         const playersList = players.map(p => p.name);
-
         schedulerState.players = [...playersList].reverse();
-
         schedulerState.numCourts = numCourts;
-
         schedulerState.fixedPairs = fixedPairs;
-
         schedulerState.fixedMap = new Map();
-
         let highestRestCount = -Infinity;
-
         for (const p of playersList) {
-
             if (schedulerState.restCount.has(p)) {
-
                 const count = schedulerState.restCount.get(p);
-
                 if (count > highestRestCount) highestRestCount = count;
-
             }
-
         }
-
         for (const p of playersList) {
-
             if (!schedulerState.restCount.has(p)) {
-
                 schedulerState.restCount.set(p, highestRestCount + 1);
-
             }
-
         }
-
         for (const p of Array.from(schedulerState.restCount.keys())) {
-
             if (!playersList.includes(p)) schedulerState.restCount.delete(p);
-
         }
-
         if (currentRoundIndex + 1 <= allRounds.length) {
-
             showRound(currentRoundIndex);
-
         } else {
-
             allRounds.push(AischedulerNextRound());
-
             currentRoundIndex = currentRoundIndex + 1;
-
             showRound(currentRoundIndex);
-
         }
-
     }
-
     document.getElementById('page1').style.display = 'none';
-
     document.getElementById('page2').style.display = 'block';
-
     isOnPage2 = true;
-
 }
 
 function goBack() {
-
     const pin = prompt("Enter 4-digit code to go back:");
-
     if (pin === "0000") {
-
         document.getElementById('page1').style.display = 'block';
-
         document.getElementById('page2').style.display = 'none';
-
         isOnPage2 = false;
-
     } else if (pin !== null) alert("Incorrect PIN!");
-
 }
 
 function nextRound() {
-
     if (currentRoundIndex + 1 < allRounds.length) {
-
         currentRoundIndex++;
-
         showRound(currentRoundIndex);
-
     } else {
-
         const newRound = AischedulerNextRound();
-
         allRounds.push(newRound);
-
         currentRoundIndex = allRounds.length - 1;
-
         showRound(currentRoundIndex);
-
     }
-
 }
 
 function prevRound() {
-
     if (currentRoundIndex > 0) {
-
         currentRoundIndex--;
-
         showRound(currentRoundIndex);
-
     }
-
 }
 
- 
-
 /* =========================
-
 MOBILE BEHAVIOR
-
 ========================= */
-
 document.addEventListener('touchmove', function (event) {
-
     if (event.touches.length > 1) {
-
         event.preventDefault();
-
     }
-
 }, { passive: false });
 
 window.addEventListener('beforeunload', function (e) {
-
     e.preventDefault();
-
     e.returnValue = '';
-
 });
-
 </script>
-
 </body>
-
-    
 </html>
