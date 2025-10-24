@@ -1179,21 +1179,30 @@ function AischedulerNextRound() {
   let resting = sortedPlayers.slice(0, numResting);
 
   // 2️⃣ Rest fixed-pair partners together
-  for (const p of [...resting]) {
-    if (fixedMap.has(p)) {
-      const partner = fixedMap.get(p);
-      if (!resting.includes(partner)) resting.push(partner);
-    }
+  // 2️⃣ Rest fixed-pair partners together
+for (const p of [...resting]) {
+  if (fixedMap.has(p)) {
+    const partner = fixedMap.get(p);
+    if (!resting.includes(partner)) resting.push(partner);
+  }
+}
+
+// 3️⃣ Prevent over-resting — but keep pairs together
+while (players.length - resting.length < numPlayersPerRound && resting.length > 0) {
+  // Find the most rested *pair or single*
+  let mostRested = resting[0];
+  for (const r of resting) {
+    if ((restCount.get(r) || 0) > (restCount.get(mostRested) || 0)) mostRested = r;
   }
 
-  // 3️⃣ Prevent over-resting
-  while (players.length - resting.length < numPlayersPerRound && resting.length > 0) {
-    let mostRested = resting[0];
-    for (const r of resting) {
-      if ((restCount.get(r) || 0) > (restCount.get(mostRested) || 0)) mostRested = r;
-    }
+  // If part of a fixed pair, remove both
+  if (fixedMap.has(mostRested)) {
+    const partner = fixedMap.get(mostRested);
+    resting = resting.filter(p => p !== mostRested && p !== partner);
+  } else {
     resting = resting.filter(p => p !== mostRested);
   }
+}
 
   // 4️⃣ Playing list
   const playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
