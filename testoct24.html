@@ -573,23 +573,29 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
 
 
 /* Highlight the latest (active) round visually */
-.latest-round .match-card {
-  border: 3px solid black;
-  box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
-}
 
+    /* ✅ Latest (active) round - crisp and bright */
+.latest-round .match-card,
 .latest-round .rest-btn,
 .latest-round .Lplayer-btn,
 .latest-round .Rplayer-btn {
-  animation: pulse 1.2s infinite alternate;
+  opacity: 1;
+  filter: none;
+  transform: scale(1.01);
+  border: 2px solid black;
+  transition: all 0.3s ease;
 }
 
-/* simple pulsing animation for active buttons */
-@keyframes pulse {
-  from { transform: scale(1); opacity: 1; }
-  to { transform: scale(1.1); opacity: 0.85; }
+/* ✅ Previous (played) rounds - greyed out and de-emphasized */
+.played-round .match-card,
+.played-round .rest-btn,
+.played-round .Lplayer-btn,
+.played-round .Rplayer-btn {
+  opacity: 0.6;
+  filter: grayscale(40%);
+  transform: scale(1);
+  border: 1px solid #999;
 }
-    
 
 </style>
 
@@ -1334,23 +1340,27 @@ function showRound(index) {
   const data = allRounds[index];
   if (!data) return;
 
-  document.getElementById("roundTitle").className = "round-title";
-  document.getElementById("roundTitle").innerText = `Round ${data.round}`;
+  // ✅ Update round title
+  const roundTitle = document.getElementById("roundTitle");
+  roundTitle.className = "round-title";
+  roundTitle.innerText = `Round ${data.round}`;
 
+  // ✅ Create sections
   const restDiv = renderRestingPlayers(data, index);
   const gamesDiv = renderGames(data, index);
 
-  // ✅ Wrap everything for latest-round distinction
+  // ✅ Wrap everything in a container to distinguish latest vs played
   const wrapper = document.createElement('div');
-  wrapper.className = (index === allRounds.length - 1) ? 'latest-round' : 'past-round';
+  const isLatest = index === allRounds.length - 1;
+  wrapper.className = isLatest ? 'latest-round' : 'played-round'; // consistent with CSS
 
   wrapper.append(restDiv, gamesDiv);
   resultsDiv.append(wrapper);
 
+  // ✅ Navigation buttons
   document.getElementById('prevBtn').disabled = index === 0;
   document.getElementById('nextBtn').disabled = false;
 }
-
     
 
 function showRound2(index) {
