@@ -212,108 +212,69 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
 .fixed-pair-remove:hover { color: #a00; }
 
 #importModal {
-
-    display: none;
-
-    position: fixed;
-
-    top: 0; left: 0;
-
-    width: 100vw; height: 100vh;
-
-    background: rgba(0,0,0,0.6);
-
-    z-index: 1000;
-
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  font-size: 22px; /* ⬆️ slightly larger overall text */
 }
 
 #importModal .modal-content {
-
-    background: white;
-
-    color: black;
-
-    max-width: 400px;
-
-    margin: 100px auto;
-
-    padding: 20px;
-
-    border-radius: 10px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
+  background: white;
+  color: black;
+  max-width: 500px; /* ⬆️ a bit wider for larger text */
+  margin: 100px auto;
+  padding: 24px; /* ⬆️ extra padding for balance */
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 22px; /* ⬆️ ensure all inner text inherits */
 }
 
 #importModal textarea {
-
-    width: 100%;
-
-    box-sizing: border-box;
-
-    margin-bottom: 15px;
-
-    padding: 8px;
-
-    border-radius: 6px;
-
-    resize: vertical;
-
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 18px;
+  padding: 10px 12px; /* ⬆️ more space inside */
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 20px; /* ⬆️ bigger typing area text */
 }
 
 .modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
 
-    display: flex;
-
-    justify-content: flex-end;
-
-    gap: 10px;
-
+.ok-btn,
+.cancel-btn {
+  font-size: 18px; /* ⬆️ larger button text */
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px 16px; /* ⬆️ larger click area */
+  border-radius: 8px;
+  border: none;
+  color: white;
 }
 
 .ok-btn {
-
-    background: #009c3c;
-
-    color: white;
-
-    border: none;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    padding: 8px 12px;
-
-    border-radius: 6px;
-
+  background: #009c3c;
 }
-
-.ok-btn:hover { background: #00b84d; }
+.ok-btn:hover {
+  background: #00b84d;
+}
 
 .cancel-btn {
-
-    background: #d11a2a;
-
-    color: white;
-
-    border: none;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    padding: 8px 12px;
-
-    border-radius: 6px;
-
+  background: #d11a2a;
+}
+.cancel-btn:hover {
+  background: #ff3b3b;
 }
 
-.cancel-btn:hover { background: #ff3b3b; }
 
 .main-action {
 
@@ -594,6 +555,33 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
   transform: scale(1);
   border: 1px solid #999;
 }
+
+.Lplayer-btn.selected,
+.Rplayer-btn.selected,
+.rest-btn.selected {
+  outline: 2px solid #4caf50;
+  background: #4caf50 !important;
+  color: #fff;
+  box-shadow: 0 0 10px #4caf50;
+  animation: borderPulse 1s ease-in-out infinite;
+}
+
+@keyframes borderPulse {
+  0% {
+    box-shadow: 0 0 4px #4caf50, 0 0 8px #4caf50;
+    outline-color: #4caf50;
+  }
+  50% {
+    box-shadow: 0 0 16px #4caf50, 0 0 24px #4caf50;
+    outline-color: #6fff6f;
+  }
+  100% {
+    box-shadow: 0 0 4px #4caf50, 0 0 8px #4caf50;
+    outline-color: #4caf50;
+  }
+}
+
+
 
 </style>
 
@@ -1517,46 +1505,60 @@ function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
   const isLatestRound = index === allRounds.length - 1;
   if (!isLatestRound) return btn; // not interactive if not latest
 
-  // ✅ Tap to select or swap
-  btn.addEventListener('touchstart', (e) => {
+  // ✅ Click/tap to select or swap (no long press)
+  const handleTap = (e) => {
     e.preventDefault();
 
-    // if one player already selected → swap
+    // If another player already selected → swap between teams
     if (window.selectedPlayer) {
       const src = window.selectedPlayer;
-      handleDropBetweenTeams(
-        e,
-        teamSide,
-        gameIndex,
-        playerIndex,
-        data,
-        index,
-        src.playerName
-      );
+
+      if (src.from === 'rest') {
+        // Coming from rest list → move into team
+        handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index, src.playerName);
+      } else {
+        // Swap between team slots
+        handleDropBetweenTeams(
+          e,
+          teamSide,
+          gameIndex,
+          playerIndex,
+          data,
+          index,
+          src
+        );
+      }
+
+      // Clear selection
       window.selectedPlayer = null;
+      document.querySelectorAll('.selected').forEach(b => b.classList.remove('selected'));
     } else {
-      // select first player
+      // Select this player for swap
       window.selectedPlayer = {
         playerName: name,
         teamSide,
         gameIndex,
-        playerIndex
+        playerIndex,
+        from: 'team'
       };
+      btn.classList.add('selected');
     }
-  });
+  };
 
-enableTouchDrag(btn)
-    
+  btn.addEventListener('click', handleTap);
+  btn.addEventListener('touchstart', handleTap);
+
   return btn;
 }
 
 
-    function makeRestButton(player, data, index) {
+
+   function makeRestButton(player, data, index) {
   const btn = document.createElement('button');
   btn.innerText = player;
   btn.className = 'rest-btn';
 
-  // 🎨 Colored background by player number
+  // 🎨 Color by player number
   const match = player.match(/\.?#(\d+)/);
   if (match) {
     const num = parseInt(match[1]);
@@ -1570,25 +1572,31 @@ enableTouchDrag(btn)
   const isLatestRound = index === allRounds.length - 1;
   if (!isLatestRound) return btn; // not interactive if not latest
 
-  // ✅ Touch-to-move between Rest ↔ Team
-  btn.addEventListener('touchstart', (e) => {
+  // ✅ Tap-to-move between Rest ↔ Team
+  const handleTap = (e) => {
     e.preventDefault();
 
-    // if a team player was selected → move from rest to team
+    // If a team player selected → move from rest to team
     if (window.selectedPlayer) {
       const src = window.selectedPlayer;
-      handleDropRestToTeam(e, src.teamSide, src.gameIndex, src.playerIndex, data, index, player);
+      if (src.from === 'team') {
+        handleDropRestToTeam(e, src.teamSide, src.gameIndex, src.playerIndex, data, index, player);
+      }
       window.selectedPlayer = null;
+      document.querySelectorAll('.selected').forEach(b => b.classList.remove('selected'));
     } else {
-      // select this resting player
+      // Select this resting player
       window.selectedPlayer = { playerName: player, from: 'rest' };
+      btn.classList.add('selected');
     }
-  });
+  };
 
+  btn.addEventListener('click', handleTap);
+  btn.addEventListener('touchstart', handleTap);
 
-      enableTouchDrag(btn)  
   return btn;
 }
+
 
 
    function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index, movingPlayer = null) {
@@ -1627,35 +1635,28 @@ enableTouchDrag(btn)
 
 
 
-function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index) {
+function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index, src) {
+  // src contains info about the player you selected first
+  const { teamSide: fromTeamSide, gameIndex: fromGameIndex, playerIndex: fromPlayerIndex, playerName: player } = src;
 
-    const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
+  if (!player || player === '(Empty)') return;
 
-    if (drop.type !== 'team') return;
+  const fromTeamKey = fromTeamSide === 'L' ? 'pair1' : 'pair2';
+  const toTeamKey = teamSide === 'L' ? 'pair1' : 'pair2';
 
-    const { fromTeamSide, fromGameIndex, fromPlayerIndex, player } = drop;
+  const fromTeam = data.games[fromGameIndex][fromTeamKey];
+  const toTeam = data.games[gameIndex][toTeamKey];
 
-    if (!player || player === '(Empty)') return;
+  const movedPlayer = player.replace(/#\d+$/, '');
+  const targetPlayer = toTeam[playerIndex];
 
-    const fromTeamKey = fromTeamSide === 'L' ? 'pair1' : 'pair2';
+  // ✅ Swap players
+  toTeam[playerIndex] = movedPlayer;
+  fromTeam[fromPlayerIndex] = targetPlayer && targetPlayer !== '(Empty)' ? targetPlayer : '(Empty)';
 
-    const toTeamKey = teamSide === 'L' ? 'pair1' : 'pair2';
-
-    const fromTeam = data.games[fromGameIndex][fromTeamKey];
-
-    const toTeam = data.games[gameIndex][toTeamKey];
-
-    const movedPlayer = player.replace(/#\d+$/, '');
-
-    const targetPlayer = toTeam[playerIndex];
-
-    toTeam[playerIndex] = movedPlayer;
-
-    fromTeam[fromPlayerIndex] = targetPlayer && targetPlayer !== '(Empty)' ? targetPlayer : '(Empty)';
-
-    showRound(index);
-
+  showRound(index);
 }
+
 
  
 
@@ -1815,12 +1816,12 @@ MOBILE BEHAVIOR
 function enableTouchDrag(el) {
   let offsetX = 0, offsetY = 0;
   let clone = null;
+  let isDragging = false;
 
-  el.addEventListener('touchstart', e => {
-    const touch = e.touches[0];
+  const startDrag = (x, y) => {
     const rect = el.getBoundingClientRect();
-    offsetX = touch.clientX - rect.left;
-    offsetY = touch.clientY - rect.top;
+    offsetX = x - rect.left;
+    offsetY = y - rect.top;
 
     clone = el.cloneNode(true);
     clone.style.position = 'fixed';
@@ -1831,24 +1832,60 @@ function enableTouchDrag(el) {
     clone.style.zIndex = 9999;
     clone.classList.add('dragging');
     document.body.appendChild(clone);
+    isDragging = true;
+  };
 
-    e.preventDefault();
-  });
-
-  el.addEventListener('touchmove', e => {
+  const moveDrag = (x, y) => {
     if (!clone) return;
-    const touch = e.touches[0];
-    clone.style.left = `${touch.clientX - offsetX}px`;
-    clone.style.top = `${touch.clientY - offsetY}px`;
-  });
+    clone.style.left = `${x - offsetX}px`;
+    clone.style.top = `${y - offsetY}px`;
+  };
 
-  el.addEventListener('touchend', e => {
+  const endDrag = () => {
     if (clone) {
       clone.remove();
       clone = null;
     }
+    isDragging = false;
+  };
+
+  // --- Touch Events ---
+  el.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    startDrag(touch.clientX, touch.clientY);
+    e.preventDefault();
   });
+
+  el.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    moveDrag(touch.clientX, touch.clientY);
+  });
+
+  el.addEventListener('touchend', endDrag);
+
+  // --- Mouse Events ---
+  el.addEventListener('mousedown', e => {
+    startDrag(e.clientX, e.clientY);
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (isDragging) moveDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mouseup', endDrag);
 }
+
+// Warn before leaving or refreshing
+window.addEventListener('beforeunload', function (e) {
+  // Cancel the event
+  e.preventDefault();
+  // Some browsers require setting returnValue
+  e.returnValue = '';
+  // On mobile, this usually triggers a generic "Leave site?" dialog
+});
+
 
 </script>
 
