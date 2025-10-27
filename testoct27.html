@@ -1510,67 +1510,84 @@ function renderGames(data, index) {
 }
 
 function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
-    const btn = document.createElement('button');
-    btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
-    btn.innerText = name;
+  const btn = document.createElement('button');
+  btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
+  btn.innerText = name;
 
-    const isLatestRound = index === allRounds.length - 1;
+  const isLatestRound = index === allRounds.length - 1;
+  if (!isLatestRound) return btn; // not interactive if not latest
 
-    btn.draggable = isLatestRound; // ✅ only latest round is draggable
+  // ✅ Tap to select or swap
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
 
-    if (isLatestRound) {
-        btn.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', JSON.stringify({
-                type: 'team',
-                player: name,
-                fromTeamSide: teamSide,
-                fromGameIndex: gameIndex,
-                fromPlayerIndex: playerIndex
-            }));
-        });
-
-        btn.addEventListener('dragover', (e) => e.preventDefault());
-
-        btn.addEventListener('drop', (e) => {
-            const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
-            if (drop.type === 'rest') {
-                handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index);
-            } else if (drop.type === 'team') {
-                handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index);
-            }
-        });
-    }
-
-    return btn;
-}
-
-function makeRestButton(player, data, index) {
-    const btn = document.createElement('button');
-    btn.innerText = player;
-    btn.className = 'rest-btn';
-
-    const match = player.match(/\.?#(\d+)/);
-    if (match) {
-        const num = parseInt(match[1]);
-        const hue = (num * 40) % 360;
-        btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
+    // if one player already selected → swap
+    if (window.selectedPlayer) {
+      const src = window.selectedPlayer;
+      handleDropBetweenTeams(
+        e,
+        teamSide,
+        gameIndex,
+        playerIndex,
+        data,
+        index,
+        src.playerName
+      );
+      window.selectedPlayer = null;
     } else {
-        btn.style.backgroundColor = '#777';
+      // select first player
+      window.selectedPlayer = {
+        playerName: name,
+        teamSide,
+        gameIndex,
+        playerIndex
+      };
     }
-    btn.style.color = 'white';
+  });
 
-    const isLatestRound = index === allRounds.length - 1;
-
-    btn.draggable = isLatestRound; // ✅ only latest round is draggable
-
-    if (isLatestRound) {
-        btn.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'rest', player }));
-        });
-    }
-
-    return btn;
+  return btn;
 }
+
+
+    function makeRestButton(player, data, index) {
+  const btn = document.createElement('button');
+  btn.innerText = player;
+  btn.className = 'rest-btn';
+
+  // 🎨 Colored background by player number
+  const match = player.match(/\.?#(\d+)/);
+  if (match) {
+    const num = parseInt(match[1]);
+    const hue = (num * 40) % 360;
+    btn.style.backgroundColor = `hsl(${hue}, 65%, 45%)`;
+  } else {
+    btn.style.backgroundColor = '#777';
+  }
+  btn.style.color = 'white';
+
+  const isLatestRound = index === allRounds.length - 1;
+  if (!isLatestRound) return btn; // not interactive if not latest
+
+  // ✅ Touch-to-move between Rest ↔ Team
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+
+    // if a team player was selected → move from rest to team
+    if (window.selectedPlayer) {
+      const src = window.selectedPlayer;
+      handleDropRestToTeam(e, src.teamSide, src.gameIndex, src.playerIndex, data, index, player);
+      window.selectedPlayer = null;
+    } else {
+      // select this resting player
+      window.selectedPlayer = { playerName: player, from: 'rest' };
+    }
+  });
+
+  return btn;
+}
+
+
+    
 
 
 function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
