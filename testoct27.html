@@ -1591,52 +1591,41 @@ enableTouchDrag(btn)
 }
 
 
-    
+   function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index, movingPlayer = null) {
+  // ✅ For desktop drag
+  const drop = !movingPlayer && e.dataTransfer
+    ? JSON.parse(e.dataTransfer.getData('text/plain'))
+    : { type: 'rest', player: movingPlayer };
+
+  if (drop.type !== 'rest' || !drop.player) return;
+
+  const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+  const restIndex = data.resting.indexOf(drop.player);
+  if (restIndex === -1) return;
+
+  const baseNewPlayer = drop.player.replace(/#\d+$/, '');
+  const oldPlayer = data.games[gameIndex][teamKey][playerIndex];
+
+  data.games[gameIndex][teamKey][playerIndex] = baseNewPlayer;
+
+  const { restCount } = schedulerState;
+
+  if (oldPlayer && oldPlayer !== '(Empty)') {
+    const cleanOld = oldPlayer.replace(/#\d+$/, '');
+    const newCount = (restCount.get(cleanOld) || 0) + 1;
+    restCount.set(cleanOld, newCount);
+    data.resting[restIndex] = `${cleanOld}#${newCount}`;
+  } else {
+    data.resting[restIndex] = null;
+  }
+
+  restCount.set(baseNewPlayer, Math.max((restCount.get(baseNewPlayer) || 0) - 1, 0));
+  data.resting = data.resting.filter(p => p && p !== '(Empty)');
+
+  showRound(index);
+} 
 
 
-function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index) {
-
-    const drop = JSON.parse(e.dataTransfer.getData('text/plain'));
-
-    if (drop.type !== 'rest') return;
-
-    const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
-
-    const restIndex = data.resting.indexOf(drop.player);
-
-    if (restIndex === -1) return;
-
-    const baseNewPlayer = drop.player.replace(/#\d+$/, '');
-
-    const oldPlayer = data.games[gameIndex][teamKey][playerIndex];
-
-    data.games[gameIndex][teamKey][playerIndex] = baseNewPlayer;
-
-    const { restCount } = schedulerState;
-
-    if (oldPlayer && oldPlayer !== '(Empty)') {
-
-        const cleanOld = oldPlayer.replace(/#\d+$/, '');
-
-        const newCount = (restCount.get(cleanOld) || 0) + 1;
-
-        restCount.set(cleanOld, newCount);
-
-        data.resting[restIndex] = `${cleanOld}#${newCount}`;
-
-    } else {
-
-        data.resting[restIndex] = null;
-
-    }
-
-    restCount.set(baseNewPlayer, Math.max((restCount.get(baseNewPlayer) || 0) - 1, 0));
-
-    data.resting = data.resting.filter(p => p && p !== '(Empty)');
-
-    showRound(index);
-
-}
 
 function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index) {
 
