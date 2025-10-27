@@ -1545,6 +1545,8 @@ function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
     }
   });
 
+enableTouchDrag(btn)
+    
   return btn;
 }
 
@@ -1583,6 +1585,8 @@ function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
     }
   });
 
+
+      enableTouchDrag(btn)  
   return btn;
 }
 
@@ -1819,7 +1823,43 @@ MOBILE BEHAVIOR
 
 ========================= */
 
+function enableTouchDrag(el) {
+  let offsetX = 0, offsetY = 0;
+  let clone = null;
 
+  el.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    const rect = el.getBoundingClientRect();
+    offsetX = touch.clientX - rect.left;
+    offsetY = touch.clientY - rect.top;
+
+    clone = el.cloneNode(true);
+    clone.style.position = 'fixed';
+    clone.style.left = `${rect.left}px`;
+    clone.style.top = `${rect.top}px`;
+    clone.style.width = `${rect.width}px`;
+    clone.style.opacity = '0.7';
+    clone.style.zIndex = 9999;
+    clone.classList.add('dragging');
+    document.body.appendChild(clone);
+
+    e.preventDefault();
+  });
+
+  el.addEventListener('touchmove', e => {
+    if (!clone) return;
+    const touch = e.touches[0];
+    clone.style.left = `${touch.clientX - offsetX}px`;
+    clone.style.top = `${touch.clientY - offsetY}px`;
+  });
+
+  el.addEventListener('touchend', e => {
+    if (clone) {
+      clone.remove();
+      clone = null;
+    }
+  });
+}
 
 </script>
 
