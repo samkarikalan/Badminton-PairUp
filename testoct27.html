@@ -1038,29 +1038,14 @@ function initScheduler(playersList, numCourts, fixedPairs = []) {
 }
 
 
-function updateScheduler(playersList, fixedPairs = []) {
-  const samePlayers = schedulerState.players?.length === playersList.length &&
-    schedulerState.players.every(p => playersList.includes(p));
-
-  const sameFixed = JSON.stringify(fixedPairs) ===
-    JSON.stringify(schedulerState.lastFixedPairs);
-
-  if (samePlayers && sameFixed) return; // nothing changed
-
-  schedulerState.players = [...playersList];
-  schedulerState.lastFixedPairs = [...fixedPairs];
-
+function updateScheduler(playersList) {
   schedulerState.opponentMap = new Map();
   for (const p1 of playersList) {
-    const inner = new Map();
-    for (const p2 of playersList) if (p1 !== p2) inner.set(p2, 0);
-    schedulerState.opponentMap.set(p1, inner);
-  }
-
-  schedulerState.fixedMap = new Map();
-  for (const [a, b] of fixedPairs) {
-    schedulerState.fixedMap.set(a, b);
-    schedulerState.fixedMap.set(b, a);
+    const innerMap = new Map();
+    for (const p2 of playersList) {
+      if (p1 !== p2) innerMap.set(p2, 0); // start all counts at 0
+    }
+    schedulerState.opponentMap.set(p1, innerMap);
   }
 }
 
@@ -1705,7 +1690,7 @@ function goToRounds() {
         schedulerState.fixedMap = new Map();
 
         let highestRestCount = -Infinity;
-         updateScheduler(players.map(p => p.name), fixedPairs);
+         updateScheduler(players.map(p => p.name));
         
         for (const p of playersList) {
 
