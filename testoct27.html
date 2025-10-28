@@ -584,6 +584,25 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
 }
 
 
+@keyframes blinkTwice {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+@keyframes blinkLoop {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+.blink-twice {
+  animation: blinkTwice 0.6s ease-in-out 2;
+}
+
+.blink-loop {
+  animation: blinkLoop 0.8s ease-in-out infinite;
+}
+    
+
 
 </style>
 
@@ -1807,18 +1826,31 @@ function prevRound() {
 
 }
 
- 
-
-/* =========================
-
-MOBILE BEHAVIOR
-
-========================= */
-
-function enableTouchDrag(el) {
+ function enableTouchDrag(el) {
   let offsetX = 0, offsetY = 0;
   let clone = null;
   let isDragging = false;
+  let source = el;
+  let sourceBlinkInterval = null;
+
+  // Blink twice animation trigger
+  const blinkTwice = (element) => {
+    if (!element) return;
+    element.classList.add('blink-twice');
+    setTimeout(() => element.classList.remove('blink-twice'), 1200);
+  };
+
+  // Continuous blink start
+  const startBlink = (element) => {
+    if (!element) return;
+    element.classList.add('blink-loop');
+  };
+
+  // Stop continuous blink
+  const stopBlink = (element) => {
+    if (!element) return;
+    element.classList.remove('blink-loop');
+  };
 
   const startDrag = (x, y) => {
     const rect = el.getBoundingClientRect();
@@ -1835,6 +1867,8 @@ function enableTouchDrag(el) {
     clone.classList.add('dragging');
     document.body.appendChild(clone);
     isDragging = true;
+
+    startBlink(source); // Start continuous blinking for source
   };
 
   const moveDrag = (x, y) => {
@@ -1843,11 +1877,24 @@ function enableTouchDrag(el) {
     clone.style.top = `${y - offsetY}px`;
   };
 
-  const endDrag = () => {
+  const endDrag = (x, y) => {
+    if (!isDragging) return;
+
+    const target = document.elementFromPoint(x, y);
+
+    // Stop source blinking
+    stopBlink(source);
+
+    if (target && target !== source && target.tagName === source.tagName) {
+      // Blink target twice
+      blinkTwice(target);
+    }
+
     if (clone) {
       clone.remove();
       clone = null;
     }
+
     isDragging = false;
   };
 
@@ -1864,7 +1911,10 @@ function enableTouchDrag(el) {
     moveDrag(touch.clientX, touch.clientY);
   });
 
-  el.addEventListener('touchend', endDrag);
+  el.addEventListener('touchend', e => {
+    const touch = e.changedTouches[0];
+    endDrag(touch.clientX, touch.clientY);
+  });
 
   // --- Mouse Events ---
   el.addEventListener('mousedown', e => {
@@ -1876,17 +1926,18 @@ function enableTouchDrag(el) {
     if (isDragging) moveDrag(e.clientX, e.clientY);
   });
 
-  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('mouseup', e => {
+    endDrag(e.clientX, e.clientY);
+  });
 }
 
-// Warn before leaving or refreshing
-window.addEventListener('beforeunload', function (e) {
-  // Cancel the event
-  e.preventDefault();
-  // Some browsers require setting returnValue
-  e.returnValue = '';
-  // On mobile, this usually triggers a generic "Leave site?" dialog
-});
+/* =========================
+
+MOBILE BEHAVIOR
+
+========================= */
+
+
 
 
 </script>
