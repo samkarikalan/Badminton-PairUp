@@ -1905,8 +1905,36 @@ window.addEventListener('beforeunload', function (e) {
 </div>
 
 <script>
+
+
+
+
+
+
+    <!-- 🔒 Password Overlay for Page 2 -->
+<div id="lock-overlay" style="
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  visibility: hidden; z-index: 9999;">
+  <h3 style="color:white; margin-bottom:10px;">Enter Password to Refresh</h3>
+  <input type="password" id="lock-pass" placeholder="Password"
+    style="padding:8px; font-size:16px; border-radius:8px; border:none; margin-bottom:8px;">
+  <div style="display:flex; gap:10px;">
+    <button id="unlock-btn"
+      style="padding:8px 16px; font-size:16px; border:none; border-radius:8px; background:#7d00b8; color:white;">
+      Unlock & Refresh
+    </button>
+    <button id="cancel-btn"
+      style="padding:8px 16px; font-size:16px; border:none; border-radius:8px; background:#777; color:white;">
+      Cancel
+    </button>
+  </div>
+  <p id="msg" style="color:#ff4444; margin-top:8px;"></p>
+</div>
+
+<script>
 (() => {
-  const PASSWORD = "0000"; // 🔐 Change your password here
+  const PASSWORD = "admin123"; // 🔐 Change password here
   let locked = false;
   let lastTouchY = 0;
 
@@ -1915,7 +1943,7 @@ window.addEventListener('beforeunload', function (e) {
     return page2 && getComputedStyle(page2).display !== "none";
   }
 
-  // Prevent pull-to-refresh on mobile
+  // 📴 Prevent pull-to-refresh (mobile)
   document.addEventListener("touchstart", e => lastTouchY = e.touches[0].clientY, {passive:false});
   document.addEventListener("touchmove", e => {
     if (isOnPage2()) {
@@ -1924,7 +1952,7 @@ window.addEventListener('beforeunload', function (e) {
     }
   }, {passive:false});
 
-  // Intercept refresh or close attempts
+  // 🔒 Show password prompt on refresh attempt (Page 2 only)
   window.addEventListener("beforeunload", e => {
     if (isOnPage2() && locked) {
       e.preventDefault();
@@ -1934,7 +1962,7 @@ window.addEventListener('beforeunload', function (e) {
     }
   });
 
-  // Password unlock
+  // ✅ Unlock & Refresh
   document.getElementById("unlock-btn").addEventListener("click", () => {
     const pass = document.getElementById("lock-pass").value.trim();
     const msg = document.getElementById("msg");
@@ -1947,7 +1975,14 @@ window.addEventListener('beforeunload', function (e) {
     }
   });
 
-  // Watch when Page 2 becomes visible
+  // 🚫 Cancel — just close overlay, stay on same Page 2
+  document.getElementById("cancel-btn").addEventListener("click", () => {
+    document.getElementById("lock-overlay").style.visibility = "hidden";
+    document.getElementById("lock-pass").value = "";
+    document.getElementById("msg").textContent = "";
+  });
+
+  // 🔍 Track when Page 2 is visible
   const page2 = document.getElementById("page2");
   if (page2) {
     const observer = new MutationObserver(() => {
@@ -1958,6 +1993,9 @@ window.addEventListener('beforeunload', function (e) {
 
   if (isOnPage2()) locked = true;
 })();
+</script>
+
+    
 </script> 
 
 </body>
