@@ -218,7 +218,7 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
   width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.6);
   z-index: 1000;
-  font-size: 22px;
+  font-size: 15px;
 }
 
 #importModal .modal-content {
@@ -226,12 +226,12 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
   color: black;
   max-width: 500px;
   margin: 100px auto;
-  padding: 24px;
+  padding: 8px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 22px;
+  font-size: 15px;
 }
 
 #importModal textarea {
@@ -640,7 +640,7 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
     <h2>Import Players</h2>
 
     <label for="playerData">Paste or type player names:</label>
-    <textarea id="playerData" rows="5" placeholder="Example: John, Lisa, Ken"></textarea>
+    <textarea id="playerData" rows="5" placeholder=="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
 
     <!-- 🎯 Gender Selection (clean & aligned) -->
     <div class="gender-row">
@@ -650,8 +650,8 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
     </div>
 
     <div class="modal-buttons">
-      <button class="ok-btn">OK</button>
-      <button class="cancel-btn">Cancel</button>
+      <button class="ok-btn" onclick="addPlayersFromText()">Import</button>
+      <button class="cancel-btn" onclick="hideImportModal()">Cancel</button>
     </div>
   </div>
 </div>
