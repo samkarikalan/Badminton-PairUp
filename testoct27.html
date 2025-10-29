@@ -1923,7 +1923,102 @@ function enableTouchDrag(el) {
   });
 }
 
-    
+
+
+
+    function enableTouchDrag(el) {
+  let offsetX = 0, offsetY = 0;
+  let clone = null;
+  let isDragging = false;
+  let source = el;
+
+  const startBlink = (element) => {
+    if (element) element.classList.add('blink-loop');
+  };
+
+  const stopBlink = (element) => {
+    if (element) element.classList.remove('blink-loop');
+  };
+
+  const blinkTwice = (element) => {
+    if (element) {
+      element.classList.add('blink-twice');
+      setTimeout(() => element.classList.remove('blink-twice'), 1200);
+    }
+  };
+
+  const startDrag = (x, y) => {
+    const rect = source.getBoundingClientRect();
+    offsetX = x - rect.left;
+    offsetY = y - rect.top;
+
+    clone = source.cloneNode(true);
+    clone.style.position = 'fixed';
+    clone.style.left = `${rect.left}px`;
+    clone.style.top = `${rect.top}px`;
+    clone.style.width = `${rect.width}px`;
+    clone.style.opacity = '0.7';
+    clone.style.zIndex = 9999;
+    clone.classList.add('dragging');
+    document.body.appendChild(clone);
+
+    isDragging = true;
+    startBlink(source);
+  };
+
+  const moveDrag = (x, y) => {
+    if (!clone) return;
+    clone.style.left = `${x - offsetX}px`;
+    clone.style.top = `${y - offsetY}px`;
+  };
+
+  const endDrag = (x, y) => {
+    if (!isDragging) return;
+    if (clone) clone.remove();
+
+    // Stop source blinking
+    stopBlink(source);
+
+    const target = document.elementFromPoint(x, y);
+    if (target && target !== source && target.tagName === source.tagName) {
+      blinkTwice(target);
+    }
+
+    isDragging = false;
+  };
+
+  // --- Touch Events ---
+  el.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    startDrag(t.clientX, t.clientY);
+    e.preventDefault();
+  });
+
+  el.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const t = e.touches[0];
+    moveDrag(t.clientX, t.clientY);
+  });
+
+  el.addEventListener('touchend', e => {
+    const t = e.changedTouches[0];
+    endDrag(t.clientX, t.clientY);
+  });
+
+  // --- Mouse Events ---
+  el.addEventListener('mousedown', e => {
+    startDrag(e.clientX, e.clientY);
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (isDragging) moveDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mouseup', e => {
+    endDrag(e.clientX, e.clientY);
+  });
+}
 
 
 
