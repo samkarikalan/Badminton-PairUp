@@ -584,22 +584,22 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
 }
 
 
-@keyframes blinkTwice {
-  0%, 50%, 100% { opacity: 1; }
-  25%, 75% { opacity: 0; }
-}
-
 @keyframes blinkLoop {
   0%, 50%, 100% { opacity: 1; }
   25%, 75% { opacity: 0; }
 }
 
-.blink-twice {
-  animation: blinkTwice 0.6s ease-in-out 2;
+@keyframes blinkTwice {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
 }
 
 .blink-loop {
   animation: blinkLoop 0.8s ease-in-out infinite;
+}
+
+.blink-twice {
+  animation: blinkTwice 0.6s ease-in-out 2;
 }
     
 
@@ -1826,38 +1826,36 @@ function prevRound() {
 
 }
 
- function enableTouchDrag(el) {
+
+
+
+function enableTouchDrag(el) {
   let offsetX = 0, offsetY = 0;
   let clone = null;
   let isDragging = false;
   let source = el;
-  let sourceBlinkInterval = null;
 
-  // Blink twice animation trigger
-  const blinkTwice = (element) => {
-    if (!element) return;
-    element.classList.add('blink-twice');
-    setTimeout(() => element.classList.remove('blink-twice'), 1200);
-  };
-
-  // Continuous blink start
   const startBlink = (element) => {
-    if (!element) return;
-    element.classList.add('blink-loop');
+    if (element) element.classList.add('blink-loop');
   };
 
-  // Stop continuous blink
   const stopBlink = (element) => {
-    if (!element) return;
-    element.classList.remove('blink-loop');
+    if (element) element.classList.remove('blink-loop');
+  };
+
+  const blinkTwice = (element) => {
+    if (element) {
+      element.classList.add('blink-twice');
+      setTimeout(() => element.classList.remove('blink-twice'), 1200);
+    }
   };
 
   const startDrag = (x, y) => {
-    const rect = el.getBoundingClientRect();
+    const rect = source.getBoundingClientRect();
     offsetX = x - rect.left;
     offsetY = y - rect.top;
 
-    clone = el.cloneNode(true);
+    clone = source.cloneNode(true);
     clone.style.position = 'fixed';
     clone.style.left = `${rect.left}px`;
     clone.style.top = `${rect.top}px`;
@@ -1866,9 +1864,9 @@ function prevRound() {
     clone.style.zIndex = 9999;
     clone.classList.add('dragging');
     document.body.appendChild(clone);
-    isDragging = true;
 
-    startBlink(source); // Start continuous blinking for source
+    isDragging = true;
+    startBlink(source);
   };
 
   const moveDrag = (x, y) => {
@@ -1879,20 +1877,14 @@ function prevRound() {
 
   const endDrag = (x, y) => {
     if (!isDragging) return;
-
-    const target = document.elementFromPoint(x, y);
+    if (clone) clone.remove();
 
     // Stop source blinking
     stopBlink(source);
 
+    const target = document.elementFromPoint(x, y);
     if (target && target !== source && target.tagName === source.tagName) {
-      // Blink target twice
       blinkTwice(target);
-    }
-
-    if (clone) {
-      clone.remove();
-      clone = null;
     }
 
     isDragging = false;
@@ -1900,20 +1892,20 @@ function prevRound() {
 
   // --- Touch Events ---
   el.addEventListener('touchstart', e => {
-    const touch = e.touches[0];
-    startDrag(touch.clientX, touch.clientY);
+    const t = e.touches[0];
+    startDrag(t.clientX, t.clientY);
     e.preventDefault();
   });
 
   el.addEventListener('touchmove', e => {
     if (!isDragging) return;
-    const touch = e.touches[0];
-    moveDrag(touch.clientX, touch.clientY);
+    const t = e.touches[0];
+    moveDrag(t.clientX, t.clientY);
   });
 
   el.addEventListener('touchend', e => {
-    const touch = e.changedTouches[0];
-    endDrag(touch.clientX, touch.clientY);
+    const t = e.changedTouches[0];
+    endDrag(t.clientX, t.clientY);
   });
 
   // --- Mouse Events ---
@@ -1931,11 +1923,8 @@ function prevRound() {
   });
 }
 
-/* =========================
+    
 
-MOBILE BEHAVIOR
-
-========================= */
 
 
 
