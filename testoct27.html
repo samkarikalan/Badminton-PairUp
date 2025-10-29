@@ -602,7 +602,14 @@ h1 { font-size: 20px; margin: 0; font-weight: bold; letter-spacing: 2px; }
   animation: blinkTwice 0.6s ease-in-out 2;
 }
     
+.blink {
+  animation: blink-effect 0.5s ease-in-out 2;
+}
 
+@keyframes blink-effect {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(2); } /* 💡 bright flash */
+}
 
 </style>
 
@@ -1620,7 +1627,8 @@ function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
 
 
 
-   function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index, movingPlayer = null) {
+   
+function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index, movingPlayer = null) {
   // ✅ For desktop drag
   const drop = !movingPlayer && e.dataTransfer
     ? JSON.parse(e.dataTransfer.getData('text/plain'))
@@ -1652,8 +1660,18 @@ function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
   data.resting = data.resting.filter(p => p && p !== '(Empty)');
 
   showRound(index);
-} 
 
+  // ✨ Blink the updated button
+  setTimeout(() => {
+    const selector = teamSide === 'L' ? '.Lplayer-btn' : '.Rplayer-btn';
+    const targetBtns = document.querySelectorAll(selector);
+    const target = targetBtns[playerIndex + gameIndex * 2]; // rough mapping, adjust if needed
+    if (target) {
+      target.classList.add('blink');
+      setTimeout(() => target.classList.remove('blink'), 1000);
+    }
+  }, 50);
+}
 
 
 function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index, src) {
@@ -1676,6 +1694,17 @@ function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index
   fromTeam[fromPlayerIndex] = targetPlayer && targetPlayer !== '(Empty)' ? targetPlayer : '(Empty)';
 
   showRound(index);
+
+  // ✨ Blink the target button after swap
+  setTimeout(() => {
+    const selector = teamSide === 'L' ? '.Lplayer-btn' : '.Rplayer-btn';
+    const targetBtns = document.querySelectorAll(selector);
+    const target = targetBtns[playerIndex + gameIndex * 2];
+    if (target) {
+      target.classList.add('blink');
+      setTimeout(() => target.classList.remove('blink'), 1000);
+    }
+  }, 50);
 }
 
 
