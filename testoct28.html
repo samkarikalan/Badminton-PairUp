@@ -2320,6 +2320,96 @@ window.addEventListener('beforeunload', function (e) {
 
 </script>
 
+
+    <script>
+const page2 = document.getElementById('page2');
+let startY = 0;
+let maybePulling = false;
+
+window.addEventListener('touchstart', (e) => {
+  // Only activate when Page 2 is currently visible
+  const isPage2Visible = page2 && page2.style.display !== 'none' && page2.offsetParent !== null;
+  if (!isPage2Visible) return;
+
+  // Only when scrolled to top
+  if (window.scrollY === 0) {
+    startY = e.touches[0].pageY;
+    maybePulling = true;
+  } else {
+    maybePulling = false;
+  }
+}, { passive: false });
+
+window.addEventListener('touchmove', (e) => {
+  const isPage2Visible = page2 && page2.style.display !== 'none' && page2.offsetParent !== null;
+  if (!maybePulling || !isPage2Visible) return;
+
+  const y = e.touches[0].pageY;
+  if (y - startY > 10) {
+    // 🛑 Block browser pull-to-refresh, but still allow normal scroll
+    e.preventDefault();
+  }
+}, { passive: false });
+</script>
+
+
+    Perfect 👍 — since your Page 2 is hidden using
+
+<div id="page2" style="display:none;">
+
+and shown dynamically (probably via page2.style.display = 'block' or similar),
+we’ll adapt the pull-to-refresh lock to work based on visibility instead of a CSS class.
+
+Here’s the exact solution you can safely drop into your HTML 👇
+
+
+---
+
+✅ 1️⃣ Add this CSS (optional but recommended)
+
+body {
+  overscroll-behavior-y: contain; /* Helps block browser pull-to-refresh */
+}
+
+
+---
+
+✅ 2️⃣ Add this JS snippet (anywhere after Page 2 exists in DOM)
+
+<script>
+const page2 = document.getElementById('page2');
+let startY = 0;
+let maybePulling = false;
+
+window.addEventListener('touchstart', (e) => {
+  // Only activate when Page 2 is currently visible
+  const isPage2Visible = page2 && page2.style.display !== 'none' && page2.offsetParent !== null;
+  if (!isPage2Visible) return;
+
+  // Only when scrolled to top
+  if (window.scrollY === 0) {
+    startY = e.touches[0].pageY;
+    maybePulling = true;
+  } else {
+    maybePulling = false;
+  }
+}, { passive: false });
+
+window.addEventListener('touchmove', (e) => {
+  const isPage2Visible = page2 && page2.style.display !== 'none' && page2.offsetParent !== null;
+  if (!maybePulling || !isPage2Visible) return;
+
+  const y = e.touches[0].pageY;
+  if (y - startY > 10) {
+    // 🛑 Block browser pull-to-refresh, but still allow normal scroll
+    e.preventDefault();
+  }
+}, { passive: false });
+</script>
+
+overscroll-behavior-y: contain; 
+
+
 </body>
 
 </html>
