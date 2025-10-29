@@ -1317,14 +1317,17 @@ function AischedulerNextRound() {
  
 
     } else {
+    // ⚖️ Sort players by how often they've rested (low first)
+    let sortedPlayers = [...players].sort((a, b) => 
+      (restCount.get(a) || 0) - (restCount.get(b) || 0)
+    );
 
-        // If no fixed pairs, simply assign
+    // 💤 Select players to rest
+    resting = sortedPlayers.slice(0, numResting);
 
-        playing = players.slice(0, numPlayersPerRound);
-
-        resting = players.filter(p => !playing.includes(p)).slice(0, numResting);
-
-    }
+    // 🎾 Remaining players play
+    playing = players.filter(p => !resting.includes(p)).slice(0, numPlayersPerRound);
+}
 
  
 
