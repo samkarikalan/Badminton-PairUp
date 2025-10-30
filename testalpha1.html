@@ -532,6 +532,12 @@
       animation: borderPulse 1s ease-in-out infinite;
     }
 
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+    
     @keyframes borderPulse {
       0% {
         box-shadow: 0 0 4px #4caf50, 0 0 8px #4caf50;
@@ -2286,6 +2292,12 @@
       // On mobile, this usually triggers a generic "Leave site?" dialog
     });
 
+
+
+    window.onload = function() {
+    const btn = document.getElementById('goToRoundsBtn');
+    btn.disabled = (allRounds.length === 0);
+  };
 
   </script>
 
