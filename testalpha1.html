@@ -2075,18 +2075,7 @@ button:disabled {
    function resetRounds() {
   // 1️⃣ Clear all previous rounds
   allRounds.length = 0;
-
-  // 2️⃣ Reinitialize scheduler
-  initScheduler(players.map(p => p.name), numCourts, fixedPairs);
-
-  // 3️⃣ Generate the first round
-  allRounds = [AischedulerNextRound()];
-
-  // 4️⃣ Reset round index
-  currentRoundIndex = 0;
-
-  // 5️⃣ Display first round
-  showRound(0);
+  goToRounds()
 }
       
     function goToRounds() {
