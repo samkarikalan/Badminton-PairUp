@@ -231,6 +231,16 @@
     }
 
 
+
+    .gender-select {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.gender-select label {
+  margin-right: 15px;
+}
+
     .main-action {
       display: block;
       width: 100%;
@@ -577,23 +587,25 @@ button:disabled {
       </div>
 
       <div id="importModal">
+  <div class="modal-content">
+    <textarea
+      id="players-textarea"
+      rows="8"
+      placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female&#10;Suresh">
+    </textarea>
 
-        <div class="modal-content">
+    <!-- Default gender selection -->
+    <div class="gender-select">
+      <label><input type="radio" name="genderSelect" value="Male" checked> Male</label>
+      <label><input type="radio" name="genderSelect" value="Female"> Female</label>
+    </div>
 
-          <textarea id="players-textarea" rows="8"
-            placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
+    <div class="modal-buttons">
+      <button class="ok-btn" onclick="addPlayersFromText()">Import</button>
+      <button class="cancel-btn" onclick="hideImportModal()">Cancel</button>
+    </div>
+  </div>
 
-          <div class="modal-buttons">
-
-            <button class="ok-btn" onclick="addPlayersFromText()">Import</button>
-
-            <button class="cancel-btn" onclick="hideImportModal()">Cancel</button>
-
-          </div>
-
-        </div>
-
-      </div>
 
       <!-- Add Player Form -->
 
@@ -748,36 +760,32 @@ button:disabled {
     }
 
     function addPlayersFromText() {
+  const text = document.getElementById('players-textarea').value.trim();
+  if (!text) return;
 
-      const text = document.getElementById('players-textarea').value.trim();
+  // Get selected default gender (from radio)
+  const genderSelect = document.querySelector('input[name="genderSelect"]:checked');
+  const defaultGender = genderSelect ? genderSelect.value : "Male";
 
-      if (!text) return;
+  const lines = text.split(/\r?\n/);
 
-      const lines = text.split(/\r?\n/);
+  lines.forEach(line => {
+    if (!line.trim()) return;
 
-      lines.forEach(line => {
+    const [nameRaw, genderRaw] = line.split(',');
+    const name = nameRaw?.trim();
+    // Use the specified gender if available, otherwise default to selected one
+    const gender = genderRaw?.trim() || defaultGender;
 
-        const [nameRaw, genderRaw] = line.split(',');
-
-        const name = nameRaw?.trim();
-
-        const gender = genderRaw?.trim() || "Male";
-
-        if (name && !players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-
-          players.push({ name, gender });
-
-        }
-
-      });
-
-      updatePlayerList();
-
-      updateFixedPairSelectors();
-
-      hideImportModal();
-
+    if (name && !players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+      players.push({ name, gender });
     }
+  });
+
+  updatePlayerList();
+  updateFixedPairSelectors();
+  hideImportModal();
+}
 
     function addPlayer() {
 
