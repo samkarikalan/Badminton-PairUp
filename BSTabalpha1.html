@@ -10,7 +10,8 @@
 
   <title>Badminton Pair-UP</title>
 
-  <style>/* Base font size: 16px = 1rem */
+  <style>
+
 /* ===== Base font size: 16px = 1rem ===== */
 html {
   font-size: 16px;
@@ -251,12 +252,12 @@ h1 {
   transform: scale(1.05);
 }
 
+/* ===== Flex & Layout ===== */
 .card-col {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 1.25rem; /* 20px */
-  flex-wrap: nowrap;
 }
 
 #game-results {
@@ -335,6 +336,7 @@ h1 {
   margin-top: 0.25rem; /* 4px */
 }
 
+/* ===== Round Navigation ===== */
 .round-navigation {
   display: flex;
   justify-content: center;
@@ -356,7 +358,233 @@ h1 {
 .round-navigation button {
   background: #fff;
   border: none;
-  padding:
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-width: 3.125rem; /* 50px */
+}
+
+.round-navigation button:hover:enabled {
+  background: #009ffd;
+  color: #fff;
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.2);
+  transform: translateY(-0.0625rem);
+}
+
+.round-navigation button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Rest Button ===== */
+.rest-btn {
+  border: none;
+  border-radius: 0.375rem; /* 6px */
+  font-size: 1rem; /* 16px */
+  padding: 0.375rem; /* 6px */
+  margin: 0.25rem 0; /* 4px 0 */
+  color: #fff;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.rest-btn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.rest-box.drag-over {
+  outline: 0.1875rem dashed #ff9800; /* 3px */
+}
+
+.rest-box:empty {
+  min-height: 2.5rem; /* 40px */
+}
+
+/* ===== Round Titles ===== */
+.round-title {
+  display: inline-block;
+  background: #007BFF;
+  color: white;
+  padding: 0.5rem 1.25rem; /* 8px 20px */
+  border-radius: 0.875rem; /* 14px */
+  font-weight: 700;
+  font-size: 1.4rem;
+  box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.25);
+  margin: 0.625rem 0; /* 10px 0 */
+}
+
+/* ===== Latest and Played Rounds ===== */
+.latest-round .match-card,
+.latest-round .rest-btn,
+.latest-round .Lplayer-btn,
+.latest-round .Rplayer-btn {
+  filter: none;
+  transform: scale(1.01);
+  transition: all 0.3s ease;
+}
+
+.played-round .match-card,
+.played-round .rest-btn,
+.played-round .Lplayer-btn,
+.played-round .Rplayer-btn {
+  filter: grayscale(40%) opacity(0.7);
+  transform: scale(1);
+  border: 0.0625rem solid #999; /* 1px */
+}
+
+/* ===== Selected States ===== */
+.Lplayer-btn.selected,
+.Rplayer-btn.selected,
+.rest-btn.selected {
+  outline: 0.125rem solid #4caf50; /* 2px */
+  background: grey !important;
+  color: #fff;
+  box-shadow: 0 0 0.625rem #4caf50; /* 10px */
+  animation: borderPulse 1s ease-in-out infinite;
+}
+
+@keyframes borderPulse {
+  0% {
+    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
+    outline-color: #4caf50;
+  }
+  50% {
+    box-shadow: 0 0 1rem #4caf50, 0 0 1.5rem #4caf50;
+    outline-color: #6fff6f;
+  }
+  100% {
+    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
+    outline-color: #4caf50;
+  }
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Match Card Teams Buttons Hover Transitions ===== */
+.Lplayer-btn:hover,
+.Rplayer-btn:hover,
+.rest-btn:hover {
+  transition: transform 0.2s, background 0.2s;
+}
+
+/* ===== Match Time ===== */
+.match-time {
+  font-size: 1rem; /* 16px */
+  color: #3b0073;
+  font-weight: 600;
+  margin-top: 0.25rem; /* 4px */
+}
+
+/* ===== Highlight latest round buttons ===== */
+.latest-round .Lplayer-btn,
+.latest-round .Rplayer-btn,
+.latest-round .rest-btn {
+  transform: scale(1.01);
+  filter: none;
+  transition: all 0.3s ease;
+}
+
+/* ===== Dim previous rounds ===== */
+.played-round .Lplayer-btn,
+.played-round .Rplayer-btn,
+.played-round .rest-btn,
+.played-round .match-card {
+  filter: grayscale(40%) opacity(0.7);
+  transform: scale(1);
+  border: 0.0625rem solid #999; /* 1px */
+}
+
+/* ===== Misc Buttons Hover Effect ===== */
+.card button:hover,
+.main-action:hover,
+.ok-btn:hover,
+.cancel-btn:hover {
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+/* ===== General Disabled Buttons ===== */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Utility Box Shadows and Outlines ===== */
+.rest-box.drag-over {
+  outline: 0.1875rem dashed #ff9800; /* 3px */
+}
+
+.rest-box:empty {
+  min-height: 2.5rem; /* 40px */
+}
+
+/* ===== Round Titles ===== */
+.round-title {
+  display: inline-block;
+  background: #007BFF;
+  color: white;
+  padding: 0.5rem 1.25rem; /* 8px 20px */
+  border-radius: 0.875rem; /* 14px */
+  font-weight: 700;
+  font-size: 1.4rem;
+  box-shadow: 0 0.1875rem 0.375rem rgba(0,0,0,0.25);
+  margin: 0.625rem 0; /* 10px 0 */
+}
+
+/* ===== Selected Button Pulse Animation ===== */
+@keyframes borderPulse {
+  0% {
+    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
+    outline-color: #4caf50;
+  }
+  50% {
+    box-shadow: 0 0 1rem #4caf50, 0 0 1.5rem #4caf50;
+    outline-color: #6fff6f;
+  }
+  100% {
+    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
+    outline-color: #4caf50;
+  }
+}
+
+/* ===== Ensure Uniform Gaps and Padding ===== */
+.card-col,
+.teams,
+.round-navigation,
+.modal-buttons,
+.rest-box {
+  gap: 0.375rem 1.25rem; /* uniformly scaled gaps where needed */
+}
+
+/* ===== Ensure Button Sizes Uniform Across Devices ===== */
+.card button,
+.main-action,
+.Lplayer-btn,
+.Rplayer-btn,
+.rest-btn,
+.ok-btn,
+.cancel-btn {
+  box-sizing: border-box;
+  font-family: inherit;
+  text-align: center;
+}
+
+/* ===== Team Column Min Width Uniform ===== */
+.team {
+  min-width: 7.5rem; /* 120px */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+    
 
   </style>
 
