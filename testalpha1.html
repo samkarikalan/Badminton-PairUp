@@ -605,8 +605,7 @@ button:disabled {
       <button class="cancel-btn" onclick="hideImportModal()">Cancel</button>
     </div>
   </div>
-
-
+</div>
       <!-- Add Player Form -->
 
       <div class="card">
@@ -763,19 +762,16 @@ button:disabled {
   const text = document.getElementById('players-textarea').value.trim();
   if (!text) return;
 
-  // Get selected default gender (from radio)
+  // 👇 Get selected gender (default for missing entries)
   const genderSelect = document.querySelector('input[name="genderSelect"]:checked');
   const defaultGender = genderSelect ? genderSelect.value : "Male";
 
   const lines = text.split(/\r?\n/);
 
   lines.forEach(line => {
-    if (!line.trim()) return;
-
     const [nameRaw, genderRaw] = line.split(',');
     const name = nameRaw?.trim();
-    // Use the specified gender if available, otherwise default to selected one
-    const gender = genderRaw?.trim() || defaultGender;
+    const gender = genderRaw?.trim() || defaultGender; // 👈 use radio default if missing
 
     if (name && !players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
       players.push({ name, gender });
