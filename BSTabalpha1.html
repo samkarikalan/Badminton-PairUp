@@ -11,560 +11,369 @@
   <title>Badminton Pair-UP</title>
 
   <style>
-    
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #3b0073, #7d00b8);
-      color: white;
-      text-align: center;
-      overflow-x: hidden;
-    }
+    /* 📱 Base: Phone */
+html {
+  font-size: 16px; /* 1rem = 16px */
+}
 
-    header {
-      padding: 8px;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #3b0073, #7d00b8);
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
+}
 
-    h1 {
-      font-size: 20px;
-      margin: 0;
-      font-weight: bold;
-      letter-spacing: 2px;
-    }
+header {
+  padding: 0.5rem;
+}
 
-    .container {
-      
-      margin: 12px;
-      padding: 8px;
-    }
+h1 {
+  font-size: 1.25rem; /* 20px */
+  margin: 0;
+  font-weight: bold;
+  letter-spacing: 0.125rem;
+}
 
-    .card,
-    .match-card {
-      background: white;
-      color: black;
-      padding: 12px;
-      margin-bottom: 8px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);   
-      max-width: 95vw;
-      box-sizing: border-box;
+.container {
+  margin: 0.75rem;
+  padding: 0.5rem;
+}
 
-    }
+.card,
+.match-card {
+  background: white;
+  color: black;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
+  max-width: 95vw;
+  box-sizing: border-box;
+}
 
-    .rest-box {
-      background: transparent !important;
-      color: black;
-      padding: 8px;
-      margin-bottom: 6px;
-      border-radius: 12px;    
-      max-width: 95vw;
-      box-sizing: border-box;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-       border: 1px solid #999;
+.rest-box {
+  background: transparent !important;
+  color: black;
+  padding: 0.5rem;
+  margin-bottom: 0.375rem;
+  border-radius: 0.75rem;
+  max-width: 95vw;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.375rem;
+  border: 0.0625rem solid #999;
+}
 
-    }
+.card input,
+.card select,
+.card button {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 1rem; /* 16px */
+  border-radius: 0.375rem;
+  box-sizing: border-box;
+}
 
-    .card input,
-    .card select,
-    .card button {
-      width: 100%;
-      padding: 8px;
-      margin: 8px 0;
-      font-size: 16px;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
+.card input,
+.card select {
+  border: 0.0625rem solid #ccc;
+}
 
-    .card input,
-    .card select {
-      border: 1px solid #ccc;
-    }
+.card button {
+  background: purple;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
 
-    .card button {
-      background: purple;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
+.card button:hover {
+  background: #5e009c;
+  transform: scale(1.05);
+}
 
-    }
+#player-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.125rem;
+}
 
-    .card button:hover {
-      background: #5e009c;
-      transform: scale(1.05);
-    }
+#player-list-table th,
+#player-list-table td {
+  border: 0.0625rem solid #ccc;
+  padding: 0.375rem;
+  text-align: center;
+  font-size: 0.875rem; /* 14px */
+}
 
-    #player-list-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 2px;
-    }
+#player-list-table th {
+  background: #f2f2f2;
+}
 
-    #player-list-table th,
-    #player-list-table td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: center;
-      font-size: 14px;
-    }
+.delete-btn {
+  background: none;
+  border: none;
+  color: #d11a2a;
+  font-size: 0.5rem; /* 8px */
+  cursor: pointer;
+}
 
-    #player-list-table th {
-      background: #f2f2f2;
-    }
+.delete-btn:hover {
+  color: #a00;
+}
 
-    .delete-btn {
-      background: none;
-      border: none;
-      color: #d11a2a;
-      font-size: 8px;
-      cursor: pointer;
-    }
+.fixed-pairs-list {
+  margin-top: 0.5rem;
+}
 
-    .delete-btn:hover {
-      color: #a00;
-    }
+.fixed-pair-item {
+  background: #eee;
+  color: black;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.375rem;
+  margin: 0.3125rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .fixed-pairs-list {
-      margin-top: 8px;
-    }
+.fixed-pair-remove {
+  color: #d11a2a;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
 
-    .fixed-pair-item {
-      background: #eee;
-      color: black;
-      padding: 6px 8px;
-      border-radius: 6px;
-      margin: 5px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.fixed-pair-remove:hover {
+  color: #a00;
+}
 
-    .fixed-pair-remove {
-      color: #d11a2a;
-      cursor: pointer;
-      margin-left: 8px;
-    }
+#importModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  font-size: 1.375rem; /* 22px */
+}
 
-    .fixed-pair-remove:hover {
-      color: #a00;
-    }
+#importModal .modal-content {
+  background: white;
+  color: black;
+  max-width: 31.25rem; /* 500px */
+  margin: 6.25rem auto;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 1.375rem; /* 22px */
+}
 
-    #importModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 1000;
-      font-size: 22px;
-      /* ⬆️ slightly larger overall text */
-    }
+#importModal textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1.125rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  resize: vertical;
+  font-size: 1.25rem;
+}
 
-    #importModal .modal-content {
-      background: white;
-      color: black;
-      max-width: 500px;
-      /* ⬆️ a bit wider for larger text */
-      margin: 100px auto;
-      padding: 24px;
-      /* ⬆️ extra padding for balance */
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      font-size: 22px;
-      /* ⬆️ ensure all inner text inherits */
-    }
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
 
-    #importModal textarea {
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 18px;
-      padding: 10px 12px;
-      /* ⬆️ more space inside */
-      border-radius: 8px;
-      resize: vertical;
-      font-size: 20px;
-      /* ⬆️ bigger typing area text */
-    }
+.ok-btn,
+.cancel-btn {
+  font-size: 1.125rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  color: white;
+}
 
-    .modal-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-    }
+.ok-btn {
+  background: #009c3c;
+}
 
-    .ok-btn,
-    .cancel-btn {
-      font-size: 18px;
-      /* ⬆️ larger button text */
-      font-weight: bold;
-      cursor: pointer;
-      padding: 10px 16px;
-      /* ⬆️ larger click area */
-      border-radius: 8px;
-      border: none;
-      color: white;
-    }
+.ok-btn:hover {
+  background: #00b84d;
+}
 
-    .ok-btn {
-      background: #009c3c;
-    }
+.cancel-btn {
+  background: #d11a2a;
+}
 
-    .ok-btn:hover {
-      background: #00b84d;
-    }
+.cancel-btn:hover {
+  background: #ff3b3b;
+}
 
-    .cancel-btn {
-      background: #d11a2a;
-    }
-
-    .cancel-btn:hover {
-      background: #ff3b3b;
-    }
-
-
-
-    .gender-select {
-  margin: 10px 0;
-  font-size: 16px;
+.gender-select {
+  margin: 0.625rem 0;
+  font-size: 1rem;
 }
 
 .gender-select label {
-  margin-right: 15px;
+  margin-right: 0.9375rem;
 }
 
-    .main-action {
-      display: block;
-      width: 100%;
-      background: orange;
-      color: black;
-      font-size: 20px;
-      font-weight: bold;
-      padding: 8px;
-      border-radius: 15px;
-      margin-top: 8px;
-      cursor: pointer;
-      border: none;
-      
-      transition: background 0.3s, transform 0.2s;
+.main-action {
+  display: block;
+  width: 100%;
+  background: orange;
+  color: black;
+  font-size: 1.25rem;
+  font-weight: bold;
+  padding: 0.5rem;
+  border-radius: 0.9375rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.main-action:hover {
+  background: #ffb84d;
+  transform: scale(1.05);
+}
+
+/* Everything else (gaps, buttons, round titles, etc.) also converted to rems */
+.card-col {
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  gap: 1.25rem;
+}
+
+#game-results {
+  display: block;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.75rem;
+  background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
+  min-height: 40vh;
+  margin: 0.75rem;
+}
+
+.match-card h3 {
+  font-size: 1.375rem;
+  margin: 0;
+}
+
+.vs-text {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #3b0073;
+  flex: 0 0 auto;
+  margin: 0 0.5rem;
+}
+
+.Lplayer-btn,
+.Rplayer-btn {
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1.75rem;
+  padding: 0.625rem;
+  margin: 0.25rem 0;
+  color: #fff;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+  cursor: grab;
+}
+
+.Lplayer-btn {
+  background: #009c3c;
+}
+
+.Rplayer-btn {
+  background: #0494ad;
+}
+
+.Lplayer-btn:hover {
+  background: #34995b;
+  transform: scale(1.03);
+}
+
+.Rplayer-btn:hover {
+  background: #3f8e9c;
+  transform: scale(1.03);
+}
+
+.match-time {
+  font-size: 1rem;
+  color: #3b0073;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.round-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #2a2a72, #009ffd);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.1875rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.round-navigation .round-label {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.round-navigation button {
+  background: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  min-width: 3.125rem;
+}
+
+.rest-btn {
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  padding: 0.375rem;
+  margin: 0.25rem 0;
+  color: #fff;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.round-title {
+  display: inline-block;
+  background: #007BFF;
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.875rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.25);
+  margin: 0.625rem 0;
+}
 
-    }
-
-    .main-action:hover {
-      background: #ffb84d;
-      transform: scale(1.05);
-    }
-
-
-    .card-col {
-      display: flex;
-      flex-direction: row;
-      align-items: center; 
-      gap:20px;     
-
-    }
-    #game-results {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 12px;
-      background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
-      min-height: 40vh;
-      display: block;
-      margin: 12px;
-
-    }
-
-    .match-card h3 {
-      font-size: 22px;
-      margin: 0;
-    }
-
-    .match-card .teams {
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      gap: 8px;
-
-    }
-
-    .team {
-
-      display: flex;
-
-      flex-direction: column;
-
-      flex: 1;
-
-      min-width: 120px;
-
-    }
-
-    .vs-text {
-
-      font-size: 20px;
-
-      font-weight: bold;
-
-      color: #3b0073;
-
-      flex: 0 0 auto;
-
-      margin: 0 8px;
-
-    }
-
-    .Lplayer-btn,
-    .Rplayer-btn {
-
-      border: none;
-
-      border-radius: 6px;
-
-      font-size: 28px;
-
-      padding: 10px;
-
-      margin: 4px 0;
-
-      color: #fff;
-
-      text-align: center;
-
-      transition: transform 0.2s, background 0.2s;
-
-      cursor: grab;
-
-    }
-
-    .Lplayer-btn {
-      background: #009c3c;
-    }
-
-    .Rplayer-btn {
-      background: #0494ad;
-    }
-
-    .Lplayer-btn:hover {
-      background: #34995b;
-      transform: scale(1.03);
-    }
-
-    .Rplayer-btn:hover {
-      background: #3f8e9c;
-      transform: scale(1.03);
-    }
-
-    .match-time {
-      font-size: 16px;
-      color: #3b0073;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    .round-navigation {
-
-      display: flex;
-
-      justify-content: center;
-
-      align-items: center;
-
-      gap: 16px;
-
-      margin-top: 20px;
-
-      padding: 8px 16px;
-
-      background: linear-gradient(135deg, #2a2a72, #009ffd);
-
-      border-radius: 12px;
-
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-
-    }
-
-    .round-navigation .round-label {
-
-      color: #fff;
-
-      font-weight: 600;
-
-      font-size: 1.2rem;
-
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-
-    }
-
-    .round-navigation button {
-
-      background: #fff;
-
-      border: none;
-
-      padding: 8px 16px;
-
-      font-size: 1.2rem;
-
-      font-weight: 600;
-
-      border-radius: 8px;
-
-      cursor: pointer;
-
-      transition: all 0.25s ease;
-
-      min-width: 50px;
-
-    }
-
-    .round-navigation button:hover:enabled {
-
-      background: #009ffd;
-
-      color: #fff;
-
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-
-      transform: translateY(-1px);
-
-    }
-
-    .round-navigation button:disabled {
-
-      opacity: 0.5;
-
-      cursor: not-allowed;
-
-    }
-
-    .rest-btn {
-
-      border: none;
-
-      border-radius: 6px;
-
-      font-size: 16px;
-
-      padding: 6px;
-
-      margin: 4px 0;
-
-      color: #fff;
-
-      text-align: center;
-
-      transition: transform 0.2s, background 0.2s;
-
-    }
-
-    .rest-btn:hover {
-
-      transform: scale(1.05);
-
-      opacity: 0.9;
-
-    }
-
-    .rest-box.drag-over {
-      outline: 3px dashed #ff9800;
-    }
-
-    .rest-box:empty {
-      min-height: 40px;
-    }
-
-    .round-title {
-
-      display: inline-block;
-
-      background: #007BFF;
-
-      color: white;
-
-      padding: 8px 20px;
-
-      border-radius: 14px;
-
-      font-weight: 700;
-
-      font-size: 1.4rem;
-
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
-
-      margin: 10px 0;
-
-    }
-
-
-    /* Highlight the latest (active) round visually */
-
-    /* ✅ Latest (active) round - crisp and bright */
-    .latest-round .match-card,
-    .latest-round .rest-btn,
-    .latest-round .Lplayer-btn,
-    .latest-round .Rplayer-btn {
-      filter: none;
-      transform: scale(1.01);
-      transition: all 0.3s ease;
-    }
-
-    /* ✅ Previous (played) rounds - greyed out and de-emphasized */
-    .played-round .match-card,
-    .played-round .rest-btn,
-    .played-round .Lplayer-btn,
-    .played-round .Rplayer-btn {
-      filter: grayscale(40%) opacity(0.7);
-
-      transform: scale(1);
-      border: 1px solid #999;
-    }
-
-    .Lplayer-btn.selected,
-    .Rplayer-btn.selected,
-    .rest-btn.selected {
-      outline: 2px solid #4caf50;
-      background: grey !important;
-      color: #fff;
-      box-shadow: 0 0 10px #4caf50;
-      animation: borderPulse 1s ease-in-out infinite;
-    }
-
-
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-    
-    @keyframes borderPulse {
-      0% {
-        box-shadow: 0 0 4px #4caf50, 0 0 8px #4caf50;
-        outline-color: #4caf50;
-      }
-
-      50% {
-        box-shadow: 0 0 16px #4caf50, 0 0 24px #4caf50;
-        outline-color: #6fff6f;
-      }
-
-      100% {
-        box-shadow: 0 0 4px #4caf50, 0 0 8px #4caf50;
-        outline-color: #4caf50;
-      }
-    }
   </style>
 
 </head>
