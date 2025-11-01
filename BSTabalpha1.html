@@ -619,8 +619,8 @@ button:disabled {
   <div class="modal-content">
     <textarea
       id="players-textarea"
-      rows="8"
-      placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female&#10;Suresh">
+      rows="15"
+      placeholder="Name,Gender&#10;Kari,Male&#10;Bhavani,Female"></textarea>
     </textarea>
 
     <!-- Default gender selection -->
@@ -2115,15 +2115,27 @@ button:disabled {
       
     function goToRounds() {
 
-      const numCourts = parseInt(document.getElementById('num-courts').value);
+       const numCourtsInput = parseInt(document.getElementById('num-courts').value);
+  const totalPlayers = players.length;
 
-      if (!players.length || !numCourts) {
+  if (!totalPlayers) {
+    alert('Please add players first!');
+    return;
+  }
 
-        alert('Please add players and number of courts!');
+  // Auto-calculate courts based on player count ÷ 4
+  let autoCourts = Math.floor(totalPlayers / 4);
+  if (autoCourts < 1) autoCourts = 1;
 
-        return;
+  // Use the smaller of user-input or calculated courts
+  const numCourts = numCourtsInput
+    ? Math.min(numCourtsInput, autoCourts)
+    : autoCourts;
 
-      }
+  if (!numCourts) {
+    alert('Number of courts could not be determined!');
+    return;
+  }
 
       if (allRounds.length === 0) {
 
