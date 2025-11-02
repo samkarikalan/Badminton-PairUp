@@ -10,13 +10,7 @@
 
   <title>Badminton Pair-UP</title>
 
-  <style>
-
-/* ===== Base font size: 16px = 1rem ===== */
-html {
-  font-size: 16px;
-}
-
+<style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -27,38 +21,28 @@ body {
 }
 
 header {
-  padding: 0.5rem; /* 8px */
+  padding: 0.5rem;
 }
 
 h1 {
-  font-size: 1.25rem; /* 20px */
+  font-size: 1.25rem;
   margin: 0;
   font-weight: bold;
-  letter-spacing: 0.125rem; /* 2px */
+  letter-spacing: 0.125rem;
 }
 
 .container {
-  margin: 0.75rem; /* 12px */
-  padding: 0.5rem; /* 8px */
+  margin: 0.75rem;
+  padding: 0.5rem;
 }
 
-.card {
-  background: white;
-  color: black;
-  padding: 1rem; /* 12px */
-  margin-bottom: 0.5rem; /* 8px */
-  border-radius: 0.75rem; /* 12px */
-  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
-  max-width: 95vw;
-  box-sizing: border-box;
-}
-
+.card,
 .match-card {
   background: white;
   color: black;
-  padding: 1rem; /* 12px */
-  margin-bottom: 1.5rem; /* 8px */
-  border-radius: 0.75rem; /* 12px */
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.75rem;
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
   max-width: 95vw;
   box-sizing: border-box;
@@ -67,27 +51,27 @@ h1 {
 .rest-box {
   background: transparent !important;
   color: black;
-  padding: 0.5rem; /* 8px */
-  margin-bottom: 0.375rem; /* 6px */
-  border-radius: 0.75rem; /* 12px */
+  padding: 0.5rem;
+  margin-bottom: 0.375rem;
+  border-radius: 0.75rem;
   max-width: 95vw;
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 0.375rem; /* 6px */
-  border: 0.0625rem solid #999; /* 1px */
+  gap: 0.375rem;
+  border: 0.0625rem solid #999;
 }
 
 .card input,
 .card select,
 .card button {
   width: 100%;
-  padding: 0.5rem; /* 8px */
-  margin: 0.5rem 0; /* 8px 0 */
-  font-size: 1rem; /* 16px */
-  border-radius: 0.375rem; /* 6px */
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  border-radius: 0.375rem;
   box-sizing: border-box;
 }
 
@@ -113,15 +97,15 @@ h1 {
 #player-list-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 0.125rem; /* 2px */
+  margin-top: 0.125rem;
 }
 
 #player-list-table th,
 #player-list-table td {
   border: 0.0625rem solid #ccc;
-  padding: 0.375rem; /* 6px */
+  padding: 0.375rem;
   text-align: center;
-  font-size: 1rem; /* 14px */
+  font-size: 0.875rem;
 }
 
 #player-list-table th {
@@ -132,7 +116,7 @@ h1 {
   background: none;
   border: none;
   color: #d11a2a;
-  font-size: 1rem; /* 8px */
+  font-size: 0.5rem;
   cursor: pointer;
 }
 
@@ -141,15 +125,15 @@ h1 {
 }
 
 .fixed-pairs-list {
-  margin-top: 1rem; /* 8px */
+  margin-top: 0.5rem;
 }
 
 .fixed-pair-item {
   background: #eee;
   color: black;
-  padding: 0.375rem 0.5rem; /* 6px 8px */
-  border-radius: 0.375rem; /* 6px */
-  margin: 0.3125rem 0; /* 5px 0 */
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.375rem;
+  margin: 0.3125rem 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -158,7 +142,7 @@ h1 {
 .fixed-pair-remove {
   color: #d11a2a;
   cursor: pointer;
-  margin-left: 0.5rem; /* 8px */
+  margin-left: 0.5rem;
 }
 
 .fixed-pair-remove:hover {
@@ -183,11 +167,11 @@ h1 {
   max-width: 31.25rem; /* 500px */
   margin: 6.25rem auto; /* 100px */
   padding: 1.5rem; /* 24px */
-  border-radius: 0.75rem; /* 12px */
+  border-radius: 0.75rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 1.375rem; /* 22px */
+  font-size: 1.375rem;
 }
 
 #importModal textarea {
@@ -195,9 +179,9 @@ h1 {
   box-sizing: border-box;
   margin-bottom: 1.125rem; /* 18px */
   padding: 0.625rem 0.75rem; /* 10px 12px */
-  border-radius: 0.5rem; /* 8px */
+  border-radius: 0.5rem;
   resize: vertical;
-  font-size: 1.25rem; /* 20px */
+  font-size: 1.25rem;
 }
 
 .modal-buttons {
@@ -235,7 +219,7 @@ h1 {
 
 .gender-select {
   margin: 0.625rem 0; /* 10px */
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
 }
 
 .gender-select label {
@@ -251,7 +235,7 @@ h1 {
   font-weight: bold;
   padding: 0.5rem; /* 8px */
   border-radius: 0.9375rem; /* 15px */
-  margin-top: 0.5rem; /* 8px */
+  margin-top: 0.5rem;
   cursor: pointer;
   border: none;
   transition: background 0.3s, transform 0.2s;
@@ -262,7 +246,6 @@ h1 {
   transform: scale(1.05);
 }
 
-/* ===== Flex & Layout ===== */
 .card-col {
   display: flex;
   flex-direction: row;
@@ -271,23 +254,27 @@ h1 {
 }
 
 #game-results {
-  margin: 0.75rem; /* 12px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem; /* 12px */
   padding: 0.5rem; /* 8px */
-  gap: 1.25rem;
+  background: linear-gradient(180deg, #3b0073 0%, #7d00b8 100%);
+  min-height: 25vh;
+  display: block;
+  margin: 0.75rem;
 }
-
 
 .match-card h3 {
   font-size: 1.375rem; /* 22px */
   margin: 0;
 }
 
-.teams {
+.match-card .teams {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5rem; 
-  /* 8px */
+  gap: 0.5rem; /* 8px */
 }
 
 .team {
@@ -308,8 +295,8 @@ h1 {
 .Lplayer-btn,
 .Rplayer-btn {
   border: none;
-  border-radius: 0.5em; /* 6px */
-  font-size: 1rem; /* 28px */
+  border-radius: 0.375rem; /* 6px */
+  font-size: 1.125rem; /* 18px */
   padding: 0.625rem; /* 10px */
   margin: 0.25rem 0; /* 4px */
   color: #fff;
@@ -343,30 +330,30 @@ h1 {
   margin-top: 0.25rem; /* 4px */
 }
 
-/* ===== Round Navigation ===== */
 .round-navigation {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem; /* 16px */
-  margin-top: 1.25rem; /* 20px */
+  margin-top: 0.75rem; /* 12px */
   padding: 0.5rem 1rem; /* 8px 16px */
   background: linear-gradient(135deg, #2a2a72, #009ffd);
   border-radius: 0.75rem; /* 12px */
-  box-shadow: 0 0.1875rem 0.5rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.1875rem 0.5rem rgba(0, 0, 0, 0.15); /* 3px 8px */
 }
 
 .round-navigation .round-label {
   color: #fff;
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1rem;
+  text-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.2);
 }
 
 .round-navigation button {
   background: #fff;
   border: none;
   padding: 0.5rem 1rem;
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   font-weight: 600;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -386,17 +373,15 @@ h1 {
   cursor: not-allowed;
 }
 
-/* ===== Rest Button ===== */
 .rest-btn {
   border: none;
-  border-radius: 0.375rem; /* 6px */
-  font-size: 1.5rem; /* 16px */
+  border-radius: 0.375rem;
+  font-size: 1rem;
   padding: 0.375rem; /* 6px */
-  margin: 0.25rem 0; /* 4px 0 */
+  margin: 0.25rem 0;
   color: #fff;
   text-align: center;
   transition: transform 0.2s, background 0.2s;
-  cursor: pointer;
 }
 
 .rest-btn:hover {
@@ -412,7 +397,6 @@ h1 {
   min-height: 2.5rem; /* 40px */
 }
 
-/* ===== Round Titles ===== */
 .round-title {
   display: inline-block;
   background: #007BFF;
@@ -422,10 +406,10 @@ h1 {
   font-weight: 700;
   font-size: 1.4rem;
   box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.25);
-  margin: 0.625rem 0; /* 10px 0 */
+  margin: 0.625rem 0; /* 10px */
 }
 
-/* ===== Latest and Played Rounds ===== */
+/* ✅ Round status visuals */
 .latest-round .match-card,
 .latest-round .rest-btn,
 .latest-round .Lplayer-btn,
@@ -441,170 +425,44 @@ h1 {
 .played-round .Rplayer-btn {
   filter: grayscale(40%) opacity(0.7);
   transform: scale(1);
-  border: 0.0625rem solid #999; /* 1px */
+  border: 0.0625rem solid #999;
 }
 
-/* ===== Selected States ===== */
 .Lplayer-btn.selected,
 .Rplayer-btn.selected,
 .rest-btn.selected {
-  outline: 0.125rem solid #4caf50; /* 2px */
+  outline: 0.125rem solid #4caf50;
   background: grey !important;
   color: #fff;
-  box-shadow: 0 0 0.625rem #4caf50; /* 10px */
+  box-shadow: 0 0 0.625rem #4caf50;
   animation: borderPulse 1s ease-in-out infinite;
 }
 
-@keyframes borderPulse {
-  0% {
-    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
-    outline-color: #4caf50;
-  }
-  50% {
-    box-shadow: 0 0 1rem #4caf50, 0 0 1.5rem #4caf50;
-    outline-color: #6fff6f;
-  }
-  100% {
-    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
-    outline-color: #4caf50;
-  }
-}
-
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* ===== Match Card Teams Buttons Hover Transitions ===== */
-.Lplayer-btn:hover,
-.Rplayer-btn:hover,
-.rest-btn:hover {
-  transition: transform 0.2s, background 0.2s;
-}
-
-/* ===== Match Time ===== */
-.match-time {
-  font-size: 1rem; /* 16px */
-  color: #3b0073;
-  font-weight: 600;
-  margin-top: 0.25rem; /* 4px */
-}
-
-/* ===== Highlight latest round buttons ===== */
-.latest-round .Lplayer-btn,
-.latest-round .Rplayer-btn,
-.latest-round .rest-btn {
-  transform: scale(1.01);
-  filter: none;
-  transition: all 0.3s ease;
-}
-
-/* ===== Dim previous rounds ===== */
-.played-round .Lplayer-btn,
-.played-round .Rplayer-btn,
-.played-round .rest-btn,
-.played-round .match-card {
-  filter: grayscale(40%) opacity(0.7);
-  transform: scale(1);
-  border: 0.0625rem solid #999; /* 1px */
-}
-
-/* ===== Misc Buttons Hover Effect ===== */
-.card button:hover,
-.main-action:hover,
-.ok-btn:hover,
-.cancel-btn:hover {
-  transform: scale(1.05);
-  transition: all 0.2s ease;
-}
-
-/* ===== General Disabled Buttons ===== */
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ===== Utility Box Shadows and Outlines ===== */
-.rest-box.drag-over {
-  outline: 0.1875rem dashed #ff9800; /* 3px */
-}
-
-.rest-box:empty {
-  min-height: 2.5rem; /* 40px */
-}
-
-/* ===== Round Titles ===== */
-.round-title {
-  display: inline-block;
-  background: #007BFF;
-  color: white;
-  padding: 0.5rem 1.25rem; /* 8px 20px */
-  border-radius: 0.875rem; /* 14px */
-  font-weight: 700;
-  font-size: 1.4rem;
-  box-shadow: 0 0.1875rem 0.375rem rgba(0,0,0,0.25);
-  margin: 0.625rem 0; /* 10px 0 */
-}
-
-/* ===== Selected Button Pulse Animation ===== */
 @keyframes borderPulse {
   0% {
     box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
     outline-color: #4caf50;
   }
+
   50% {
     box-shadow: 0 0 1rem #4caf50, 0 0 1.5rem #4caf50;
     outline-color: #6fff6f;
   }
+
   100% {
     box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
     outline-color: #4caf50;
   }
 }
-
-/* ===== Ensure Uniform Gaps and Padding ===== */
-.card-col,
-.teams,
-.round-navigation,
-.modal-buttons,
-.rest-box {
-  gap: 0.375rem 1.25rem; /* uniformly scaled gaps where needed */
-}
-
-/* ===== Ensure Button Sizes Uniform Across Devices ===== */
-.card button,
-.main-action,
-.Lplayer-btn,
-.Rplayer-btn,
-.rest-btn,
-.ok-btn,
-.cancel-btn {
-  box-sizing: border-box;
-  font-family: inherit;
-  text-align: center;
-}
-
-/* ===== Team Column Min Width Uniform ===== */
-.team {
-  min-width: 7.5rem; /* 120px */
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.responsive-container {
-  width: 100%;
-  max-width: 100vw;
-  box-sizing: border-box;
-  margin: 0 auto;
-  padding: 0.75rem;
-  font-size: 1rem; /* iPad default */
-}
+</style>
 
 
-  </style>
-
-</head>
+  
 
 <body onload="initPage()">
  <div class="responsive-container">
