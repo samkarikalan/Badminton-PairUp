@@ -373,7 +373,7 @@ h1 {
   cursor: not-allowed;
 }
 
-.r.rest-box {
+.rest-box {
   display: none; /* hidden when empty */
   flex-wrap: wrap;
   justify-content: center;
@@ -415,6 +415,19 @@ h1 {
   font-size: 1.4rem;
   box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.25);
   margin: 0.625rem 0; /* 10px */
+}
+
+  #roundTitle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: #6200ea;
+  color: #fff;
+  font-size: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
 }
 
 /* ✅ Round status visuals */
@@ -579,7 +592,7 @@ button:disabled {
     <div id="game-results"></div>
        <div class="round-navigation">
          <button id="prevBtn" onclick="prevRound()" disabled>Prev Round</button>
-         <button id="roundTitle"</button>
+         <div id="roundTitle">R</div>
          
          <button id="nextBtn" onclick="nextRound()" disabled>NextRound</button>
 
@@ -1659,7 +1672,7 @@ button:disabled {
       // ✅ Update round title
       const roundTitle = document.getElementById("roundTitle");
       roundTitle.className = "round-title";
-      roundTitle.innerText = `Round ${data.round}`;
+      roundTitle.innerText = data.round;
 
       // ✅ Create sections
       const restDiv = renderRestingPlayers(data, index);
