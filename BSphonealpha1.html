@@ -393,8 +393,21 @@ h1 {
   outline: 0.1875rem dashed #ff9800; /* 3px */
 }
 
-.rest-box:empty {
-  min-height: 5rem; /* 40px */
+.rest-box {
+  display: none; /* hidden by default */
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  border-radius: 0.375rem;
+  min-height: 5rem; /* ensures space for ~2 rows when visible */
+}
+
+/* When it has at least one .rest-btn, show it */
+.rest-box:not(:empty) {
+  display: flex;
 }
 
 .round-title {
