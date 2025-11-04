@@ -1507,7 +1507,6 @@ function remakeCurrentRound() {
   // Refresh display
   showRound(currentRoundIndex);
 }
-
 function makeMixedDoubles(playing, numCourts) {
   let males = playing.filter(p => p.gender === "Male");
   let females = playing.filter(p => p.gender === "Female");
@@ -1518,20 +1517,38 @@ function makeMixedDoubles(playing, numCourts) {
   while (males.length >= 2 && females.length >= 2 && games.length < numCourts) {
     const pair1 = [males.pop(), females.pop()];
     const pair2 = [males.pop(), females.pop()];
-    games.push({ court: court++, type: "XD", pair1, pair2 });
+
+    games.push({
+      court: court++,
+      type: "XD",
+      pair1: pair1.map(p => p.name || p),
+      pair2: pair2.map(p => p.name || p)
+    });
   }
 
   // If leftover males/females, fill remaining courts
   while (males.length >= 4 && games.length < numCourts) {
     const pair1 = [males.pop(), males.pop()];
     const pair2 = [males.pop(), males.pop()];
-    games.push({ court: court++, type: "MD", pair1, pair2 });
+
+    games.push({
+      court: court++,
+      type: "MD",
+      pair1: pair1.map(p => p.name || p),
+      pair2: pair2.map(p => p.name || p)
+    });
   }
 
   while (females.length >= 4 && games.length < numCourts) {
     const pair1 = [females.pop(), females.pop()];
     const pair2 = [females.pop(), females.pop()];
-    games.push({ court: court++, type: "LD", pair1, pair2 });
+
+    games.push({
+      court: court++,
+      type: "LD",
+      pair1: pair1.map(p => p.name || p),
+      pair2: pair2.map(p => p.name || p)
+    });
   }
 
   return games;
@@ -1547,14 +1564,26 @@ function makeNormalDoubles(playing, numCourts) {
   while (males.length >= 4 && games.length < numCourts) {
     const pair1 = [males.pop(), males.pop()];
     const pair2 = [males.pop(), males.pop()];
-    games.push({ court: court++, type: "MD", pair1, pair2 });
+
+    games.push({
+      court: court++,
+      type: "MD",
+      pair1: pair1.map(p => p.name || p),
+      pair2: pair2.map(p => p.name || p)
+    });
   }
 
   // Then ladies’ doubles
   while (females.length >= 4 && games.length < numCourts) {
     const pair1 = [females.pop(), females.pop()];
     const pair2 = [females.pop(), females.pop()];
-    games.push({ court: court++, type: "LD", pair1, pair2 });
+
+    games.push({
+      court: court++,
+      type: "LD",
+      pair1: pair1.map(p => p.name || p),
+      pair2: pair2.map(p => p.name || p)
+    });
   }
 
   return games;
