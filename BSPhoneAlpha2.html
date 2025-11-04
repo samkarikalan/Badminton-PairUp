@@ -590,15 +590,9 @@ button:disabled {
     
 
     <div id="matchTypeSelector" style="margin-bottom: 1rem;">
-  <label>
-    <input type="radio" name="matchType" value="AUTO" checked> Auto
-  </label>
-  <label>
-    <input type="radio" name="matchType" value="XD"> Mixed Doubles
-  </label>
-  <label>
-    <input type="radio" name="matchType" value="D"> Normal Doubles
-  </label>
+  <label><input type="radio" name="mode" value="Auto" checked> Auto</label>
+<label><input type="radio" name="mode" value="XD"> Mixed Doubles</label>
+<label><input type="radio" name="mode" value="D"> Doubles</label>
 </div>
 
   </div>
@@ -2361,16 +2355,27 @@ const btn = document.getElementById('goToRoundsBtn');
 
 
 
-    document.querySelectorAll('input[name="mode"]').forEach(radio => {
+    
+document.querySelectorAll('input[name="mode"]').forEach(radio => {
   radio.addEventListener('change', () => {
     const mode = document.querySelector('input[name="mode"]:checked').value;
-    const newRound = AischedulerNextRoundWithMode(mode);
-    if (!newRound) return;
+    console.log("Mode changed to:", mode);
 
-    // Replace only the current round data
+    const newRound = AischedulerNextRoundWithMode(mode);
+    if (!newRound) {
+      console.warn("No round generated!");
+      return;
+    }
+
+    // Update current round data
     allRounds[currentRoundIndex] = newRound;
 
-    // Refresh display (your existing UI update)
+    console.log("Updated round:", newRound);
+
+    // Force re-render (clear old DOM if necessary)
+    const gameResults = document.getElementById("game-results");
+    if (gameResults) gameResults.innerHTML = "";
+
     showRound(currentRoundIndex);
   });
 });
