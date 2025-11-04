@@ -587,8 +587,19 @@ button:disabled {
          <button id="nextBtn" onclick="nextRound()" disabled>NextRound</button>
 
     </div>
-
     
+
+    <div id="matchTypeSelector" style="margin-bottom: 1rem;">
+  <label>
+    <input type="radio" name="matchType" value="AUTO" checked> Auto
+  </label>
+  <label>
+    <input type="radio" name="matchType" value="XD"> Mixed Doubles
+  </label>
+  <label>
+    <input type="radio" name="matchType" value="D"> Normal Doubles
+  </label>
+</div>
 
   </div>
 
@@ -1457,6 +1468,98 @@ button:disabled {
 
 
 
+    function getSelectedMatchType() {
+  const selected = document.querySelector('input[name="matchType"]:checked');
+  return selected ? selected.value : "AUTO";
+}
+
+function remakeCurrentRound() {
+  if (currentRoundIndex < 0 || currentRoundIndex >= allRounds.length) return;
+
+  const matchType = getSelectedMatchType();
+
+  // If AUTO → restore original calculated round
+  if (matchType === "AUTO") {
+    showRound(currentRoundIndex); // just re-render original scheduler output
+    return;
+  }
+
+  const currentRound = allRounds[currentRoundIndex];
+  const playingNames = currentRound.playing;
+  const numCourts = currentRound.games.length;
+
+  // Map names → player objects with gender
+  const playing = playingNames
+    .map(name => players.find(p => p.name === name))
+    .filter(Boolean);
+
+  let newGames = [];
+
+  if (matchType === "XD") {
+    newGames = makeMixedDoubles(playing, numCourts);
+  } else if (matchType === "D") {
+    newGames = makeNormalDoubles(playing, numCourts);
+  }
+
+  // Replace current games with remade ones
+  currentRound.games = newGames;
+
+  // Refresh display
+  showRound(currentRoundIndex);
+}
+
+function makeMixedDoubles(playing, numCourts) {
+  let males = playing.filter(p => p.gender === "Male");
+  let females = playing.filter(p => p.gender === "Female");
+  const games = [];
+  let court = 1;
+
+  // Prioritize mixed pairs
+  while (males.length >= 2 && females.length >= 2 && games.length < numCourts) {
+    const pair1 = [males.pop(), females.pop()];
+    const pair2 = [males.pop(), females.pop()];
+    games.push({ court: court++, type: "XD", pair1, pair2 });
+  }
+
+  // If leftover males/females, fill remaining courts
+  while (males.length >= 4 && games.length < numCourts) {
+    const pair1 = [males.pop(), males.pop()];
+    const pair2 = [males.pop(), males.pop()];
+    games.push({ court: court++, type: "MD", pair1, pair2 });
+  }
+
+  while (females.length >= 4 && games.length < numCourts) {
+    const pair1 = [females.pop(), females.pop()];
+    const pair2 = [females.pop(), females.pop()];
+    games.push({ court: court++, type: "LD", pair1, pair2 });
+  }
+
+  return games;
+}
+
+function makeNormalDoubles(playing, numCourts) {
+  let males = playing.filter(p => p.gender === "Male");
+  let females = playing.filter(p => p.gender === "Female");
+  const games = [];
+  let court = 1;
+
+  // Men’s doubles first
+  while (males.length >= 4 && games.length < numCourts) {
+    const pair1 = [males.pop(), males.pop()];
+    const pair2 = [males.pop(), males.pop()];
+    games.push({ court: court++, type: "MD", pair1, pair2 });
+  }
+
+  // Then ladies’ doubles
+  while (females.length >= 4 && games.length < numCourts) {
+    const pair1 = [females.pop(), females.pop()];
+    const pair2 = [females.pop(), females.pop()];
+    games.push({ court: court++, type: "LD", pair1, pair2 });
+  }
+
+  return games;
+}
+
 
 
     function AischedulerNextRound2() {
@@ -2227,6 +2330,11 @@ const btn = document.getElementById('goToRoundsBtn');
     btn.disabled = (allRounds.length === 0);
   };
 
+
+
+    document.querySelectorAll('input[name="matchType"]').forEach(radio => {
+  radio.addEventListener('change', remakeCurrentRound);
+});
   </script>
 
 
