@@ -2361,9 +2361,141 @@ const btn = document.getElementById('goToRoundsBtn');
 
 
 
-    document.querySelectorAll('input[name="matchType"]').forEach(radio => {
-  radio.addEventListener('change', remakeCurrentRound);
+    document.querySelectorAll('input[name="mode"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    const newRound = AischedulerNextRoundWithMode(mode);
+    if (!newRound) return;
+
+    // Replace only the current round data
+    allRounds[currentRoundIndex] = newRound;
+
+    // Refresh display (your existing UI update)
+    showRound(currentRoundIndex);
+  });
 });
+
+    function AischedulerNextRoundWithMode(mode = "Auto") {
+  const { pairPlayedSet, opponentMap, playedTogether, schedulerState } = window;
+  const lastRound = allRounds[currentRoundIndex];
+  if (!lastRound) return null;
+
+  const roundIdx = lastRound.round;
+  const playing = lastRound.playing; // use only current round's playing players
+  const numCourts = lastRound.games.length;
+
+  // Mode awareness
+  const isXD = mode === "XD";
+  const isD = mode === "D";
+
+  // --- Pair formation with fairness intelligence ---
+  let allPairs = [];
+  let usedPlayers = new Set();
+
+  // Helper: add a pair safely (avoiding duplicates)
+  function addPair(a, b) {
+    const key = [a.name, b.name].sort().join("&");
+    if (!pairPlayedSet.has(key)) {
+      pairPlayedSet.add(key);
+      allPairs.push([a, b]);
+      usedPlayers.add(a);
+      usedPlayers.add(b);
+      playedTogether.set(key, roundIdx);
+      return true;
+    }
+    return false;
+  }
+
+  // Split players by gender
+  const males = playing.filter(p => p.gender === "Male");
+  const females = playing.filter(p => p.gender === "Female");
+
+  if (isXD) {
+    // 🟣 Mixed Doubles: prefer M-F pairs
+    const minPairs = Math.min(males.length, females.length);
+    for (let i = 0; i < minPairs; i++) {
+      const a = males[i];
+      const b = females[i];
+      if (!usedPlayers.has(a) && !usedPlayers.has(b)) addPair(a, b);
+    }
+
+    // Leftovers (same gender if unpaired)
+    const leftover = playing.filter(p => !usedPlayers.has(p));
+    for (let i = 0; i + 1 < leftover.length; i += 2) {
+      addPair(leftover[i], leftover[i + 1]);
+    }
+  } 
+  else if (isD) {
+    // 🔵 Doubles (Men or Women only)
+    const sameGenderGroups = [males, females];
+    for (const group of sameGenderGroups) {
+      for (let i = 0; i + 1 < group.length; i += 2) {
+        const a = group[i];
+        const b = group[i + 1];
+        if (!usedPlayers.has(a) && !usedPlayers.has(b)) addPair(a, b);
+      }
+    }
+  } 
+  else {
+    // 🟢 Auto mode: reuse your existing algorithmic fairness logic
+    return AischedulerNextRound();
+  }
+
+  // --- Opponent balancing (same as your original logic) ---
+  let matchupScores = [];
+  for (let i = 0; i < allPairs.length; i++) {
+    for (let j = i + 1; j < allPairs.length; j++) {
+      const [a1, a2] = allPairs[i];
+      const [b1, b2] = allPairs[j];
+      const totalScore =
+        (opponentMap.get(a1.name)?.get(b1.name) || 0) +
+        (opponentMap.get(a1.name)?.get(b2.name) || 0) +
+        (opponentMap.get(a2.name)?.get(b1.name) || 0) +
+        (opponentMap.get(a2.name)?.get(b2.name) || 0);
+
+      matchupScores.push({ pair1: allPairs[i], pair2: allPairs[j], score: totalScore });
+    }
+  }
+
+  matchupScores.sort((a, b) => a.score - b.score);
+
+  const games = [];
+  const usedPairs = new Set();
+
+  for (const match of matchupScores) {
+    const { pair1, pair2 } = match;
+    const p1Key = pair1.map(p => p.name).join("&");
+    const p2Key = pair2.map(p => p.name).join("&");
+    if (usedPairs.has(p1Key) || usedPairs.has(p2Key)) continue;
+
+    games.push({ court: games.length + 1, pair1, pair2 });
+    usedPairs.add(p1Key);
+    usedPairs.add(p2Key);
+
+    // Update opponent tracking
+    for (const a of pair1) {
+      for (const b of pair2) {
+        if (!opponentMap.get(a.name)) opponentMap.set(a.name, new Map());
+        if (!opponentMap.get(b.name)) opponentMap.set(b.name, new Map());
+        opponentMap.get(a.name).set(b.name, (opponentMap.get(a.name).get(b.name) || 0) + 1);
+        opponentMap.get(b.name).set(a.name, (opponentMap.get(b.name).get(a.name) || 0) + 1);
+      }
+    }
+
+    if (games.length >= numCourts) break;
+  }
+
+  // Return same format as your scheduler
+  return {
+    round: roundIdx,
+    resting: lastRound.resting,
+    playing,
+    games,
+  };
+}
+
+
+    
   </script>
 
 
