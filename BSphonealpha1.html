@@ -226,7 +226,7 @@ h1 {
   margin-right: 0.9375rem; /* 15px */
 }
 
-.main-action {
+.main-action2 {
   display: black;
   width: 90vw;
   background: orange;
@@ -236,6 +236,23 @@ h1 {
   padding: 0.5rem; /* 8px */
   border-radius: 0.9375rem; /* 15px */
   margin: 1.5rem;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s, transform 0.2s;
+}
+
+
+  
+.main-action {
+  display: block;
+  width: 100%;
+  background: orange;
+  color: black;
+  font-size: 1.25rem; /* 20px */
+  font-weight: bold;
+  padding: 0.5rem; /* 8px */
+  border-radius: 0.9375rem; /* 15px */
+  margin-top: 0.5rem;
   cursor: pointer;
   border: none;
   transition: background 0.3s, transform 0.2s;
@@ -578,7 +595,7 @@ button:disabled {
   <!-- Page 2 -->
 
   <div id="page2" style="display:none;">
-    <button class="main-action" onclick="goBack()">Back to Input</button>
+    <button class="main-action2" onclick="goBack()">Back to Input</button>
     <div id="game-results"></div>
     
        <div class="round-navigation">
