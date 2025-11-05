@@ -1713,19 +1713,24 @@ button:disabled {
       document.getElementById("roundTitle").className = "round-title";
 
       document.getElementById("roundTitle").innerText = `Round ${data.round}`;
+  
+      let restDiv = null; // Declare outside so it's always defined
 
-      const restDiv = renderRestingPlayers(data, index);
+if (data.resting.length != 0) {
+  restDiv = renderRestingPlayers(data, index);
+}
 
-      const gamesDiv = renderGames(data, index);
+const gamesDiv = renderGames(data, index);
 
-      resultsDiv.append(restDiv, gamesDiv);
+// Append only existing elements
+if (restDiv) {
+  resultsDiv.append(restDiv, gamesDiv);
+} else {
+  resultsDiv.append(gamesDiv);
+}
 
-      document.getElementById('prevBtn').disabled = index === 0;
-
-      document.getElementById('nextBtn').disabled = false;
-
-    }
-
+document.getElementById('prevBtn').disabled = index === 0;
+document.getElementById('nextBtn').disabled = false;
 
 
     // Resting players display
