@@ -228,7 +228,7 @@ h1 {
 
 .main-action {
   display: block;
-  width: 100%;
+  width: 95%;
   background: orange;
   color: black;
   font-size: 1.25rem; /* 20px */
@@ -392,7 +392,7 @@ h1 {
 .rest-btn {
   border: none;
   border-radius: 0.375rem;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   padding: 0.375rem 0.75rem;
   margin: 0; /* ✅ remove margin to prevent double spacing */
   color: black;
@@ -578,9 +578,9 @@ button:disabled {
   <!-- Page 2 -->
 
   <div id="page2" style="display:none;">
-    
-    <div id="game-results"></div>
     <button class="main-action" onclick="goBack()">Back to Input</button>
+    <div id="game-results"></div>
+    
        <div class="round-navigation">
          <button id="prevBtn" onclick="prevRound()" disabled>Prev Round</button>
          <div id="roundTitle">R</div>
@@ -2089,9 +2089,9 @@ button:disabled {
 
     function goBack() {
 
-      const pin = prompt("Enter 4-digit code to go back:");
+     // const pin = prompt("Enter 4-digit code to go back:");
 
-      if (pin === "0000") {
+      //if (pin === "0000") {
 
         document.getElementById('page1').style.display = 'block';
 
@@ -2102,9 +2102,9 @@ button:disabled {
 const btn = document.getElementById('goToRoundsBtn');
   btn.disabled = false;
         
-      } else if (pin !== null) alert("Incorrect PIN!");
+      //} else if (pin !== null) alert("Incorrect PIN!");
 
-    }
+    //}
 
     function nextRound() {
 
