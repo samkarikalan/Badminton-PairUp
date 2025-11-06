@@ -1762,73 +1762,41 @@ button:disabled {
 
 
 
-    function handleTeamSwapAcrossCourts(src, target, data, index) {
-  const srcGame = data.games[src.gameIndex];
-  const tgtGame = data.games[target.gameIndex];
-
-  const srcTeam = src.teamSide === 'L' ? srcGame.pair1 : srcGame.pair2;
-  const tgtTeam = target.teamSide === 'L' ? tgtGame.pair1 : tgtGame.pair2;
-
-  // ✅ Perform swap
-  if (src.teamSide === 'L') srcGame.pair1 = tgtTeam;
-  else srcGame.pair2 = tgtTeam;
-
-  if (target.teamSide === 'L') tgtGame.pair1 = srcTeam;
-  else tgtGame.pair2 = srcTeam;
-
-  showRound(index); // refresh
-}
     
-function handleTeamSwapAcrossCourts(src, target, data, index) {
-  const srcGame = data.games[src.gameIndex];
-  const tgtGame = data.games[target.gameIndex];
+    
 
-  const srcTeam = src.teamSide === 'L' ? srcGame.pair1 : srcGame.pair2;
-  const tgtTeam = target.teamSide === 'L' ? tgtGame.pair1 : tgtGame.pair2;
 
-  // ✅ Perform swap
-  if (src.teamSide === 'L') srcGame.pair1 = tgtTeam;
-  else srcGame.pair2 = tgtTeam;
+    function makeTeamButton(label, teamSide, gameIndex, data, index) {
+  const btn = document.createElement('button');
+  btn.className = 'team-btn';
+  btn.innerText = label;
 
-  if (target.teamSide === 'L') tgtGame.pair1 = srcTeam;
-  else tgtGame.pair2 = srcTeam;
+  const isLatestRound = index === allRounds.length - 1;
+  if (!isLatestRound) return btn; // only interactive for latest round
 
-  showRound(index); // refresh
-}
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
 
-    function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index, movingPlayer = null) {
-      // ✅ For desktop drag
-      const drop = !movingPlayer && e.dataTransfer
-        ? JSON.parse(e.dataTransfer.getData('text/plain'))
-        : { type: 'rest', player: movingPlayer };
+    // If one already selected → perform swap
+    if (window.selectedTeam) {
+      const src = window.selectedTeam;
 
-      if (drop.type !== 'rest' || !drop.player) return;
-
-      const teamKey = teamSide === 'L' ? 'pair1' : 'pair2';
-      const restIndex = data.resting.indexOf(drop.player);
-      if (restIndex === -1) return;
-
-      const baseNewPlayer = drop.player.replace(/#\d+$/, '');
-      const oldPlayer = data.games[gameIndex][teamKey][playerIndex];
-
-      data.games[gameIndex][teamKey][playerIndex] = baseNewPlayer;
-
-      const { restCount } = schedulerState;
-
-      if (oldPlayer && oldPlayer !== '(Empty)') {
-        const cleanOld = oldPlayer.replace(/#\d+$/, '');
-        const newCount = (restCount.get(cleanOld) || 0) + 1;
-        restCount.set(cleanOld, newCount);
-        data.resting[restIndex] = `${cleanOld}#${newCount}`;
-      } else {
-        data.resting[restIndex] = null;
+      if (src.gameIndex !== gameIndex) {
+        handleTeamSwapAcrossCourts(src, { teamSide, gameIndex }, data, index);
       }
 
-      restCount.set(baseNewPlayer, Math.max((restCount.get(baseNewPlayer) || 0) - 1, 0));
-      data.resting = data.resting.filter(p => p && p !== '(Empty)');
-
-      showRound(index);
+      // Clear after swap
+      window.selectedTeam = null;
+      document.querySelectorAll('.selected-team').forEach(b => b.classList.remove('selected-team'));
+    } else {
+      // Select current team
+      window.selectedTeam = { teamSide, gameIndex };
+      btn.classList.add('selected-team');
     }
+  });
+
+  return btn;
+}
 
 
 
