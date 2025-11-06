@@ -294,6 +294,28 @@ h1 {
   gap: 0.5rem; /* 8px */
 }
 
+
+
+.team-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.team-btn:hover {
+  background: #0056b3;
+}
+
+.selected-team {
+  outline: 2px solid #ffcc00;
+  background: #ffa500;
+}
+  
 .team {
   display: flex;
   flex-direction: column;
@@ -308,6 +330,10 @@ h1 {
 }
 
 /* Top drag handle area */
+
+
+
+  
 .team::before {
   content: "";
   position: absolute;
@@ -1840,56 +1866,51 @@ document.getElementById('nextBtn').disabled = false;
     // Games display
 
     function renderGames(data, index) {
+  const wrapper = document.createElement('div');
 
-      const wrapper = document.createElement('div');
+  data.games.forEach((game, gameIndex) => {
+    const card = document.createElement('div');
+    card.className = 'match-card';
 
-      data.games.forEach((game, gameIndex) => {
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
 
-        const card = document.createElement('div');
+    // Left team container
+    const team1 = document.createElement('div');
+    team1.className = 'team';
 
-        card.className = 'match-card';
+    // Make team-level button (for swap between courts)
+    const team1Btn = makeTeamButton('Team L', 'L', gameIndex, data, index);
+    team1.appendChild(team1Btn);
 
-        const teamsDiv = document.createElement('div');
+    // Add player buttons
+    game.pair1.forEach((p, i) =>
+      team1.appendChild(makePlayerButton(p, 'L', gameIndex, i, data, index))
+    );
 
-        teamsDiv.className = 'teams';
+    // Right team container
+    const team2 = document.createElement('div');
+    team2.className = 'team';
 
-        const team1 = document.createElement('div');
+    const team2Btn = makeTeamButton('Team R', 'R', gameIndex, data, index);
+    team2.appendChild(team2Btn);
 
-        team1.className = 'team';
+    game.pair2.forEach((p, i) =>
+      team2.appendChild(makePlayerButton(p, 'R', gameIndex, i, data, index))
+    );
 
-        game.pair1.forEach((p, i) =>
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = 'VS';
 
-          team1.appendChild(makePlayerButton(p, 'L', gameIndex, i, data, index))
+    teamsDiv.append(team1, vs, team2);
+    card.appendChild(teamsDiv);
+    wrapper.appendChild(card);
+  });
 
-        );
-
-        const vs = document.createElement('span');
-
-        vs.className = 'vs';
-
-        vs.innerText = 'VS';
-
-        const team2 = document.createElement('div');
-
-        team2.className = 'team';
-
-        game.pair2.forEach((p, i) =>
-
-          team2.appendChild(makePlayerButton(p, 'R', gameIndex, i, data, index))
-
-        );
-
-        teamsDiv.append(team1, vs, team2);
-
-        card.appendChild(teamsDiv);
-
-        wrapper.appendChild(card);
-
-      });
-
-      return wrapper;
-
-    }
+  return wrapper;
+}
+      
 
     function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
       const btn = document.createElement('button');
@@ -1992,6 +2013,40 @@ document.getElementById('nextBtn').disabled = false;
     }
 
 
+
+    function handleTeamSwapAcrossCourts(src, target, data, index) {
+  const srcGame = data.games[src.gameIndex];
+  const tgtGame = data.games[target.gameIndex];
+
+  const srcTeam = src.teamSide === 'L' ? srcGame.pair1 : srcGame.pair2;
+  const tgtTeam = target.teamSide === 'L' ? tgtGame.pair1 : tgtGame.pair2;
+
+  // ✅ Perform swap
+  if (src.teamSide === 'L') srcGame.pair1 = tgtTeam;
+  else srcGame.pair2 = tgtTeam;
+
+  if (target.teamSide === 'L') tgtGame.pair1 = srcTeam;
+  else tgtGame.pair2 = srcTeam;
+
+  showRound(index); // refresh
+}
+    
+function handleTeamSwapAcrossCourts(src, target, data, index) {
+  const srcGame = data.games[src.gameIndex];
+  const tgtGame = data.games[target.gameIndex];
+
+  const srcTeam = src.teamSide === 'L' ? srcGame.pair1 : srcGame.pair2;
+  const tgtTeam = target.teamSide === 'L' ? tgtGame.pair1 : tgtGame.pair2;
+
+  // ✅ Perform swap
+  if (src.teamSide === 'L') srcGame.pair1 = tgtTeam;
+  else srcGame.pair2 = tgtTeam;
+
+  if (target.teamSide === 'L') tgtGame.pair1 = srcTeam;
+  else tgtGame.pair2 = srcTeam;
+
+  showRound(index); // refresh
+}
 
     function handleDropRestToTeam(e, teamSide, gameIndex, playerIndex, data, index, movingPlayer = null) {
       // ✅ For desktop drag
