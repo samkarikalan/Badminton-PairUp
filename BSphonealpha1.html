@@ -1769,15 +1769,18 @@ button:disabled {
     function makeTeamButton(label, teamSide, gameIndex, data, index) {
   const btn = document.createElement('button');
   btn.className = 'team-btn';
-  btn.innerText = label;
+  btn.innerText = label; // Visible label stays simple (Team L / Team R)
+
+  // Store internal unique info in dataset
+  btn.dataset.gameIndex = gameIndex;
+  btn.dataset.teamSide = teamSide;
 
   const isLatestRound = index === allRounds.length - 1;
-  if (!isLatestRound) return btn; // only interactive for latest round
+  if (!isLatestRound) return btn;
 
   btn.addEventListener('click', (e) => {
     e.preventDefault();
 
-    // If one already selected → perform swap
     if (window.selectedTeam) {
       const src = window.selectedTeam;
 
@@ -1785,11 +1788,10 @@ button:disabled {
         handleTeamSwapAcrossCourts(src, { teamSide, gameIndex }, data, index);
       }
 
-      // Clear after swap
       window.selectedTeam = null;
       document.querySelectorAll('.selected-team').forEach(b => b.classList.remove('selected-team'));
     } else {
-      // Select current team
+      // Store internal info for selection
       window.selectedTeam = { teamSide, gameIndex };
       btn.classList.add('selected-team');
     }
@@ -1799,31 +1801,28 @@ button:disabled {
 }
 
 
-
     function handleDropBetweenTeams(e, teamSide, gameIndex, playerIndex, data, index, src) {
-      // src contains info about the player you selected first
-      const { teamSide: fromTeamSide, gameIndex: fromGameIndex, playerIndex: fromPlayerIndex, playerName: player } = src;
+  // src contains info about the player you selected first
+  const { teamSide: fromTeamSide, gameIndex: fromGameIndex, playerIndex: fromPlayerIndex, playerName: player } = src;
 
-      if (!player || player === '(Empty)') return;
+  if (!player || player === '(Empty)') return;
 
-      const fromTeamKey = fromTeamSide === 'L' ? 'pair1' : 'pair2';
-      const toTeamKey = teamSide === 'L' ? 'pair1' : 'pair2';
+  const fromTeamKey = fromTeamSide === 'L' ? 'pair1' : 'pair2';
+  const toTeamKey = teamSide === 'L' ? 'pair1' : 'pair2';
 
-      const fromTeam = data.games[fromGameIndex][fromTeamKey];
-      const toTeam = data.games[gameIndex][toTeamKey];
+  const fromTeam = data.games[fromGameIndex][fromTeamKey];
+  const toTeam = data.games[gameIndex][toTeamKey];
 
-      const movedPlayer = player.replace(/#\d+$/, '');
-      const targetPlayer = toTeam[playerIndex];
+  // No need to strip #index anymore
+  const movedPlayer = player;
+  const targetPlayer = toTeam[playerIndex];
 
-      // ✅ Swap players
-      toTeam[playerIndex] = movedPlayer;
-      fromTeam[fromPlayerIndex] = targetPlayer && targetPlayer !== '(Empty)' ? targetPlayer : '(Empty)';
+  // ✅ Swap players
+  toTeam[playerIndex] = movedPlayer;
+  fromTeam[fromPlayerIndex] = targetPlayer && targetPlayer !== '(Empty)' ? targetPlayer : '(Empty)';
 
-      showRound(index);
-    }
-
-
-
+  showRound(index);
+}
 
     /* =========================
     
