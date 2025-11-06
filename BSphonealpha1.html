@@ -299,8 +299,26 @@ h1 {
   flex-direction: column;
   flex: 1;
   background: yellow;
-  padding: 1.5rem
-  min-width: 7.5rem; /* 120px */
+  padding: 1.5rem;
+  min-width: 7.5rem;      /* 120px */
+  border-radius: 0.5rem;
+  cursor: grab;
+  gap: 0.75rem;
+  position: relative;     /* needed for the ::before handle positioning */
+}
+
+/* Top drag handle area */
+.team::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.2rem;               /* handle height */
+  background: rgba(0, 0, 0, 0.15); /* translucent dark bar */
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  cursor: grab;
 }
 
 .vs-text {
