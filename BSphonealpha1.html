@@ -328,7 +328,22 @@ h1 {
   outline: 2px solid #ffcc00;
   background: #ffa500;
 }
+.swap-icon {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.25rem 0.4rem;
+  border-radius: 50%;
+  transition: 0.2s;
+}
 
+.swap-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
 /* Optional: subtle handle bar at top */
 .team2::before {
   content: "";
@@ -1629,43 +1644,39 @@ function renderGames(data, index) {
       return String.fromCharCode(65 + teamNumber);
     };
 
-    // Create a team block (L or R)
     const makeTeamDiv = (teamSide) => {
       const teamDiv = document.createElement('div');
       teamDiv.className = 'team';
       teamDiv.dataset.teamSide = teamSide;
       teamDiv.dataset.gameIndex = gameIndex;
 
-      // ⭕ optional team label (hide if not needed)
-      // const teamLabel = document.createElement('div');
-      // teamLabel.className = 'team-label';
-      // teamLabel.innerText = getTeamLetter(gameIndex, teamSide);
-      // teamDiv.appendChild(teamLabel);
+      // 🟢 Exchange icon button
+      const swapIcon = document.createElement('div');
+      swapIcon.className = 'swap-icon';
+      swapIcon.innerHTML = '🔁'; // you can replace with ↔️ or ⟳
+      teamDiv.appendChild(swapIcon);
 
-      // 🎾 Add players
+      // 🎾 Add player buttons
       const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
       teamPairs.forEach((p, i) => {
         teamDiv.appendChild(makePlayerButton(p, teamSide, gameIndex, i, data, index));
       });
 
-      // 🟦 Only latest round is interactive
+      // 🟦 Team swapping only for latest round
       const isLatestRound = index === allRounds.length - 1;
       if (isLatestRound) {
-        teamDiv.addEventListener('click', (e) => {
-          // 🚫 Ignore if clicked on a player button
-          if (e.target.closest('.Lplayer-btn, .Rplayer-btn')) return;
-
+        swapIcon.addEventListener('click', (e) => {
+          e.stopPropagation(); // prevent bubbling
           e.preventDefault();
 
-          // ✅ Team selection/swapping logic
+          // ✅ Swap logic
           if (window.selectedTeam) {
             const src = window.selectedTeam;
             if (src.gameIndex !== gameIndex) {
               handleTeamSwapAcrossCourts(src, { teamSide, gameIndex }, data, index);
             }
             window.selectedTeam = null;
-            document.querySelectorAll('.selected-team')
-              .forEach(b => b.classList.remove('selected-team'));
+            document.querySelectorAll('.selected-team').forEach(b => b.classList.remove('selected-team'));
           } else {
             window.selectedTeam = { teamSide, gameIndex };
             teamDiv.classList.add('selected-team');
@@ -1690,7 +1701,7 @@ function renderGames(data, index) {
 
   return wrapper;
 }
-
+    
     function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
       const btn = document.createElement('button');
       btn.className = teamSide === 'L' ? 'Lplayer-btn' : 'Rplayer-btn';
