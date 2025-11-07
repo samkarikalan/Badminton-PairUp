@@ -9,7 +9,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <title>Badminton Pair-UP</title>
-
 <style>
 body {
   margin: 0;
@@ -94,27 +93,49 @@ h1 {
   background: rgba(255, 255, 255, 0.15);
 }
 
-.selected-team {
-  outline: 2px solid #ffcc00;
-  box-shadow: 0 0 10px #ffcc00;
-  transform: scale(1.02);
-}
-
 .team.swapping {
   background: #ffa50066;
   transform: scale(1.05);
   transition: transform 0.3s ease, background 0.3s ease;
 }
 
+/* Selected highlights */
+.selected-team,
+.Lplayer-btn.selected,
+.Rplayer-btn.selected,
+.rest-btn.selected {
+  outline: 0.125rem solid #4caf50;
+  background: grey !important;
+  color: #fff;
+  box-shadow: 0 0 0.625rem #4caf50;
+  transform: scale(1.02);
+  animation: borderPulse 1s ease-in-out infinite;
+}
+
+@keyframes borderPulse {
+  0% {
+    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
+    outline-color: #4caf50;
+  }
+  50% {
+    box-shadow: 0 0 1rem #4caf50, 0 0 1.5rem #4caf50;
+    outline-color: #6fff6f;
+  }
+  100% {
+    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
+    outline-color: #4caf50;
+  }
+}
+
 /* Player buttons */
-.Lplayer-btn, .Rplayer-btn {
+.Lplayer-btn, .Rplayer-btn, .rest-btn {
   width: 100%;
   text-align: center;
   border: none;
   border-radius: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 1.125rem; /* larger */
   font-weight: 500;
-  padding: 0.45rem 0;
+  padding: 0.625rem 0.75rem; /* larger */
   cursor: pointer;
   transition: 0.2s;
   color: #fff;
@@ -128,74 +149,14 @@ h1 {
   background: #0099cc;
 }
 
-.Lplayer-btn:hover, .Rplayer-btn:hover {
-  opacity: 0.85;
-}
-
-/* Rest box */
-.rest-box {
-  background: transparent !important;
-  color: black;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  min-height: 5rem;
-  display: none;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 0.5rem;
-  box-sizing: border-box;
-  border: 0.0625rem solid #999;
-}
-
-.rest-box:not(:empty) {
-  display: flex;
-}
-
 .rest-btn {
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 1.125rem;
-  padding: 0.375rem 0.75rem;
+  background: #fff;
   color: black;
-  text-align: center;
-  transition: transform 0.2s, background 0.2s;
   margin: 0;
 }
 
-.rest-btn:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
-}
-
-/* Inputs and buttons inside cards */
-.card input,
-.card select,
-.card button {
-  width: 100%;
-  padding: 0.25rem;
-  margin: 0.5rem 0;
-  font-size: 1rem;
-  border-radius: 0.375rem;
-  box-sizing: border-box;
-}
-
-.card input,
-.card select {
-  border: 0.0625rem solid #ccc;
-}
-
-.card button {
-  background: purple;
-  color: white;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-}
-
-.card button:hover {
-  background: #5e009c;
+.Lplayer-btn:hover, .Rplayer-btn:hover, .rest-btn:hover {
+  opacity: 0.85;
   transform: scale(1.05);
 }
 
@@ -204,9 +165,9 @@ h1 {
 .main-action2 {
   background: orange;
   color: black;
-  font-size: 1.25rem;
+  font-size: 1.25rem; /* larger */
   font-weight: bold;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem; /* larger */
   border-radius: 0.9375rem;
   cursor: pointer;
   border: none;
