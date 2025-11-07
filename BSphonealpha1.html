@@ -296,57 +296,62 @@ h1 {
 
 
 
-.team-btn {
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  background: black;
+  padding: 1.5rem 0.25rem 0.25rem;
+  min-width: 7.5rem; /* 120px */
+  border-radius: 0.5rem;
+  cursor: pointer;
+  gap: 0.25rem;
+  position: relative;
+  transition: transform 0.15s ease;
+}
+
+.team:hover {
+  transform: scale(1.02);
+}
+
+/* Circular Team Letter */
+.team-label {
+  position: absolute;
+  top: -0.8rem;
+  left: 50%;
+  transform: translateX(-50%);
   background: #007bff;
   color: white;
-  border: none;
-  border-radius: 0.4rem;
-  padding: 0.4rem 0.8rem;
+  font-weight: bold;
   font-size: 0.85rem;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
+  border-radius: 50%;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
 }
 
-.team-btn:hover {
-  background: #0056b3;
-}
-
+/* Selected highlight */
 .selected-team {
   outline: 2px solid #ffcc00;
   background: #ffa500;
 }
-  
-.team {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  background: black;
-  padding: 1.5rem 0.25rem 0.25rem;
-  min-width: 7.5rem;      /* 120px */
-  border-radius: 0.5rem;
-  cursor: grab;
-  gap: 0.25rem;
-  position: relative;     /* needed for the ::before handle positioning */
-}
 
-/* Top drag handle area */
-
-
-
-  
+/* Optional: subtle handle bar at top */
 .team::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 1.2rem;               /* handle height */
-  background: rgba(0, 0, 0, 0.15); /* translucent dark bar */
+  height: 1.2rem;
+  background: rgba(0, 0, 0, 0.15);
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
-  cursor: grab;
 }
-
 .vs-text {
   font-size: 1.25rem; /* 20px */
   font-weight: bold;
@@ -1612,8 +1617,7 @@ button:disabled {
 
 
     // Games display
-
-    function renderGames(data, index) {
+function renderGames(data, index) {
   const wrapper = document.createElement('div');
 
   data.games.forEach((game, gameIndex) => {
@@ -1623,38 +1627,58 @@ button:disabled {
     const teamsDiv = document.createElement('div');
     teamsDiv.className = 'teams';
 
-    // Helper to get team letter (A, B, C, D, ...)
+    // Helper → Team letters A, B, C, D...
     const getTeamLetter = (gameIndex, teamSide) => {
-      // Each game has two teams: L and R
       const teamNumber = gameIndex * 2 + (teamSide === 'L' ? 0 : 1);
-      return String.fromCharCode(65 + teamNumber); // 65 = 'A'
+      return String.fromCharCode(65 + teamNumber);
     };
 
-    // Left team container
-    const team1 = document.createElement('div');
-    team1.className = 'team';
-    const team1Label = `Team ${getTeamLetter(gameIndex, 'L')}`;
-    const team1Btn = makeTeamButton(team1Label, 'L', gameIndex, data, index);
-    team1.appendChild(team1Btn);
+    // Make a team container (L or R)
+    const makeTeamDiv = (teamSide) => {
+      const teamDiv = document.createElement('div');
+      teamDiv.className = 'team';
+      teamDiv.dataset.teamSide = teamSide;
+      teamDiv.dataset.gameIndex = gameIndex;
 
-    // Add player buttons for left team
-    game.pair1.forEach((p, i) =>
-      team1.appendChild(makePlayerButton(p, 'L', gameIndex, i, data, index))
-    );
+      const teamLetter = getTeamLetter(gameIndex, teamSide);
 
-    // Right team container
-    const team2 = document.createElement('div');
-    team2.className = 'team';
-    const team2Label = `Team ${getTeamLetter(gameIndex, 'R')}`;
-    const team2Btn = makeTeamButton(team2Label, 'R', gameIndex, data, index);
-    team2.appendChild(team2Btn);
+      // Add circular text label
+      const teamLabel = document.createElement('div');
+      teamLabel.className = 'team-label';
+      teamLabel.innerText = teamLetter;
+      teamDiv.appendChild(teamLabel);
 
-    // Add player buttons for right team
-    game.pair2.forEach((p, i) =>
-      team2.appendChild(makePlayerButton(p, 'R', gameIndex, i, data, index))
-    );
+      // Add players
+      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
+      teamPairs.forEach((p, i) =>
+        teamDiv.appendChild(makePlayerButton(p, teamSide, gameIndex, i, data, index))
+      );
 
-    // Add "VS" separator
+      const isLatestRound = index === allRounds.length - 1;
+      if (isLatestRound) {
+        teamDiv.addEventListener('click', (e) => {
+          e.preventDefault();
+
+          if (window.selectedTeam) {
+            const src = window.selectedTeam;
+            if (src.gameIndex !== gameIndex) {
+              handleTeamSwapAcrossCourts(src, { teamSide, gameIndex }, data, index);
+            }
+            window.selectedTeam = null;
+            document.querySelectorAll('.selected-team').forEach(b => b.classList.remove('selected-team'));
+          } else {
+            window.selectedTeam = { teamSide, gameIndex };
+            teamDiv.classList.add('selected-team');
+          }
+        });
+      }
+
+      return teamDiv;
+    };
+
+    const team1 = makeTeamDiv('L');
+    const team2 = makeTeamDiv('R');
+
     const vs = document.createElement('span');
     vs.className = 'vs';
     vs.innerText = 'VS';
