@@ -537,6 +537,13 @@ button:disabled {
     outline-color: #4caf50;
   }
 }
+
+.team.swapping {
+  transition: transform 0.3s ease, background 0.3s ease;
+  background: #ffa50066;
+  transform: scale(1.05);
+}
+  
 </style>
 
   </head>
@@ -1855,6 +1862,34 @@ function renderGames(data, index) {
   showRound(index);
 }
 
+
+
+function handleTeamSwapAcrossCourts(src, target, data, index) {
+  if (!src || !target) return;
+  if (src.gameIndex === target.gameIndex && src.teamSide === target.teamSide) return;
+
+  const srcKey = src.teamSide === 'L' ? 'pair1' : 'pair2';
+  const targetKey = target.teamSide === 'L' ? 'pair1' : 'pair2';
+
+  const srcTeam = data.games[src.gameIndex][srcKey];
+  const targetTeam = data.games[target.gameIndex][targetKey];
+
+  // Animation highlight
+  const srcDiv = document.querySelector(`.team[data-game-index="${src.gameIndex}"][data-team-side="${src.teamSide}"]`);
+  const targetDiv = document.querySelector(`.team[data-game-index="${target.gameIndex}"][data-team-side="${target.teamSide}"]`);
+  [srcDiv, targetDiv].forEach(div => {
+    div.classList.add('swapping');
+    setTimeout(() => div.classList.remove('swapping'), 600);
+  });
+
+  // Swap and refresh after short delay
+  setTimeout(() => {
+    data.games[src.gameIndex][srcKey] = [...targetTeam];
+    data.games[target.gameIndex][targetKey] = [...srcTeam];
+    showRound(index);
+  }, 300);
+}
+    
     /* =========================
     
     PAGE NAVIGATION
