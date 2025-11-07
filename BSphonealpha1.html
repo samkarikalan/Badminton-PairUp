@@ -1614,6 +1614,7 @@ button:disabled {
     // Games display
 
     function renderGames(data, index) {
+  cofunction renderGames(data, index) {
   const wrapper = document.createElement('div');
 
   data.games.forEach((game, gameIndex) => {
@@ -1623,15 +1624,21 @@ button:disabled {
     const teamsDiv = document.createElement('div');
     teamsDiv.className = 'teams';
 
+    // Helper to get team letter (A, B, C, D, ...)
+    const getTeamLetter = (gameIndex, teamSide) => {
+      // Each game has two teams: L and R
+      const teamNumber = gameIndex * 2 + (teamSide === 'L' ? 0 : 1);
+      return String.fromCharCode(65 + teamNumber); // 65 = 'A'
+    };
+
     // Left team container
     const team1 = document.createElement('div');
     team1.className = 'team';
-
-    // Make team-level button (for swap between courts)
-    const team1Btn = makeTeamButton('Team L', 'L', gameIndex, data, index);
+    const team1Label = `Team ${getTeamLetter(gameIndex, 'L')}`;
+    const team1Btn = makeTeamButton(team1Label, 'L', gameIndex, data, index);
     team1.appendChild(team1Btn);
 
-    // Add player buttons
+    // Add player buttons for left team
     game.pair1.forEach((p, i) =>
       team1.appendChild(makePlayerButton(p, 'L', gameIndex, i, data, index))
     );
@@ -1639,14 +1646,16 @@ button:disabled {
     // Right team container
     const team2 = document.createElement('div');
     team2.className = 'team';
-
-    const team2Btn = makeTeamButton('Team R', 'R', gameIndex, data, index);
+    const team2Label = `Team ${getTeamLetter(gameIndex, 'R')}`;
+    const team2Btn = makeTeamButton(team2Label, 'R', gameIndex, data, index);
     team2.appendChild(team2Btn);
 
+    // Add player buttons for right team
     game.pair2.forEach((p, i) =>
       team2.appendChild(makePlayerButton(p, 'R', gameIndex, i, data, index))
     );
 
+    // Add "VS" separator
     const vs = document.createElement('span');
     vs.className = 'vs';
     vs.innerText = 'VS';
@@ -1658,7 +1667,6 @@ button:disabled {
 
   return wrapper;
 }
-      
 
     function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
       const btn = document.createElement('button');
