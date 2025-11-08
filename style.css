@@ -487,7 +487,7 @@ button:disabled {
 }
 
 .vs {
-  font-size: 1.25rem; /* 20px */
+  font-size: 0.25rem; /* 20px */
   font-weight: bold;
   color: #3b0073;
   flex: 0 0 auto;
