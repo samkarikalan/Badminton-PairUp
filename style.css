@@ -89,11 +89,12 @@ h1 {
 .team[data-team-side="L"] {
   flex: 1;
   background: white;
-  border-radius: 0.8rem;
+  border-radius: 1rem;
   padding: 0.6rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  justify-content: center;
   gap: 0.4rem;
   position: relative;
   box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
@@ -105,11 +106,12 @@ h1 {
 .team[data-team-side="R"] {
   flex: 1;
   background: white;
-  border-radius: 0.8rem;
+  border-radius: 1rem;
   padding: 0.6rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  justify-content: center;
   gap: 0.4rem;
   position: relative;
   box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
