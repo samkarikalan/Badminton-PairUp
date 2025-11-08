@@ -74,12 +74,12 @@ h1 {
 .teams {
   display: flex;
   position: relative;
-  width: 300px;
+  width: 95%;
   height: 120px;
-  border-radius: 10px;
+  border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  margin: 12px auto;
+  margin: 1rem auto;
   text-align: center;
   font-weight: bold;
 }
