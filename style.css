@@ -80,6 +80,7 @@ h1 {
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   margin: 1rem auto;
+  padding: 0.25rem;
   text-align: center;
   font-weight: bold;
 }
