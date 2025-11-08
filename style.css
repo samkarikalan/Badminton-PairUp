@@ -22,21 +22,21 @@ h1 {
 
 .container {
   margin: 0.75rem;
-  padding: 0.25rem;
+  padding: 0.5rem;
 }
 
 /* Card Styles */
-.card,
-.match-card {
+.card {
   background: white;
   color: black;
-  padding: 0.25rem;
-  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  margin: 0.25rem;
   border-radius: 0.75rem;
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
   max-width: 95vw;
   box-sizing: border-box;
 }
+
 
 .card input,
 .card select,
@@ -65,17 +65,16 @@ h1 {
 
 .card button:hover {
   background: #5e009c;
-  transform: scale(1.05);
+  transform: scale(1.01);
 }
 
 /* Match Card Styles */
 .match-card {
-  background: linear-gradient(145deg, #ffffff22, #00000033);
+  background: lwhite;;
   border-radius: 1rem;
   padding: 1rem;
   margin: 1rem auto;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  max-width: 400px;
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -91,6 +90,8 @@ h1 {
 }
 
 .teams {
+  background: white;
+  padding: 0.6rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -99,7 +100,7 @@ h1 {
 
 .team {
   flex: 1;
-  background: rgba(255, 255, 255, 0.08);
+  background: white;
   border-radius: 0.8rem;
   padding: 0.6rem;
   display: flex;
@@ -218,36 +219,39 @@ h1 {
 }
 
 /* Buttons */
-.main-action,
-.main-action2 {
+.main-action{
   background: orange;
   color: black;
   font-size: 1.25rem;
   font-weight: bold;
   padding: 0.5rem;
+  margin: 0.25rem;
+  border-radius: 0.9375rem;
+  cursor: pointer;
+  border: none;
+  min-width: 12.125rem;
+  transition: background 0.3s, transform 0.2s;
+}
+.main-action2 {
+  width: 95vw;
+  background: orange;
+  color: black;
+  font-size: 1.25rem;
+  font-weight: bold;
+  padding: 0.5rem;
+  margin: 0.25rem;
   border-radius: 0.9375rem;
   cursor: pointer;
   border: none;
   transition: background 0.3s, transform 0.2s;
 }
-
 .main-action:hover,
 .main-action2:hover {
   background: #ffb84d;
   transform: scale(1.05);
 }
 
-.main-action2 {
-  display: block;
-  width: 90vw;
-  margin: 1.5rem;
-}
 
-.main-action {
-  display: block;
-  width: 100%;
-  margin-top: 0.5rem;
-}
 
 /* Table Styles */
 #player-list-table {
@@ -458,6 +462,13 @@ button:disabled {
   border: 0.0625rem solid #999;
 }
 
+.vs {
+  font-size: 1.25rem; /* 20px */
+  font-weight: bold;
+  color: #3b0073;
+  flex: 0 0 auto;
+  margin: 0 0.5rem; /* 8px */
+}
 /* Swap Icons */
 .swap-icon {
   position: absolute;
