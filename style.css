@@ -73,6 +73,7 @@ h1 {
 /* Each match container */
 .teams {
   display: flex;
+  background: white;
   position: relative;
   width: 95%;
   border-radius: 1rem;
@@ -92,7 +93,7 @@ h1 {
   padding: 0.6rem;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
   gap: 0.4rem;
   position: relative;
   box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
@@ -123,7 +124,7 @@ h1 {
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 1rem; /* line thickness */
+  width: 0.25rem; /* line thickness */
   background: black;
   transform: translateX(-50%);
   z-index: 1;
