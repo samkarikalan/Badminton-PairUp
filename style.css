@@ -133,13 +133,6 @@ h1 {
 
 
 
-/* Swap icon 🔁 */
-.swap-icon {
-  margin-bottom: 6px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
 /* Highlight selected team when swapping */
 .selected-team {
   outline: 3px solid yellow;
@@ -568,19 +561,13 @@ button:disabled {
   border: 0.0625rem solid #999;
 }
 
-.vs {
-  font-size: 0.25rem; /* 20px */
-  font-weight: bold;
-  color: #3b0073;
-  flex: 0 0 auto;
-  margin: 0 0.5rem; /* 8px */
-}
+
 /* Swap Icons */
 .swap-icon {
   position: absolute;
   top: -10px;
   right: -10px;
-  background: #ff9800;
+  background: white;
   color: white;
   border-radius: 50%;
   padding: 0.3rem 0.35rem;
