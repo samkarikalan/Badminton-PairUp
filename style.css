@@ -586,8 +586,8 @@ button:disabled {
 /* Swap Icons */
 .swap-icon {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -1px;
+  right: -1px;
   z-index: 10;                  /* keeps icon above player buttons */
   background: rgba(255, 255, 255, 0.9); 
   color: white;
