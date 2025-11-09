@@ -1,5 +1,10 @@
 
 /* Global Styles */
+
+html, body {
+  overscroll-behavior-y: none; /* disables pull-to-refresh but keeps scrolling */
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
