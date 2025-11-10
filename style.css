@@ -581,8 +581,10 @@ button:disabled {
 .played-round .match-card,
 .played-round .rest-btn,
 .played-round .Lplayer-btn,
-.played-round .Rplayer-btn 
-.played-round .teams{
+.played-round .Rplayer-btn,
+.played-round .teams,
+.played-round .team[data-team-side="L"],
+.played-round .team[data-team-side="R"] {
   filter: grayscale(40%) opacity(0.7);
   transform: scale(1);
   border: 0.0625rem solid #999;
